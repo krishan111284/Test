@@ -82,6 +82,8 @@ public class Constants {
 	public static final String SORT_OPTION_TWO = "2";
 	public static final String SORT_OPTION_THREE = "3";
 	public static final String SORT_OPTION_FOUR = "4";
+	public static final String SORT_OPTION_FIVE = "5";
+	public static final String SORT_OPTION_SIX = "6";
 	public static final String SORT_OPTION_SEVEN = "7";
 	public static final String SORT_OPTION_EIGHT = "8";
 	public static final String SORT_OPTION_NINE = "9";

@@ -40,6 +40,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		applyFilters(queryParam, req, excludeTagMap);
 		handleNerEntity(queryParam, nerMap, req);
 		handleFacetingRequest(queryParam, req, excludeTagMap);
+		applyGlobalBoosts(queryParam,req);
 		if(req.isSpatialQuery()){
 			handleSpatialSortingRequest(queryParam,req);
 		}else{
@@ -51,42 +52,27 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		return queryParam;
 	}
 	
+	private void applyGlobalBoosts(QueryParam queryParam,
+			DORestSearchRequest req) {
+		queryParam.addParam("boost", "booking_count");
+		queryParam.addParam("boost", "avg_rating");
+	//	queryParam.addParam("boost", ""); TODO: PAID REST
+		
+	}
+
 	private void applyFilters(QueryParam queryParam,DORestSearchRequest req,Map<String, String> excludeTagMap) throws SearchException{
-		//city filter
 		if(!StringUtils.isEmpty(req.getBycity())){
 			queryParam.addParam("fq", "city_name:\""+req.getBycity()+"\"");
 		}
-
-		if(!StringUtils.isEmpty(req.getByfeaturetags())){
-			queryParam.addParam("fq", "feature_tags_string:"+req.getByfeaturetags());
-		}
-		handleEstGroupFilter(queryParam, req);
 		handleCuisineFilters(queryParam,req,excludeTagMap);
 		handleLocationFilters(queryParam,req,excludeTagMap);
 		handleLandmarkFilters(queryParam,req,excludeTagMap);
 		handleAreaFilters(queryParam, req, excludeTagMap);
 		handlePriceFilters(queryParam,req,excludeTagMap);
 		handleTagsFilters(queryParam, req, excludeTagMap);
-		if(!StringUtils.isEmpty(req.getByrate())){
-			String[] ratingRange = req.getByrate().split("-");
-			queryParam.addParam("fq", "est_food_rating:["+ratingRange[0]+" TO "+ratingRange[1]+"]");
-		}
-		if(!StringUtils.isEmpty(req.getBytags())){
-			String byTags = null;
-			try {
-				byTags = URLDecoder.decode(req.getBytags(), "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				logger.error(e.getMessage(),e);
-				throw new SearchException(e.getMessage(),e.getCause(),ErrorCode.URL_DECODE_ERROR);
-			}
-			queryParam.addParam("fq","est_tags:\""+byTags+"\"");
-		}
-		if(!StringUtils.isEmpty(req.getByestisfeatured())){
-			queryParam.addParam("fq","est_is_featured:\""+req.getByestisfeatured()+"\"");
-		}
-
+		handleRatingsFilters(queryParam, req,excludeTagMap);
+		
 	}
-
 	private void handleNerEntity(QueryParam queryParam,
 			Map<String, String> nerMap,DORestSearchRequest req) {
 		if(nerMap!=null && nerMap.size()>0){
@@ -96,52 +82,40 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			if(nerMap.containsKey(Constants.NER_CUISINE_KEY)){
 				handleNerCuisine(queryParam,nerMap.get(Constants.NER_CUISINE_KEY));
 			}
-			
-			
 		}
-
 	}
 
+	private void handleNerZone(QueryParam queryParam, String string) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	private void handleNerCuisine(QueryParam queryParam, String nerCuisine) {
-		String primCuisineBoost1 = "(cuisine_priorities_list_ft:(\""+nerCuisine+"\") AND est_food_rating:[3.0 TO 5.0])^100000";
-		String secCuisineBoost1 = "(cuisine_secondary_list_ft:(\""+nerCuisine+"\") AND -cuisine_priorities_list_ft:("+nerCuisine+") AND est_food_rating:[3.0 TO 5.0])^10000";
-		String primCuisineBoost2 = "(cuisine_priorities_list_ft:(\""+nerCuisine+"\") AND -est_food_rating:[3.0 TO 5.0] )^5000";
-		String secCuisineBoost2 = "(cuisine_secondary_list_ft:(\""+nerCuisine+"\") AND -cuisine_priorities_list_ft:("+nerCuisine+") AND -est_food_rating:[3.0 TO 5.0])^1";
-
-		queryParam.addParam("bq", primCuisineBoost1);
-		queryParam.addParam("bq", secCuisineBoost1);
-		queryParam.addParam("bq", primCuisineBoost2);
-		queryParam.addParam("bq", secCuisineBoost2);
+		//TODO
 	}
 
-	private void handleNerZone(QueryParam queryParam, String nerZone) {
-		String zoneBoost = "(zone_name_ft:\""+nerZone+"\")^100000";
-		queryParam.addParam("bq", zoneBoost);
-	}
-
-	private void handleEstGroupFilter(QueryParam queryParam,
-			DORestSearchRequest req) {
-		if(req.getByestgroupname()!=null && req.getByestgroupname().length>0){
-			StringBuilder estGroupFilterQr = new StringBuilder();
-			String estGroupFilterQrStr=null;
-			for(String estGroup:req.getByestgroupname()){
-				estGroupFilterQr.append("est_grp_name_ft:\""+estGroup+"\"").append(" OR ");
-			}
-			estGroupFilterQrStr = estGroupFilterQr.substring(0,estGroupFilterQr.lastIndexOf(" OR "));
-
-			queryParam.addParam("fq", estGroupFilterQrStr.toString());
+	
+	private void handleRatingsFilters(QueryParam queryParam, DORestSearchRequest req,Map<String, String> excludeTagMap){
+		
+		if(req.getByrate()!=null && req.getByrate().length>0){StringBuilder rateFacetQr = new StringBuilder();
+		String rateFacetQrStr = null;
+		for(String rate:req.getByrate()){
+			String[] rateRange = rate.split("-");
+			rateFacetQr.append("avg_rating:["+rateRange[0]+" TO "+rateRange[1]+"]").append(" OR ");
 		}
+		rateFacetQrStr = rateFacetQr.substring(0,rateFacetQr.lastIndexOf(" OR "));
+
+		queryParam.addParam("fq", "{!tag=avg_rating_tag}("+rateFacetQrStr+")");
+		excludeTagMap.put("rate", "{!ex=avg_rating_tag}");
 	}
-
-
+	}
 	
 	private void handleGroupRequest(QueryParam queryParam,
 			DORestSearchRequest req) {
-		if(!StringUtils.isEmpty(req.getByGroup())){
-			queryParam.addParam("fq", "est_group:"+req.getByGroup());
+		if(!StringUtils.isEmpty(req.getByestgroup())){
+			queryParam.addParam("fq", "est_group:"+req.getByestgroup());
 		}
-		if(StringUtils.isEmpty(req.getByGroup()) && Constants.GROUP_TRUE.equals(req.getGroup())){
+		if(StringUtils.isEmpty(req.getByestgroup()) && Constants.GROUP_TRUE.equals(req.getByestgroup())){
 			queryParam.addParam("group","true");
 			queryParam.addParam("group.field","est_group");
 			queryParam.addParam("group.limit", "1");
@@ -170,28 +144,25 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 				}
 			}
 			queryParam.addParam("facet", "true");
-			if(facetSet.contains("loc_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("location")!=null?excludeTagMap.get("location"):"")+"loc_name_ft");}
-			if(facetSet.contains("cuisines_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("cuisine")!=null?excludeTagMap.get("cuisine"):"")+"cuisines_name_ft");}
-			if(facetSet.contains("feature_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("feature")!=null?excludeTagMap.get("feature"):"")+"feature_name_ft");}
-			if(facetSet.contains("est_hotel_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("landmark")!=null?excludeTagMap.get("landmark"):"")+"est_hotel_name_ft");}
-			if(facetSet.contains("zone_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("zone")!=null?excludeTagMap.get("zone"):"")+"zone_name_ft");}
+			if(facetSet.contains("locality_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("location")!=null?excludeTagMap.get("location"):"")+"locality_name_ft");}
+			if(facetSet.contains("cuisine_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("cuisine")!=null?excludeTagMap.get("cuisine"):"")+"cuisine_ft");}
+			if(facetSet.contains("landmark_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("landmark")!=null?excludeTagMap.get("landmark"):"")+"landmark_ft");}
+			if(facetSet.contains("area_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("area")!=null?excludeTagMap.get("area"):"")+"area_name_ft");}
 			if(facetSet.contains("service_tags_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("serviceTags")!=null?excludeTagMap.get("serviceTags"):"")+"service_tags_ft");}
-			if(facetSet.contains("deals")){queryParam.addParam("facet.field",(excludeTagMap.get("deals")!=null?excludeTagMap.get("deals"):"")+"deals");}
-			if(facetSet.contains("est_which_type_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("whichTypeTags")!=null?excludeTagMap.get("whichTypeTags"):"")+"est_which_type_ft");}
-			if(facetSet.contains("est_type_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("bytypeNameTags")!=null?excludeTagMap.get("bytypeNameTags"):"")+"est_type_name_ft");}
-			if(facetSet.contains("est_two_price")){
-				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "est_two_price:[0 TO 500]");
-				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "est_two_price:[501 TO 1000]");
-				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "est_two_price:[1001 TO 1500]");
-				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "est_two_price:[1501 TO 2000]");
-				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "est_two_price:[2001 TO *]");
+			if(facetSet.contains("tags_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("tags")!=null?excludeTagMap.get("tags"):"")+"tags_ft");}
+			if(facetSet.contains("costFor2")){
+				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "costFor2:[0 TO 500]");
+				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "costFor2:[501 TO 1000]");
+				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "costFor2:[1001 TO 1500]");
+				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "costFor2:[1501 TO 2000]");
+				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "costFor2:[2001 TO *]");
 			}
-			if(facetSet.contains("est_food_rating")){
-				queryParam.addParam("facet.query", "est_food_rating:[4.5 TO 5.0]");
-				queryParam.addParam("facet.query", "est_food_rating:[3.5 TO 4.5]");
-				queryParam.addParam("facet.query", "est_food_rating:[2.5 TO 3.5]");
-				queryParam.addParam("facet.query", "est_food_rating:[1.5 TO 2.5]");
-				queryParam.addParam("facet.query", "est_food_rating:[0.5 TO 1.5]");
+			if(facetSet.contains("avg_rating")){
+				queryParam.addParam("facet.query", (excludeTagMap.get("rate")!=null?excludeTagMap.get("rate"):"") +"avg_rating:[4.5 TO 5.0]");
+				queryParam.addParam("facet.query", (excludeTagMap.get("rate")!=null?excludeTagMap.get("rate"):"") +"avg_rating:[3.5 TO 4.5]");
+				queryParam.addParam("facet.query", (excludeTagMap.get("rate")!=null?excludeTagMap.get("rate"):"") +"avg_rating:[2.5 TO 3.5]");
+				queryParam.addParam("facet.query", (excludeTagMap.get("rate")!=null?excludeTagMap.get("rate"):"") +"avg_rating:[1.5 TO 2.5]");
+				queryParam.addParam("facet.query", (excludeTagMap.get("rate")!=null?excludeTagMap.get("rate"):"") +"avg_rating:[0.5 TO 1.5]");
 			}
 			queryParam.addParam("facet.limit",facetLimit);
 			queryParam.addParam("facet.mincount", ""+facetMinCount);
@@ -202,65 +173,80 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 	private void handleSortingRequest(QueryParam queryParam,
 			DORestSearchRequest restSearchReq) {
 		String bySort = restSearchReq.getBysort();
+		String sortfieldApplied = "";
 		if(!StringUtils.isEmpty(bySort)){
-			String sortfieldApplied = "";
 			if(Constants.SORT_OPTION_ONE.equals(bySort)){
-				sortfieldApplied = "est_food_rating asc";
+				sortfieldApplied = "fullfillment desc,booking_count asc";
 			}
 			if(Constants.SORT_OPTION_TWO.equals(bySort)){
-				sortfieldApplied = "est_food_rating desc";
+				sortfieldApplied = "fullfillment desc,booking_count desc";
 			}
 			if(Constants.SORT_OPTION_THREE.equals(bySort)){
-				sortfieldApplied = "est_two_price asc";
-				queryParam.addParam("fq", "!est_two_price:0");
+				sortfieldApplied = "fullfillment desc,est_two_price asc";
 			}
-			if(Constants.SORT_OPTION_FOUR.equals(bySort)){
-				sortfieldApplied = "est_two_price desc";
+			if(Constants.SORT_OPTION_THREE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,est_two_price desc";
 			}
-			if(Constants.SORT_OPTION_NINE.equals(bySort)){
-				sortfieldApplied = "est_name asc";
+			if(Constants.SORT_OPTION_FIVE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,avg_rating asc";
 			}
-			queryParam.addParam("sort", sortfieldApplied);
+			if(Constants.SORT_OPTION_SIX.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,avg_rating desc";
+			}
+		}else{
+			sortfieldApplied = "fullfillment desc";
 		}
+		queryParam.addParam("sort", sortfieldApplied);
 	}
 
 
 	private void handleSpatialSortingRequest(QueryParam queryParam,
-			DORestSearchRequest tcMainSearchReq) {
-		String geoDistance = "geodist(lat_lng," + tcMainSearchReq.getLat() +","+tcMainSearchReq.getLng()+")";
-		String sortfieldApplied = geoDistance + "asc";
-		String bySort = tcMainSearchReq.getBysort();
-		String spatialQuery = "{!geofilt sfield=lat_lng pt=" + tcMainSearchReq.getLat() + "," + tcMainSearchReq.getLng() + " d=" + tcMainSearchReq.getRadius() + "}";
+			DORestSearchRequest restSearchReq) {
+		String geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
+		String sortfieldApplied = "";
+		String bySort = restSearchReq.getBysort();
+		String spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getLat() + "," + restSearchReq.getLng() + " d=" + restSearchReq.getRadius() + "}";
 		queryParam.addParam("fq", spatialQuery);
 
 		if(!StringUtils.isEmpty(bySort)){
+			if(Constants.SORT_OPTION_ONE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,booking_count asc,"  + geoDistance + " asc";
+			}
 			if(Constants.SORT_OPTION_TWO.equals(bySort)){
-				sortfieldApplied = "est_food_rating desc," + geoDistance + " asc";
+				sortfieldApplied = "fullfillment desc,booking_count desc,"  + geoDistance + " asc";
 			}
 			if(Constants.SORT_OPTION_THREE.equals(bySort)){
-				sortfieldApplied = "est_two_price asc," + geoDistance + " asc";
-				queryParam.addParam("fq", "!est_two_price:0");
+				sortfieldApplied = "fullfillment desc,est_two_price asc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_THREE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,est_two_price desc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_FIVE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,avg_rating asc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_SIX.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,avg_rating desc,"  + geoDistance + " asc";
 			}
 			if(Constants.SORT_OPTION_SEVEN.equals(bySort)){
-				sortfieldApplied = "score desc," + geoDistance + " asc";
+				sortfieldApplied = "fullfillment desc,"  + geoDistance + " asc";
 			}
 			if(Constants.SORT_OPTION_EIGHT.equals(bySort)){
 				sortfieldApplied = geoDistance + " asc";
 			}
-			if(Constants.SORT_OPTION_NINE.equals(bySort)){
-				sortfieldApplied = "est_name asc,"  + geoDistance + " asc";
-			}
-			queryParam.addParam("sort", sortfieldApplied);
+		}else{
+			sortfieldApplied = "fullfillment desc";
+			queryParam.addParam("boost","div(1,sqrt(sum(1,mul(0.4,sub(sum(abs(sub("+geoDistance+",0)),abs(sub("+geoDistance+","+Integer.parseInt(restSearchReq.getRadius())/2+"))),sub("+Integer.parseInt(restSearchReq.getRadius())/2+",0))))))");
 		}
+		queryParam.addParam("sort", sortfieldApplied);
 	}
 
 
 	private void handlePriceFilters(QueryParam queryParam,
-			DORestSearchRequest tcMainSearchReq, Map<String, String> excludeTagMap) throws SearchException {
-		if(tcMainSearchReq.getByprice()!=null && tcMainSearchReq.getByprice().length>0){
+			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) throws SearchException {
+		if(restSearchReq.getByprice()!=null && restSearchReq.getByprice().length>0){
 			StringBuilder priceFacetQr = new StringBuilder();
 			String priceFacetQrStr = null;
-			for(String price:tcMainSearchReq.getByprice()){
+			for(String price:restSearchReq.getByprice()){
 				try {
 					price = URLDecoder.decode(price, "UTF-8");
 				} catch (UnsupportedEncodingException e) {
@@ -289,7 +275,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			facilityQrStr = facilityQr.substring(0,facilityQr.lastIndexOf(" AND "));
 
 			queryParam.addParam("fq", "{!tag=tags_ft_tag}("+facilityQrStr+")");
-			excludeTagMap.put("feature", "{!ex=tags_ft_tag}");
+			excludeTagMap.put("tags", "{!ex=tags_ft_tag}");
 		}
 	}
 
@@ -318,7 +304,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			zoneFacetQrStr = zoneFacetQr.substring(0,zoneFacetQr.lastIndexOf(" OR "));
 
 			queryParam.addParam("fq", "{!tag=area_name_ft_tag}("+zoneFacetQrStr+")");
-			excludeTagMap.put("zone", "{!ex=area_name_ft_tag}");
+			excludeTagMap.put("area", "{!ex=area_name_ft_tag}");
 		}
 	}
 
@@ -364,12 +350,12 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		setResponseNumLimit(queryParam,req);
 	}
 	private void setQfParams(QueryParam queryParam) {
-		queryParam.addParam("qf", rb.getString("tc.mainsearch.qf.param"));
+		queryParam.addParam("qf", rb.getString("dineout.search.qf.param"));
 	}
 
 	private void setPfParams(QueryParam queryParam) {
-		queryParam.addParam("pf",rb.getString("tc.mainsearch.pf.param"));
-		queryParam.addParam("pf2",rb.getString("tc.mainsearch.pf2.param"));
+		queryParam.addParam("pf",rb.getString("dineout.search.pf.param"));
+		queryParam.addParam("pf2",rb.getString("dineout.search.pf2.param"));
 	}
 
 }

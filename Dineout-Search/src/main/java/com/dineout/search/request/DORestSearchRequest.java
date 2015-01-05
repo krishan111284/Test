@@ -25,7 +25,7 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	private String[] byspeciality;
 	private String[] byestgroupname;
 	private String byestisfeatured;
-	private String byrate; 
+	private String[] byrate; 
 	private String [] byzone; 
 	private String bytags; 
 	private String relevance;
@@ -117,13 +117,13 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	public void setByfs(String[] byfs) {
 		this.byfs = byfs;
 	}
-	public String getByrate() {
+	
+	public String[] getByrate() {
 		return byrate;
 	}
-	public void setByrate(String byrate) {
+	public void setByrate(String[] byrate) {
 		this.byrate = byrate;
 	}
-	
 	public String[] getByzone() {
 		return byzone;
 	}
@@ -136,18 +136,19 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	public void setBytags(String bytags) {
 		this.bytags = bytags;
 	}
-	public String getByGroup() {
+
+	public String getByestgroup() {
 		return byestgroup;
 	}
-	public void setByestgroup(String estbygroup) {
-		this.byestgroup = estbygroup;
+	public void setByestgroup(String byestgroup) {
+		this.byestgroup = byestgroup;
 	}
-	public String getGroup() {
+	public String getEstgroup() {
 		return estgroup;
 	}
 	public void setEstgroup(String estgroup) {
 		this.estgroup = estgroup;
-	}	
+	}
 	public boolean isGrouprequest(){
 		return StringUtils.isEmpty(byestgroup) && Constants.GROUP_TRUE.equals(estgroup);
 	}
