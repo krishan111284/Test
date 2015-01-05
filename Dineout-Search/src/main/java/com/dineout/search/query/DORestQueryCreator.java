@@ -36,7 +36,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		queryString = !StringUtils.isEmpty(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY;
 		queryParam.addParam("q", queryString);
 		setQueryParser(queryParam, req);
-		handleGroupRequest(queryParam,req);
+		//handleGroupRequest(queryParam,req); TODO: Field to be shared
 		applyFilters(queryParam, req, excludeTagMap);
 		handleNerEntity(queryParam, nerMap, req);
 		handleFacetingRequest(queryParam, req, excludeTagMap);
@@ -110,14 +110,16 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 	}
 	}
 	
+	
+	//NEED TO GET FIELD FOR GROUPING!!
 	private void handleGroupRequest(QueryParam queryParam,
 			DORestSearchRequest req) {
-		if(!StringUtils.isEmpty(req.getByestgroup())){
-			queryParam.addParam("fq", "est_group:"+req.getByestgroup());
+		if(!StringUtils.isEmpty(req.getBygroup())){
+			queryParam.addParam("fq", "est_group:"+req.getBygroup());
 		}
-		if(StringUtils.isEmpty(req.getByestgroup()) && Constants.GROUP_TRUE.equals(req.getByestgroup())){
+		if(StringUtils.isEmpty(req.getBygroup()) && Constants.GROUP_TRUE.equals(req.getGroup())){
 			queryParam.addParam("group","true");
-			queryParam.addParam("group.field","est_group");
+			queryParam.addParam("group.field","est_group"); //GET NAME OF FIELD
 			queryParam.addParam("group.limit", "1");
 			queryParam.addParam("group.ngroups", "true");
 		}
@@ -266,10 +268,10 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 	
 	private void handleTagsFilters(QueryParam queryParam,
 			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
-		if(restSearchReq.getByfs()!=null && restSearchReq.getByfs().length>0){
+		if(restSearchReq.getBytags()!=null && restSearchReq.getBytags().length>0){
 			StringBuilder facilityQr = new StringBuilder();
 			String facilityQrStr = null;
-			for(String facility:restSearchReq.getByfs()){
+			for(String facility:restSearchReq.getBytags()){
 				facilityQr.append("tags_ft:\""+facility+"\"").append(" AND ");
 			}
 			facilityQrStr = facilityQr.substring(0,facilityQr.lastIndexOf(" AND "));
@@ -281,10 +283,10 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 
 	private void handleLandmarkFilters(QueryParam queryParam,
 			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
-		if(restSearchReq.getByinsidelandmark()!=null && restSearchReq.getByinsidelandmark().length>0){
+		if(restSearchReq.getBylandmark()!=null && restSearchReq.getBylandmark().length>0){
 			StringBuilder landmarkFacetQr = new StringBuilder();
 			String landmarkFacetQrStr = null;
-			for(String landmark:restSearchReq.getByinsidelandmark()){
+			for(String landmark:restSearchReq.getBylandmark()){
 				landmarkFacetQr.append("landmark_ft:\""+landmark+"\"").append(" OR ");
 			}
 			landmarkFacetQrStr = landmarkFacetQr.substring(0,landmarkFacetQr.lastIndexOf(" OR "));
@@ -295,10 +297,10 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 	}
 	private void handleAreaFilters(QueryParam queryParam,
 			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
-		if(restSearchReq.getByzone()!=null && restSearchReq.getByzone().length>0){
+		if(restSearchReq.getByarea()!=null && restSearchReq.getByarea().length>0){
 			StringBuilder zoneFacetQr = new StringBuilder();
 			String zoneFacetQrStr = null;
-			for(String zone:restSearchReq.getByzone()){
+			for(String zone:restSearchReq.getByarea()){
 				zoneFacetQr.append("area_name_ft:\""+zone+"\"").append(" OR ");
 			}
 			zoneFacetQrStr = zoneFacetQr.substring(0,zoneFacetQr.lastIndexOf(" OR "));
