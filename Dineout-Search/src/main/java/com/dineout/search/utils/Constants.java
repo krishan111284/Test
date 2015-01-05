@@ -37,7 +37,7 @@ public class Constants {
 	public static final String AUTOCOMPLETION_DATA_TYPE_LOCALITY = "Locality";
 	public static final String AUTOCOMPLETION_DATA_TYPE_QUERY = "Query";
 	/*****************************Group types*****************************************/
-	public static final String EST_GROUP_TRUE = "true";
+	public static final String GROUP_TRUE = "true";
 	
 	public static boolean IS_UNIFIED_MEMCACHE_ENABLED = false;
 	public static boolean IS_AUTO_MEMCACHE_ENABLED = false;
@@ -76,5 +76,14 @@ public class Constants {
 	public static final String PROCESSED_QUERY = "PROCESSED_QUERY";
 	public static final String IS_NEARBY_ENABLED = "true";
 	public static final String NER_FEATURE_KEY = "Feature";
+	
+	/******************Sort options**********************************/
+	public static final String SORT_OPTION_ONE= "1";
+	public static final String SORT_OPTION_TWO = "2";
+	public static final String SORT_OPTION_THREE = "3";
+	public static final String SORT_OPTION_FOUR = "4";
+	public static final String SORT_OPTION_SEVEN = "7";
+	public static final String SORT_OPTION_EIGHT = "8";
+	public static final String SORT_OPTION_NINE = "9";
 	
 }

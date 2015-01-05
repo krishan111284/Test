@@ -136,20 +136,20 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	public void setBytags(String bytags) {
 		this.bytags = bytags;
 	}
-	public String getByestgroup() {
+	public String getByGroup() {
 		return byestgroup;
 	}
 	public void setByestgroup(String estbygroup) {
 		this.byestgroup = estbygroup;
 	}
-	public String getEstgroup() {
+	public String getGroup() {
 		return estgroup;
 	}
 	public void setEstgroup(String estgroup) {
 		this.estgroup = estgroup;
 	}	
 	public boolean isGrouprequest(){
-		return StringUtils.isEmpty(byestgroup) && Constants.EST_GROUP_TRUE.equals(estgroup);
+		return StringUtils.isEmpty(byestgroup) && Constants.GROUP_TRUE.equals(estgroup);
 	}
 	public String[] getEstid() {
 		return estid;
