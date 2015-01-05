@@ -20,44 +20,44 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dineout.search.exception.SearchErrors;
-import com.dineout.search.request.RestSearchRequest;
-import com.dineout.search.request.SearchHeader;
+import com.dineout.search.request.DORestSearchRequest;
+import com.dineout.search.request.DOSearchHeader;
 import com.dineout.search.response.DOResponseBody;
-import com.dineout.search.response.SearchResponse;
-import com.dineout.search.response.SearchResult;
+import com.dineout.search.response.DOSearchResponse;
+import com.dineout.search.response.DOSearchResult;
 import com.dineout.search.service.RestSearchService;
 import com.dineout.search.utils.Constants;
-import com.dineout.search.validation.TCEstRequestValidator;
+import com.dineout.search.validation.DoRestRequestValidator;
 
 @Controller
-@RequestMapping(value="/unifiedsearch/est")
-public class TCEstSearchController extends AbstractSearchController{
+@RequestMapping(value="/search/")
+public class DORestSearchController extends DOAbstractSearchController{
 
 	Logger dbLogger = Logger.getLogger("NULL_QUERY_LOGGER");
-	Logger logger = Logger.getLogger(TCEstSearchController.class);
+	Logger logger = Logger.getLogger(DORestSearchController.class);
 	@Autowired
 	RestSearchService restSearchService;
 	@Autowired
-	TCEstRequestValidator tcEstRequestValidator;
+	DoRestRequestValidator doRestRequestValidator;
 	@RequestMapping(value="/getresult",method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<String> getKeywordresults(@ModelAttribute("searchHeader")SearchHeader header,
-			@ModelAttribute("restSearchRequest")RestSearchRequest request, BindingResult bindingResult,
+	public @ResponseBody ResponseEntity<String> getKeywordresults(@ModelAttribute("searchHeader")DOSearchHeader header,
+			@ModelAttribute("restSearchRequest")DORestSearchRequest request, BindingResult bindingResult,
 			HttpServletResponse response,
 			HttpSession session,HttpServletRequest httpReq){
 		String jsonresp = null;
 		HttpHeaders responseHeaders = new HttpHeaders();
-		List<SearchResult> tcSearchResultList = null;
+		List<DOSearchResult> searchResultList = null;
 		responseHeaders.setContentType(Constants.JSON_MEDIA_TYPE);
 		SearchErrors errors = new SearchErrors();
-		tcEstRequestValidator.validatorResourceData(request,bindingResult,new String[]{"bycity"});
+		doRestRequestValidator.validatorResourceData(request,bindingResult,new String[]{"bycity"});
 		if(bindingResult.hasErrors()){
 			processValidationErrors(bindingResult.getAllErrors(),errors);
 			jsonresp = processJSONResponse(null, null, errors);
 		}else{
-			processTCSearchRequest(request);
+			processDOSearchRequest(request);
 			Map<String, String> nerMap = getNerMap(request);
-			tcSearchResultList = restSearchService.getSearchResults(request,errors,nerMap);
-			SearchResponse resp = getTCSearchResponse(tcSearchResultList, null,errors,nerMap);
+			searchResultList = restSearchService.getSearchResults(request,errors,nerMap);
+			DOSearchResponse resp = getDOSearchResponse(searchResultList, null,errors,nerMap);
 			if(!errors.hasErrors() && ((DOResponseBody)resp.getBody()).getNumFound() == 0){
 				dbLogger.error(httpReq.getQueryString());
 				logger.error(request.getSearchname());

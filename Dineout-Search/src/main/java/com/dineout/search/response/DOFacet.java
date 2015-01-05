@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.RangeFacet;
 
-public class Facet {
+public class DOFacet {
 	
 	private Map<String, Integer> facetQueries;
 	private List<FacetField> facetDates;

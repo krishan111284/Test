@@ -3,14 +3,14 @@ package com.dineout.search.response;
 import java.util.List;
 import java.util.Map;
 
-public class SearchResult {
+public class DOSearchResult {
 	private String domain;
 	private long matches;
 	private long numGroups;
 	private List<Map<Object, Object>> docs;
-	private Facet facet;
-	private SpellCheck spellCheck;
-	private Highlight highlight;
+	private DOFacet facet;
+	private DOSpellCheck spellCheck;
+	private DOHighlight highlight;
 	
 	public String getDomain() {
 		return domain;
@@ -30,7 +30,7 @@ public class SearchResult {
 	public void setNumGroups(long numGroups) {
 		this.numGroups = numGroups;
 	}
-	public Facet getFacet() {
+	public DOFacet getFacet() {
 		return facet;
 	}
 	public List<Map<Object, Object>> getDocs() {
@@ -39,19 +39,19 @@ public class SearchResult {
 	public void setDocs(List<Map<Object, Object>> docs) {
 		this.docs = docs;
 	}
-	public void setFacet(Facet facet) {
+	public void setFacet(DOFacet facet) {
 		this.facet = facet;
 	}
-	public SpellCheck getSpellCheck() {
+	public DOSpellCheck getSpellCheck() {
 		return spellCheck;
 	}
-	public void setSpellCheck(SpellCheck spellCheck) {
+	public void setSpellCheck(DOSpellCheck spellCheck) {
 		this.spellCheck = spellCheck;
 	}
-	public Highlight getHighlight() {
+	public DOHighlight getHighlight() {
 		return highlight;
 	}
-	public void setHighlight(Highlight highlight) {
+	public void setHighlight(DOHighlight highlight) {
 		this.highlight = highlight;
 	}
 	

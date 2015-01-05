@@ -15,15 +15,15 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
 import org.apache.solr.common.SolrDocument;
 
-import com.dineout.search.response.Facet;
-import com.dineout.search.response.Highlight;
-import com.dineout.search.response.SearchResult;
-import com.dineout.search.response.SpellCheck;
+import com.dineout.search.response.DOFacet;
+import com.dineout.search.response.DOHighlight;
+import com.dineout.search.response.DOSearchResult;
+import com.dineout.search.response.DOSpellCheck;
 
-public class ResponseUtils {
+public class DOResponseUtils {
 
-	public static SearchResult processQueryResponse(QueryResponse qres, String domain, boolean isSpellcheckApplied) {
-		SearchResult result = new SearchResult();
+	public static DOSearchResult processQueryResponse(QueryResponse qres, String domain, boolean isSpellcheckApplied) {
+		DOSearchResult result = new DOSearchResult();
 		result.setDomain(domain);
 		result.setMatches((Long)qres.getResults().getNumFound());
 		result.setDocs(getTCDocList(qres));
@@ -33,8 +33,8 @@ public class ResponseUtils {
 		return result;
 	}
 
-	private static Highlight getHlInfo(QueryResponse qres) {
-		Highlight highlight = new Highlight();
+	private static DOHighlight getHlInfo(QueryResponse qres) {
+		DOHighlight highlight = new DOHighlight();
 		if(qres.getHighlighting()!=null){
 			Map<String,Object> highlights = new LinkedHashMap<String, Object>();
 			Map<String, Map<String, List<String>>> hlMap = qres.getHighlighting();
@@ -48,8 +48,8 @@ public class ResponseUtils {
 		return highlight;
 	}
 
-	public static Facet getFacetInfo(QueryResponse qres) {
-		Facet facet = new Facet();
+	public static DOFacet getFacetInfo(QueryResponse qres) {
+		DOFacet facet = new DOFacet();
 		if(qres.getFacetQuery()!=null) facet.setFacetQueries(qres.getFacetQuery());
 		if(qres.getFacetDates()!=null) facet.setFacetDates(qres.getFacetDates());
 		if(qres.getFacetRanges()!=null) facet.setFacetRanges(qres.getFacetRanges());
@@ -90,8 +90,8 @@ public class ResponseUtils {
 		return docList;
 	}
 
-	private static SpellCheck getSpellCheckInfo(QueryResponse qres, boolean isSpellcheckApplied) {
-		SpellCheck spellCheck = new SpellCheck();
+	private static DOSpellCheck getSpellCheckInfo(QueryResponse qres, boolean isSpellcheckApplied) {
+		DOSpellCheck spellCheck = new DOSpellCheck();
 		if(isSpellcheckApplied){
 			SpellCheckResponse scRes =  qres.getSpellCheckResponse();
 			if(scRes!=null){
@@ -116,9 +116,9 @@ public class ResponseUtils {
 		return tcDoc;
 	}
 
-	public static SearchResult processGroupQueryResponse(QueryResponse qRes,
+	public static DOSearchResult processGroupQueryResponse(QueryResponse qRes,
 			String domain,boolean isSpellcheckApplied) {
-		SearchResult result = new SearchResult();
+		DOSearchResult result = new DOSearchResult();
 		result.setDomain(domain);
 		GroupCommand groupCommand = qRes.getGroupResponse().getValues().get(0);
 		setMatchesForGroupQuery(result, groupCommand, domain);
@@ -138,7 +138,7 @@ public class ResponseUtils {
 		return result;
 	}
 
-	private static void setMatchesForGroupQuery(SearchResult result, GroupCommand groupCommand, String domain ){
+	private static void setMatchesForGroupQuery(DOSearchResult result, GroupCommand groupCommand, String domain ){
 		int matches = groupCommand.getMatches();
 		int numGroups = groupCommand.getNGroups();
 		result.setNumGroups(numGroups);

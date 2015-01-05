@@ -15,7 +15,7 @@ import com.dineout.search.query.QueryParam;
 import com.dineout.search.request.NerRequest;
 import com.dineout.search.server.SolrConnectionUtils;
 import com.dineout.search.utils.Constants;
-import com.dineout.search.utils.ResponseUtils;
+import com.dineout.search.utils.DOResponseUtils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -70,7 +70,7 @@ public class NerServiceImpl implements NerService{
 		try {
 			qres = server.query(tcqp);
 			if(qres!=null){
-					resp = ResponseUtils.processStrictGroupQueryResponse(qres, req.getQuery());
+					resp = DOResponseUtils.processStrictGroupQueryResponse(qres, req.getQuery());
 			}
 		} catch (SolrServerException e) {
 			

@@ -10,36 +10,35 @@ import org.springframework.stereotype.Service;
 import com.dineout.search.exception.ErrorCode;
 import com.dineout.search.exception.SearchError;
 import com.dineout.search.exception.SearchErrors;
-import com.dineout.search.query.AutoCompleteQueryCreator;
+import com.dineout.search.query.DOAutoCompleteQueryCreator;
 import com.dineout.search.query.QueryParam;
-import com.dineout.search.request.AutocompleteSearchRequest;
-import com.dineout.search.response.AutoCompleteSearchResult;
+import com.dineout.search.request.DOAutoSearchRequest;
+import com.dineout.search.response.DOAutoCompleteSearchResult;
 import com.dineout.search.server.SolrConnectionUtils;
-import com.dineout.search.utils.AutoCompleteResponseUtils;
-import com.dineout.search.utils.Constants;
+import com.dineout.search.utils.DOAutoCompleteResponseUtils;
 
-@Service("tcAutoCompleteService")
-public class TCAutoCompleteServiceImpl implements AutoCompleteService{
+@Service("doAutoCompleteService")
+public class DOAutoCompleteServiceImpl implements DOAutoCompleteService{
 	
-	Logger logger = Logger.getLogger(TCAutoCompleteServiceImpl.class);
+	Logger logger = Logger.getLogger(DOAutoCompleteServiceImpl.class);
 	
 	@Autowired
-	AutoCompleteQueryCreator tcAutoCompleteQueryCreator;
+	DOAutoCompleteQueryCreator doAutoCompleteQueryCreator;
 	
 	@Autowired
 	SolrConnectionUtils solrConnectionUtils;
 	
 	@Override
-	public AutoCompleteSearchResult getSuggestion(AutocompleteSearchRequest req, SearchErrors errors) {
+	public DOAutoCompleteSearchResult getSuggestion(DOAutoSearchRequest req, SearchErrors errors) {
 		QueryParam query = null;
-		AutoCompleteSearchResult result = null;
-		query = tcAutoCompleteQueryCreator.getAutoSuggestQuery(req);
+		DOAutoCompleteSearchResult result = null;
+		query = doAutoCompleteQueryCreator.getAutoSuggestQuery(req);
 		SolrServer server = solrConnectionUtils.getAutoSolrServer();
 		QueryResponse qres = null;
 		try {
 			qres = server.query(query);
 			if(qres!=null){
-				result = AutoCompleteResponseUtils.processGroupQueryResponse(qres);
+				result = DOAutoCompleteResponseUtils.processGroupQueryResponse(qres);
 			}
 		} catch (SolrServerException e) {
 			logger.error(e.getMessage(),e);

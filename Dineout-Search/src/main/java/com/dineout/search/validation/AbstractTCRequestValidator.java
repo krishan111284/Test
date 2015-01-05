@@ -6,8 +6,8 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.dineout.search.exception.ErrorCode;
-import com.dineout.search.request.GenericTCSearchRequest;
-import com.dineout.search.utils.RequestUtils;
+import com.dineout.search.request.GenericDOSearchRequest;
+import com.dineout.search.utils.DORequestUtils;
 
 public abstract class AbstractTCRequestValidator implements Validator{
 	private  String[] params;
@@ -23,8 +23,8 @@ public abstract class AbstractTCRequestValidator implements Validator{
 		}
 	}
 	public void validateCityLatLng(Object target,Errors errors){
-		GenericTCSearchRequest req = (GenericTCSearchRequest) target; 
-		if(!(!StringUtils.isEmpty(req.getBycity()) || RequestUtils.isSpatial(req))){
+		GenericDOSearchRequest req = (GenericDOSearchRequest) target; 
+		if(!(!StringUtils.isEmpty(req.getBycity()) || DORequestUtils.isSpatial(req))){
 			errors.reject(ErrorCode.MISSING_CITY_LAT_LNG);
 		}
 	}

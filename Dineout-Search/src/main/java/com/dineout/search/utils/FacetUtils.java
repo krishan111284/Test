@@ -11,20 +11,20 @@ public class FacetUtils {
 
 	private ResourceBundle rb = ResourceBundle.getBundle("search");
 
-	private Set<String> estfacets;
+	private Set<String> restfacets;
 	public FacetUtils() {
 		intializeRestFacets();
 	}
 	private void intializeRestFacets() {
 		 String facetList=rb.getString("dineout.search.facets");
-		 estfacets = new HashSet<String>();
+		 restfacets = new HashSet<String>();
 			String[] facets = facetList.split(Constants.SEPERATOR);
 			for(String facet:facets){
-				estfacets.add(facet);
+				restfacets.add(facet);
 			}
 	}
 
 	public Set<String> getDefaultRestFacets(){
-		return estfacets;
+		return restfacets;
 	}
 }

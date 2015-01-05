@@ -4,10 +4,10 @@ import java.util.ResourceBundle;
 
 import org.springframework.stereotype.Component;
 
-import com.dineout.search.request.AutocompleteSearchRequest;
+import com.dineout.search.request.DOAutoSearchRequest;
 
 @Component("autoCompleteQueryCreator")
-public class AutoCompleteQueryCreator {
+public class DOAutoCompleteQueryCreator {
 	
 	ResourceBundle rb = ResourceBundle.getBundle("search");
 	
@@ -16,7 +16,7 @@ public class AutoCompleteQueryCreator {
 	 * @param req
 	 * @return
 	 */
-	public QueryParam getAutoSuggestQuery(AutocompleteSearchRequest req){
+	public QueryParam getAutoSuggestQuery(DOAutoSearchRequest req){
 		QueryParam queryParam = new QueryParam();
 		queryParam.addParam("defType", "edismax");
 		queryParam.addParam("mm", "100%");

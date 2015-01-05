@@ -2,7 +2,7 @@ package com.dineout.search.response;
 
 import java.util.Map;
 
-public class Highlight {
+public class DOHighlight {
 	Map<String,Object> highlights;
 
 	public Map<String, Object> getHighlights() {

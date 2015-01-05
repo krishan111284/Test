@@ -39,7 +39,7 @@ public class HttpSolrConnectionFactory implements SolrConnectionFactory{
 
 	private void initializeRestSolrServer() {
 		try {
-		  String url=rb.getString("dineout.est.solr.url");
+		  String url=rb.getString("dineout.rest.solr.url");
 		  estSolrServer = new HttpSolrServer(url);
 		  setServerProperties(estSolrServer);
 		}catch(Exception e){

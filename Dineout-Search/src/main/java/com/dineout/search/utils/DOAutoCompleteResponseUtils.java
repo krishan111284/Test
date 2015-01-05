@@ -9,22 +9,22 @@ import org.apache.solr.client.solrj.response.GroupCommand;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 
-import com.dineout.search.response.AutoCompleteSearchResult;
-import com.dineout.search.response.AutoCompleteSuggestionEntry;
+import com.dineout.search.response.DOAutoCompleteSearchResult;
+import com.dineout.search.response.DOAutoCompleteSuggestionEntry;
 
-public class AutoCompleteResponseUtils {
+public class DOAutoCompleteResponseUtils {
 	
-	public static AutoCompleteSearchResult processGroupQueryResponse(QueryResponse qRes) {
-		AutoCompleteSearchResult result = new AutoCompleteSearchResult();
+	public static DOAutoCompleteSearchResult processGroupQueryResponse(QueryResponse qRes) {
+		DOAutoCompleteSearchResult result = new DOAutoCompleteSearchResult();
 		GroupCommand groupCommand = qRes.getGroupResponse().getValues().get(0);
 		List<Group> groups =groupCommand.getValues();
 		for(Group group:groups){
 			String dataType = group.getGroupValue();
 			Iterator<SolrDocument> iter = group.getResult().iterator();
-			List<AutoCompleteSuggestionEntry> entryList = new ArrayList<AutoCompleteSuggestionEntry>();
+			List<DOAutoCompleteSuggestionEntry> entryList = new ArrayList<DOAutoCompleteSuggestionEntry>();
 			while(iter.hasNext()){
 				SolrDocument solrDocument = iter.next();
-				AutoCompleteSuggestionEntry entry = new AutoCompleteSuggestionEntry();
+				DOAutoCompleteSuggestionEntry entry = new DOAutoCompleteSuggestionEntry();
 				entry.setTc_id((String)solrDocument.get("tc_id"));
 				entry.setGuid((String)solrDocument.get("guid"));
 				entry.setAddress((String)solrDocument.get("address"));

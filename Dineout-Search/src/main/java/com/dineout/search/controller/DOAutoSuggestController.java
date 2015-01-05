@@ -15,41 +15,41 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dineout.search.exception.SearchErrors;
-import com.dineout.search.request.AutocompleteSearchRequest;
-import com.dineout.search.request.SearchHeader;
-import com.dineout.search.response.AutoCompleteSearchResult;
+import com.dineout.search.request.DOAutoSearchRequest;
+import com.dineout.search.request.DOSearchHeader;
+import com.dineout.search.response.DOAutoCompleteSearchResult;
 import com.dineout.search.response.Header;
-import com.dineout.search.response.AutoSuggestResponseBody;
-import com.dineout.search.response.SearchResponse;
-import com.dineout.search.service.AutoCompleteService;
+import com.dineout.search.response.DOAutoSuggestResponseBody;
+import com.dineout.search.response.DOSearchResponse;
+import com.dineout.search.service.DOAutoCompleteService;
 import com.dineout.search.utils.Constants;
 import com.dineout.search.utils.GsonUtil;
 
 @Controller
-@RequestMapping(value="/search/autocomplete")
-public class AutoSuggestController extends AbstractSearchController{
+@RequestMapping(value="/auto")
+public class DOAutoSuggestController extends DOAbstractSearchController{
 	@Autowired
 	GsonUtil gsonUtil;
 	
 	@Autowired
-	AutoCompleteService autoCompleteService;
+	DOAutoCompleteService autoCompleteService;
 	
 	@RequestMapping(value="/getresult",method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<String> getKeywordresults(@ModelAttribute("searchHeader")SearchHeader header,
-											    @ModelAttribute("autocompleteSearchRequest")AutocompleteSearchRequest tcAutocompleteSearchRequest, 
+	public @ResponseBody ResponseEntity<String> getKeywordresults(@ModelAttribute("searchHeader")DOSearchHeader header,
+											    @ModelAttribute("autocompleteSearchRequest")DOAutoSearchRequest tcAutocompleteSearchRequest, 
 											    BindingResult bindingResult,
 												 HttpServletResponse response){
-		Logger logger = Logger.getLogger(AutoSuggestController.class);
+		Logger logger = Logger.getLogger(DOAutoSuggestController.class);
 		String jsonresp = null;
 		if(jsonresp == null){
 			SearchErrors errors = new SearchErrors();
-			processTCSearchRequest(tcAutocompleteSearchRequest);
-			SearchResponse resp = new SearchResponse();
+			processDOSearchRequest(tcAutocompleteSearchRequest);
+			DOSearchResponse resp = new DOSearchResponse();
 			Header resheader = new Header(); 
-			AutoSuggestResponseBody body = new AutoSuggestResponseBody();
+			DOAutoSuggestResponseBody body = new DOAutoSuggestResponseBody();
 			resp.setHeader(resheader);
 			resp.setBody(body);
-			AutoCompleteSearchResult result = null;
+			DOAutoCompleteSearchResult result = null;
 			result = autoCompleteService.getSuggestion(tcAutocompleteSearchRequest,errors);
 			if(errors.hasErrors()){
 				resheader.setErrors(errors);

@@ -1,6 +1,6 @@
 package com.dineout.search.response;
 
-public class SearchResponse {
+public class DOSearchResponse {
 	
 	private Header header;
 	private IResponseBody body;

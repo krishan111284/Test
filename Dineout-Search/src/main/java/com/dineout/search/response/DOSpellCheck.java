@@ -2,7 +2,7 @@ package com.dineout.search.response;
 
 import java.util.Map;
 
-public class SpellCheck {
+public class DOSpellCheck {
 	Map<String,Object> suggestions;
 
 	public Map<String, Object> getSuggestions() {

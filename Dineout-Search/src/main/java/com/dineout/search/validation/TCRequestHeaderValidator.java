@@ -4,14 +4,14 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
-import com.dineout.search.request.SearchHeader;
+import com.dineout.search.request.DOSearchHeader;
 
 @Component(value="tcRequestHeaderValidator")
 public class TCRequestHeaderValidator extends AbstractTCRequestValidator {
 	Logger logger = Logger.getLogger(TCRequestHeaderValidator.class);
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return SearchHeader.class.equals(clazz);
+		return DOSearchHeader.class.equals(clazz);
 	}
 
 	@Override

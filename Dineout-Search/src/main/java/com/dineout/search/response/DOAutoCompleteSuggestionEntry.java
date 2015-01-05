@@ -1,6 +1,6 @@
 package com.dineout.search.response;
 
-public class AutoCompleteSuggestionEntry {
+public class DOAutoCompleteSuggestionEntry {
 	
 	private String tc_id;
 	private String guid;

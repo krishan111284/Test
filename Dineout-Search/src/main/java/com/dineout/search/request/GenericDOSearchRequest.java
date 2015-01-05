@@ -3,7 +3,7 @@ package com.dineout.search.request;
 import org.apache.commons.lang3.StringUtils;
 
 
-public abstract class GenericTCSearchRequest {
+public abstract class GenericDOSearchRequest {
 	
 	private String searchname;
 	private String bycity;

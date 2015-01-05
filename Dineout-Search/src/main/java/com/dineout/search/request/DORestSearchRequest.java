@@ -6,7 +6,7 @@ import com.dineout.search.utils.Constants;
 
 
 
-public class RestSearchRequest extends GenericTCSearchRequest{
+public class DORestSearchRequest extends GenericDOSearchRequest{
 	
 	private String byexplore;
 	private String bywhichtype;

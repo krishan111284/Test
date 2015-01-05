@@ -15,23 +15,23 @@ import com.dineout.search.exception.ErrorCode;
 import com.dineout.search.exception.SearchError;
 import com.dineout.search.exception.SearchErrors;
 import com.dineout.search.query.QueryParam;
-import com.dineout.search.query.RestQueryCreator;
-import com.dineout.search.request.RestSearchRequest;
-import com.dineout.search.response.SearchResult;
+import com.dineout.search.query.DORestQueryCreator;
+import com.dineout.search.request.DORestSearchRequest;
+import com.dineout.search.response.DOSearchResult;
 import com.dineout.search.server.SolrConnectionUtils;
-import com.dineout.search.utils.ResponseUtils;
+import com.dineout.search.utils.DOResponseUtils;
 
 @Service("restSearchService")
 public class RestSearchServiceImpl implements RestSearchService{
 	Logger logger = Logger.getLogger(RestSearchServiceImpl.class);
 	@Autowired
-	RestQueryCreator restQueryCreator;
+	DORestQueryCreator restQueryCreator;
 	
 	@Autowired 
 	SolrConnectionUtils solrConnectionUtils;
 
-	public List<SearchResult> getSearchResults(RestSearchRequest request,SearchErrors errors,Map<String,String> nerMap) {
-		List<SearchResult> result = new ArrayList<SearchResult>();
+	public List<DOSearchResult> getSearchResults(DORestSearchRequest request,SearchErrors errors,Map<String,String> nerMap) {
+		List<DOSearchResult> result = new ArrayList<DOSearchResult>();
 		QueryParam tcqp = null;
 		QueryResponse qres = null;
 		try {
@@ -40,11 +40,11 @@ public class RestSearchServiceImpl implements RestSearchService{
 			tcqp = restQueryCreator.getSearchQuery(request,nerMap);
 			qres = server.query(tcqp);
 			if(qres!=null){
-				SearchResult serachRes = null;
+				DOSearchResult serachRes = null;
 				if(request.isGrouprequest()){
-					serachRes = ResponseUtils.processGroupQueryResponse(qres,null,request.isSpellcheckApplied());
+					serachRes = DOResponseUtils.processGroupQueryResponse(qres,null,request.isSpellcheckApplied());
 				}else{
-					serachRes = ResponseUtils.processQueryResponse(qres,null,request.isSpellcheckApplied());
+					serachRes = DOResponseUtils.processQueryResponse(qres,null,request.isSpellcheckApplied());
 				}
 				result.add(serachRes);
 			}

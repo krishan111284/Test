@@ -1,6 +1,6 @@
 package com.dineout.search.request;
 
-public class SearchHeader {
+public class DOSearchHeader {
 	
 	private String auto;
 	private String idsearch;

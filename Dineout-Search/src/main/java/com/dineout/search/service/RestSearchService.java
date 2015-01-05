@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.dineout.search.exception.SearchErrors;
-import com.dineout.search.request.RestSearchRequest;
-import com.dineout.search.response.SearchResult;
+import com.dineout.search.request.DORestSearchRequest;
+import com.dineout.search.response.DOSearchResult;
 
 
 public interface RestSearchService {
-	public List<SearchResult> getSearchResults(RestSearchRequest tcMainSearchReq,SearchErrors errors,Map<String,String> nerMap);
+	public List<DOSearchResult> getSearchResults(DORestSearchRequest tcMainSearchReq,SearchErrors errors,Map<String,String> nerMap);
 }

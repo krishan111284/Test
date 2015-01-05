@@ -5,10 +5,10 @@ import java.util.ResourceBundle;
 
 import org.springframework.stereotype.Component;
 
-import com.dineout.search.request.RestSearchRequest;
+import com.dineout.search.request.DORestSearchRequest;
 
 @Component("restQueryCreator")
-public class RestQueryCreator {
+public class DORestQueryCreator {
 	
 	ResourceBundle rb = ResourceBundle.getBundle("search");
 	
@@ -19,7 +19,7 @@ public class RestQueryCreator {
 	 */
 
 
-	public QueryParam getSearchQuery(RestSearchRequest request,
+	public QueryParam getSearchQuery(DORestSearchRequest request,
 			Map<String, String> nerMap) {
 		// TODO Auto-generated method stub
 		return null;
