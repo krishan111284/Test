@@ -33,7 +33,6 @@ import com.dineout.search.validation.DoRestRequestValidator;
 @RequestMapping(value="/search/")
 public class DORestSearchController extends DOAbstractSearchController{
 
-	Logger dbLogger = Logger.getLogger("NULL_QUERY_LOGGER");
 	Logger logger = Logger.getLogger(DORestSearchController.class);
 	@Autowired
 	RestSearchService restSearchService;
@@ -59,7 +58,6 @@ public class DORestSearchController extends DOAbstractSearchController{
 			searchResultList = restSearchService.getSearchResults(request,errors,nerMap);
 			DOSearchResponse resp = getDOSearchResponse(searchResultList, null,errors,nerMap);
 			if(!errors.hasErrors() && ((DOResponseBody)resp.getBody()).getNumFound() == 0){
-				dbLogger.error(httpReq.getQueryString());
 				logger.error(request.getSearchname());
 			}
 			jsonresp = getJSON(resp);

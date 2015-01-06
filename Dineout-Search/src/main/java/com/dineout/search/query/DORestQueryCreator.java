@@ -54,9 +54,9 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 	
 	private void applyGlobalBoosts(QueryParam queryParam,
 			DORestSearchRequest req) {
-		queryParam.addParam("boost", "booking_count");
-		queryParam.addParam("boost", "avg_rating");
-	//	queryParam.addParam("boost", ""); TODO: PAID REST
+		queryParam.addParam("boost", "product(booking_count,0.5)");
+		queryParam.addParam("boost", "product(avg_rating,0.25)");
+		queryParam.addParam("boost", "product(paid,0.25)");
 		
 	}
 
@@ -76,22 +76,15 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 	private void handleNerEntity(QueryParam queryParam,
 			Map<String, String> nerMap,DORestSearchRequest req) {
 		if(nerMap!=null && nerMap.size()>0){
-			if(nerMap.containsKey(Constants.NER_ZONE_KEY)){
-				handleNerZone(queryParam,nerMap.get(Constants.NER_ZONE_KEY));
-			}
+			
 			if(nerMap.containsKey(Constants.NER_CUISINE_KEY)){
 				handleNerCuisine(queryParam,nerMap.get(Constants.NER_CUISINE_KEY));
 			}
 		}
 	}
 
-	private void handleNerZone(QueryParam queryParam, String string) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	private void handleNerCuisine(QueryParam queryParam, String nerCuisine) {
-		//TODO
+		String query = queryParam.get("q");
 	}
 
 	
