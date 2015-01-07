@@ -18,13 +18,11 @@ public abstract class GenericDOSearchRequest {
 	private String start;
 	private String limit;
 	private String spellcheck;
-	private String ner;
 	
 	/**Flags**/
 	private boolean isSearchExecuted;
 	private boolean isSpatialQuery;
 	private boolean isSpellcheckApplied;
-	private boolean isNerApplied;
 
 	public String getSearchname() {
 		return searchname;
@@ -117,16 +115,6 @@ public abstract class GenericDOSearchRequest {
 	public void setSpellcheckApplied(boolean isSpellcheckApplied) {
 		this.isSpellcheckApplied = isSpellcheckApplied;
 	}
-	public boolean isNerApplied() {
-		return isNerApplied;
-	}
-	public void setNerApplied(boolean isNerApplied) {
-		this.isNerApplied = isNerApplied;
-	}
-	public String getNer() {
-		return ner;
-	}
-	public void setNer(String ner) {
-		this.ner = ner;
-	}
+	
+	
 }

@@ -12,14 +12,14 @@ import com.dineout.search.exception.SearchError;
 import com.dineout.search.exception.SearchErrors;
 import com.dineout.search.request.GenericDOSearchRequest;
 import com.dineout.search.request.NerRequest;
-import com.dineout.search.response.Header;
 import com.dineout.search.response.DOResponseBody;
 import com.dineout.search.response.DOSearchResponse;
 import com.dineout.search.response.DOSearchResult;
+import com.dineout.search.response.Header;
 import com.dineout.search.service.NerService;
 import com.dineout.search.utils.Constants;
-import com.dineout.search.utils.GsonUtil;
 import com.dineout.search.utils.DORequestUtils;
+import com.dineout.search.utils.GsonUtil;
 
 public abstract class DOAbstractSearchController {
 	@Autowired
@@ -46,15 +46,11 @@ public abstract class DOAbstractSearchController {
 		if(!StringUtils.isEmpty(request.getSpellcheck()) && Constants.TC_SPELL_CHECK_TRUE.equals(request.getSpellcheck())){
 			request.setSpellcheckApplied(true);
 		}
-		if(!StringUtils.isBlank(request.getNer()) &&  Constants.TC_NER_TRUE.equals(request.getNer())){
-			request.setNerApplied(true);
-		}
-		
 	}
 	
 	protected Map<String,String> getNerMap(GenericDOSearchRequest request){
 		Map<String,String> nerMap = null;
-		if(!StringUtils.isBlank(request.getSearchname()) && request.isNerApplied()){
+		if(!StringUtils.isBlank(request.getSearchname()) ){
 			NerRequest nerReq = new NerRequest();
 			nerReq.setQuery(request.getSearchname());
 			nerReq.setCity(request.getBycity());

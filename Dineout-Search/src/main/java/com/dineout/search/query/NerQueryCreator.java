@@ -11,14 +11,13 @@ public class NerQueryCreator {
 		QueryParam queryParam = new QueryParam();
 		queryParam.addParam("defType", "edismax");
 		queryParam.addParam("mm", "1");
-		queryParam.addParam("qf", rb.getString("tc.ner.qf.param"));
-		queryParam.addParam("pf", rb.getString("tc.ner.pf.param"));
-		queryParam.addParam("fl", rb.getString("tc.ner.fl.param"));
-		queryParam.addParam("fq", "((-city_name:[* TO *] AND *:*) OR city_name:"+city+")");
+		queryParam.addParam("qf", rb.getString("dineout.ner.qf.param"));
+		queryParam.addParam("pf", rb.getString("dineout.ner.pf.param"));
+		queryParam.addParam("fl", rb.getString("dineout.ner.fl.param"));
 		queryParam.addParam("q", query);
 		queryParam.addParam("group", "true");
 		queryParam.addParam("group.field", "data_type");
-		queryParam.addParam("group.limit", "10");
+		queryParam.addParam("group.limit", "5");
 		return queryParam;
 	}
 

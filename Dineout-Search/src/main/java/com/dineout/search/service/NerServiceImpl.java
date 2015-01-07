@@ -33,7 +33,7 @@ public class NerServiceImpl implements NerService{
 	
 	
 	public NerServiceImpl(){
-		CacheLoader<NerRequest, Map<String, String>> loader = new CacheLoader<NerRequest, Map<String,String>>(){
+		CacheLoader<NerRequest, Map<String,String>> loader = new CacheLoader<NerRequest, Map<String,String>>(){
 			public Map<String, String> load (NerRequest key){
 				logger.info("Loading for Key"+key.toString());
 				return loadNamedEntities(key);

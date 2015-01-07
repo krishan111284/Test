@@ -56,7 +56,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			DORestSearchRequest req) {
 		queryParam.addParam("boost", "product(booking_count,0.5)");
 		queryParam.addParam("boost", "product(avg_rating,0.25)");
-		queryParam.addParam("boost", "product(paid,0.25)");
+		queryParam.addParam("boost", "product(rank,0.25)");
 		
 	}
 
@@ -78,16 +78,36 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		if(nerMap!=null && nerMap.size()>0){
 			
 			if(nerMap.containsKey(Constants.NER_CUISINE_KEY)){
-				handleNerCuisine(queryParam,nerMap.get(Constants.NER_CUISINE_KEY));
+				handleNerCuisine(queryParam,nerMap);
 			}
 		}
 	}
 
-	private void handleNerCuisine(QueryParam queryParam, String nerCuisine) {
-		String query = queryParam.get("q");
+	private void handleNerCuisine(QueryParam queryParam, Map<String, String> nerMap) {
+		applyFamilyFilter(queryParam,nerMap);
+		applyCuisineBoosts(queryParam,nerMap);
+		changeQueryString(queryParam,nerMap);
 	}
 
 	
+	private void changeQueryString(QueryParam queryParam,
+			Map<String, String> nerMap) {
+		queryParam.updateParam("q", nerMap.get(Constants.PROCESSED_QUERY));
+	}
+
+	private void applyCuisineBoosts(QueryParam queryParam,
+			Map<String, String> nerMap) {
+		queryParam.addParam("bq", "(primary_cuisine_ft:"+nerMap.get(Constants.NER_CUISINE_KEY)+")^10000");
+		queryParam.addParam("bq", "(secondary_cuisine_ft:"+nerMap.get(Constants.NER_CUISINE_KEY)+")^5000");
+		
+	}
+
+	private void applyFamilyFilter(QueryParam queryParam,
+			Map<String, String> nerMap) {
+		queryParam.addParam("fq", "((primary_family_ft:"+nerMap.get(Constants.NER_CUISINE_FAMILY_KEY)+") OR (secondary_family_ft:"+nerMap.get(Constants.NER_CUISINE_FAMILY_KEY)+"))");
+		
+	}
+
 	private void handleRatingsFilters(QueryParam queryParam, DORestSearchRequest req,Map<String, String> excludeTagMap){
 		
 		if(req.getByrate()!=null && req.getByrate().length>0){StringBuilder rateFacetQr = new StringBuilder();
@@ -143,7 +163,6 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			if(facetSet.contains("cuisine_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("cuisine")!=null?excludeTagMap.get("cuisine"):"")+"cuisine_ft");}
 			if(facetSet.contains("landmark_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("landmark")!=null?excludeTagMap.get("landmark"):"")+"landmark_ft");}
 			if(facetSet.contains("area_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("area")!=null?excludeTagMap.get("area"):"")+"area_name_ft");}
-			if(facetSet.contains("service_tags_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("serviceTags")!=null?excludeTagMap.get("serviceTags"):"")+"service_tags_ft");}
 			if(facetSet.contains("tags_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("tags")!=null?excludeTagMap.get("tags"):"")+"tags_ft");}
 			if(facetSet.contains("costFor2")){
 				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "costFor2:[0 TO 500]");
@@ -336,7 +355,9 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 	private void setQueryParser(QueryParam queryParam,DORestSearchRequest req){
 		queryParam.addParam("defType","edismax");
 		if(req.isSearchExecuted()){
-			queryParam.addParam("mm","100%");
+			String query = req.getSearchname();
+			String[] tokens = query.split(" ");
+			queryParam.addParam("mm",tokens.length+"");
 		}
 		if(!StringUtils.isEmpty(req.getSearchname())){
 			setQfParams(queryParam);

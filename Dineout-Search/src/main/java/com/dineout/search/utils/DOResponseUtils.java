@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.Group;
 import org.apache.solr.client.solrj.response.GroupCommand;
@@ -197,50 +196,16 @@ public class DOResponseUtils {
 			Iterator<SolrDocument>iter = group.getResult().iterator();
 			while(iter.hasNext()){
 				SolrDocument doc = iter.next();
-				if(entityTypeValMap.get(Constants.NER_LOC_KEY)==null && entityTypeValMap.get(Constants.NER_ZONE_KEY)==null && Constants.NER_LOC_KEY.equalsIgnoreCase(eType)){
-					String locality = (String)doc.get("location_name");
-					ArrayList<String> localityAlias = (ArrayList<String>)doc.get("location_alias");
-					if(isValid(locality, query)){
-						String lat_lng = (String)doc.get("lat_lng");
-						entityTypeValMap.put(Constants.NER_LOC_KEY, locality);
-						entityTypeValMap.put(Constants.LAT_LNG_KEY, lat_lng);
-						entityTypeValMap.put(Constants.PROCESSED_QUERY, processQuery(query,locality));
-						break;
-					}
-
-					if(localityAlias!=null && localityAlias.size()>0){
-						if(!StringUtils.isBlank(localityAlias.get(0)) && isValid(localityAlias.get(0),query)){
-							String lat_lng = (String)doc.get("lat_lng");
-							entityTypeValMap.put(Constants.NER_LOC_KEY, locality);
-							entityTypeValMap.put(Constants.LAT_LNG_KEY, lat_lng);
-							entityTypeValMap.put(Constants.PROCESSED_QUERY, processQuery(query,localityAlias.get(0)));
+				if(entityTypeValMap.get(Constants.NER_CUISINE_KEY)==null &&  Constants.NER_CUISINE_KEY.equalsIgnoreCase(eType)){
+					String cuisine = (String)doc.get("parent_cuisine_name");
+					ArrayList<String> valCusines = (ArrayList<String>)doc.get("cuisine");
+					for(String cui:valCusines){
+						if(isStrictValid(cui, query)){
+							entityTypeValMap.put(Constants.NER_CUISINE_KEY,cui);
+							entityTypeValMap.put(Constants.NER_CUISINE_FAMILY_KEY,cuisine);
+							entityTypeValMap.put(Constants.PROCESSED_QUERY,processQuery(query, cui));
 							break;
 						}
-						if(localityAlias.size()>1 && !StringUtils.isBlank(localityAlias.get(1)) && isValid(localityAlias.get(1),query)){
-							String lat_lng = (String)doc.get("lat_lng");
-							entityTypeValMap.put(Constants.NER_LOC_KEY, locality);
-							entityTypeValMap.put(Constants.LAT_LNG_KEY, lat_lng);
-							entityTypeValMap.put(Constants.PROCESSED_QUERY, processQuery(query,localityAlias.get(1)));
-							break;
-						}
-					}
-				}else if(entityTypeValMap.get(Constants.NER_CUISINE_KEY)==null &&  Constants.NER_CUISINE_KEY.equalsIgnoreCase(eType)){
-					String cuisine = (String)doc.get("cuisine");
-					if(isStrictValid(cuisine, query)){
-						entityTypeValMap.put(Constants.NER_CUISINE_KEY,cuisine);
-						break;
-					}
-				}else if(entityTypeValMap.get(Constants.NER_LOC_KEY)==null && entityTypeValMap.get(Constants.NER_ZONE_KEY)==null &&  Constants.NER_ZONE_KEY.equalsIgnoreCase(eType)){
-					String zone = (String)doc.get("zone_name");
-					if(isStrictValid(zone, query)){
-						entityTypeValMap.put(Constants.NER_ZONE_KEY,zone);
-						break;
-					}
-				}else if(entityTypeValMap.get(Constants.NER_FEATURE_KEY)==null && Constants.NER_FEATURE_KEY.equalsIgnoreCase(eType)){
-					String feature = (String)doc.get("feature_name");
-					if(isStrictValid(feature, query)){
-						entityTypeValMap.put(Constants.NER_FEATURE_KEY,feature);
-						break;
 					}
 				}
 			}
@@ -248,9 +213,9 @@ public class DOResponseUtils {
 		return entityTypeValMap;
 	}
 
-	private static String processQuery(String query,String locality) {
+	private static String processQuery(String query,String cleanToken) {
 		String processed = query.toLowerCase();
-		String[] tokens = locality.toLowerCase().split("[,\\s/]");
+		String[] tokens = cleanToken.toLowerCase().split("[,\\s/]");
 		for(String token:tokens){
 			processed = processed.replaceAll(token, "");
 		}

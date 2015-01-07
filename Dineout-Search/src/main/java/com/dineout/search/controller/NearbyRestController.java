@@ -35,7 +35,6 @@ public class NearbyRestController extends DOAbstractSearchController{
 
 	//TODO: Nearby LOGIC
 	
-	Logger dbLogger = Logger.getLogger("NULL_QUERY_LOGGER");
 	Logger logger = Logger.getLogger(NearbyRestController.class);
 	@Autowired
 	RestSearchService restSearchService;
@@ -61,7 +60,6 @@ public class NearbyRestController extends DOAbstractSearchController{
 			searchResultList = restSearchService.getSearchResults(request,errors,nerMap);
 			DOSearchResponse resp = getDOSearchResponse(searchResultList, null,errors,nerMap);
 			if(!errors.hasErrors() && ((DOResponseBody)resp.getBody()).getNumFound() == 0){
-				dbLogger.error(httpReq.getQueryString());
 				logger.error(request.getSearchname());
 			}
 			jsonresp = getJSON(resp);

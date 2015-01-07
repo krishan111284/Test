@@ -67,6 +67,7 @@ public class Constants {
 	
 	public static final String NER_ZONE_KEY = "Zone";
 	public static final String NER_CUISINE_KEY = "Cuisine";
+	public static final String NER_CUISINE_FAMILY_KEY = "Family";
 	public static final String NER_LOC_KEY = "Locality";
 	public static final String TC_NER_TRUE = "true";
 	public static final long NER_QUERY_CACHE_ROWS = 1000;
@@ -87,5 +88,6 @@ public class Constants {
 	public static final String SORT_OPTION_SEVEN = "7";
 	public static final String SORT_OPTION_EIGHT = "8";
 	public static final String SORT_OPTION_NINE = "9";
+
 	
 }

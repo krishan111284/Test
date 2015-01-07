@@ -30,11 +30,10 @@ public class Header {
 	public void setErrors(SearchErrors errors) {
 		this.errors = errors;
 	}
-	public Map<String,String> getNerEntities() {
+	public Map<String, String> getNerEntities() {
 		return nerEntities;
 	}
-	public void setNerEntities(Map<String,String> nerEntities) {
+	public void setNerEntities(Map<String, String> nerEntities) {
 		this.nerEntities = nerEntities;
 	}
-	
 }
