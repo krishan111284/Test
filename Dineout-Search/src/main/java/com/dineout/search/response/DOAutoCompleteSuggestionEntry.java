@@ -7,6 +7,7 @@ public class DOAutoCompleteSuggestionEntry {
 	private String location_name;
 	private String profile_name;
 	private String cuisine_name;
+	private String tag_name;
 
 	private Float score;
 	
@@ -54,6 +55,12 @@ public class DOAutoCompleteSuggestionEntry {
 	}
 	public void setCuisine_name(String cuisine_name) {
 		this.cuisine_name = cuisine_name;
+	}
+	public String getTag_name() {
+		return tag_name;
+	}
+	public void setTag_name(String tag_name) {
+		this.tag_name = tag_name;
 	}
 	
 }

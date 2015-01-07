@@ -20,12 +20,12 @@ public class DOAutoCompleteQueryCreator {
 		QueryParam queryParam = new QueryParam();
 		queryParam.addParam("defType", "edismax");
 		queryParam.addParam("mm", "100%");
-		queryParam.addParam("qf", "location_name_string_ngram^2 profile_name_string_ngram^2 cuisine_name_string_ngram^2 title_bm_gram^2");
+		queryParam.addParam("qf", " location_name^2 location_name_string_ngram^2 profile_name^2 profile_name_string_ngram^2 cuisine_name^2 cuisine_name_string_ngram^2 tag_name^2 tag_name_string_ngram^2 title_bm_gram^2");
 		queryParam.addParam("group", "true");
 		queryParam.addParam("group.field", "data_type");
 		queryParam.addParam("group.limit", "3");
 		queryParam.addParam("limit", "12");
-		queryParam.addParam("fl", "uid,location_name,profile_name,cuisine_name,guid,score");
+		queryParam.addParam("fl", "uid,location_name,profile_name,cuisine_name,guid,score,tag_name");
 		queryParam.addParam("fq", "((-city_name:[* TO *] AND *:*) OR city_name:"+req.getBycity()+")");
 		queryParam.addParam("q", req.getSearchname());
 		//queryParam.addParam("group.sort", "POPULARITY desc,query_pop desc");

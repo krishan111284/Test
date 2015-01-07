@@ -30,6 +30,7 @@ public class DOAutoCompleteResponseUtils {
 				entry.setProfile_name((String)solrDocument.get("profile_name"));
 				entry.setCuisine_name((String)solrDocument.get("cuisine_name"));
 				entry.setScore((Float)solrDocument.get("score"));
+				entry.setTag_name((String)solrDocument.get("tag_name"));
 				entry.setLocation_name(solrDocument.get("location_name")!=null?(String)solrDocument.get("location_name"):null);
 				entry.setSuggestion(getSuggestion(dataType,solrDocument));	
 				entryList.add(entry);
@@ -48,6 +49,8 @@ public class DOAutoCompleteResponseUtils {
 			entity_name = (String)solrDocument.get("location_name");
 		if(Constants.AUTOCOMPLETION_DATA_TYPE_CUISINE.equals(dataType))
 			entity_name = (String)solrDocument.get("cuisine_name");
+		if(Constants.AUTOCOMPLETION_DATA_TYPE_TAGS.equals(dataType))
+			entity_name = (String)solrDocument.get("tag_name");
 		
 		return entity_name;
 	}
