@@ -47,8 +47,9 @@ public abstract class DOAbstractQueryCreator {
 		queryParam.addParam("start", start);
 		queryParam.addParam("rows", rows);
 	}
-	public void setHlParams(QueryParam queryParam,String hlfl){
+	public void setHlParams(QueryParam queryParam,String hlfl,String query){
 		if(!StringUtils.isBlank(hlfl)){
+			queryParam.addParam("hl.q", query);
 			queryParam.addParam("hl", "true");
 			queryParam.addParam("hl.fl", hlfl);
 			queryParam.addParam("hl.mergeContiguous","true");
