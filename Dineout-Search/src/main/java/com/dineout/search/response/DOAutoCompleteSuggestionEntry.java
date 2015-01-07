@@ -2,11 +2,11 @@ package com.dineout.search.response;
 
 public class DOAutoCompleteSuggestionEntry {
 	
-	private String tc_id;
+	private String uid;
 	private String guid;
 	private String location_name;
-	private String address;
-	private String entity_name;
+	private String profile_name;
+	private String cuisine_name;
 
 	private Float score;
 	
@@ -19,11 +19,11 @@ public class DOAutoCompleteSuggestionEntry {
 	
 	private String suggestion;
 	
-	public String getTc_id() {
-		return tc_id;
+	public String getUid() {
+		return uid;
 	}
-	public void setTc_id(String tc_id) {
-		this.tc_id = tc_id;
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 	public String getLocation_name() {
 		return location_name;
@@ -43,17 +43,17 @@ public class DOAutoCompleteSuggestionEntry {
 	public void setGuid(String guid) {
 		this.guid = guid;
 	}
-	public String getAddress() {
-		return address;
+	public String getProfile_name() {
+		return profile_name;
 	}
-	public void setAddress(String address) {
-		this.address = address;
+	public void setProfile_name(String profile_name) {
+		this.profile_name = profile_name;
 	}
-	public String getEntity_name() {
-		return entity_name;
+	public String getCuisine_name() {
+		return cuisine_name;
 	}
-	public void setEntity_name(String entity_name) {
-		this.entity_name = entity_name;
+	public void setCuisine_name(String cuisine_name) {
+		this.cuisine_name = cuisine_name;
 	}
 	
 }
