@@ -47,7 +47,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			handleSortingRequest(queryParam,req);
 		}
 		if(Constants.IS_HL_TRUE.equals(req.getEsthl())){
-			setHlParams(queryParam, req.getEsthlfl());
+			setHlParams(queryParam, req.getEsthlfl(),req.getSearchname());
 		}
 		return queryParam;
 	}

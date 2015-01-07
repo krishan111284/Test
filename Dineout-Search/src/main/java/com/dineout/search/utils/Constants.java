@@ -88,6 +88,7 @@ public class Constants {
 	public static final String SORT_OPTION_SEVEN = "7";
 	public static final String SORT_OPTION_EIGHT = "8";
 	public static final String SORT_OPTION_NINE = "9";
+	public static final String RESPONSE_TYPE_REST = "RESTAURANT";
 
 	
 }

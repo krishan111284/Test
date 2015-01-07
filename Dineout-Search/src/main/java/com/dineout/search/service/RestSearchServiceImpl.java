@@ -14,11 +14,12 @@ import org.springframework.stereotype.Service;
 import com.dineout.search.exception.ErrorCode;
 import com.dineout.search.exception.SearchError;
 import com.dineout.search.exception.SearchErrors;
-import com.dineout.search.query.QueryParam;
 import com.dineout.search.query.DORestQueryCreator;
+import com.dineout.search.query.QueryParam;
 import com.dineout.search.request.DORestSearchRequest;
 import com.dineout.search.response.DOSearchResult;
 import com.dineout.search.server.SolrConnectionUtils;
+import com.dineout.search.utils.Constants;
 import com.dineout.search.utils.DOResponseUtils;
 
 @Service("restSearchService")
@@ -42,9 +43,9 @@ public class RestSearchServiceImpl implements RestSearchService{
 			if(qres!=null){
 				DOSearchResult serachRes = null;
 				if(request.isGrouprequest()){
-					serachRes = DOResponseUtils.processGroupQueryResponse(qres,null,request.isSpellcheckApplied());
+					serachRes = DOResponseUtils.processGroupQueryResponse(qres,Constants.RESPONSE_TYPE_REST,request.isSpellcheckApplied());
 				}else{
-					serachRes = DOResponseUtils.processQueryResponse(qres,null,request.isSpellcheckApplied());
+					serachRes = DOResponseUtils.processQueryResponse(qres,Constants.RESPONSE_TYPE_REST,request.isSpellcheckApplied());
 				}
 				result.add(serachRes);
 			}
