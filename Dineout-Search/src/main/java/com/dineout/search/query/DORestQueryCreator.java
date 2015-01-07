@@ -357,7 +357,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		if(req.isSearchExecuted()){
 			String query = req.getSearchname();
 			String[] tokens = query.split(" ");
-			queryParam.addParam("mm",tokens.length+"");
+			queryParam.addParam("mm","100%");
 		}
 		if(!StringUtils.isEmpty(req.getSearchname())){
 			setQfParams(queryParam);
