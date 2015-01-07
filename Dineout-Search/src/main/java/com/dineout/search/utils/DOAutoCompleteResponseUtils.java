@@ -25,11 +25,13 @@ public class DOAutoCompleteResponseUtils {
 			while(iter.hasNext()){
 				SolrDocument solrDocument = iter.next();
 				DOAutoCompleteSuggestionEntry entry = new DOAutoCompleteSuggestionEntry();
-				entry.setTc_id((String)solrDocument.get("tc_id"));
+				entry.setUid((String)solrDocument.get("uid"));
 				entry.setGuid((String)solrDocument.get("guid"));
-				entry.setAddress((String)solrDocument.get("address"));
+				entry.setProfile_name((String)solrDocument.get("profile_name"));
+				entry.setCuisine_name((String)solrDocument.get("cuisine_name"));
 				entry.setScore((Float)solrDocument.get("score"));
-				entry.setLocation_name(solrDocument.get("loc_name")!=null?(String)solrDocument.get("loc_name"):null);
+				entry.setTag_name((String)solrDocument.get("tag_name"));
+				entry.setLocation_name(solrDocument.get("location_name")!=null?(String)solrDocument.get("location_name"):null);
 				entry.setSuggestion(getSuggestion(dataType,solrDocument));	
 				entryList.add(entry);
 			}
@@ -40,7 +42,17 @@ public class DOAutoCompleteResponseUtils {
 	
 	private static String getSuggestion(String dataType,
 			SolrDocument solrDocument) {
-		return (String)solrDocument.get("est_name");
+		String entity_name = null;
+		if(Constants.AUTOCOMPLETION_DATA_TYPE_RESTAURANT.equals(dataType))
+				entity_name = (String)solrDocument.get("profile_name");
+		if(Constants.AUTOCOMPLETION_DATA_TYPE_LOCALITY.equals(dataType))
+			entity_name = (String)solrDocument.get("location_name");
+		if(Constants.AUTOCOMPLETION_DATA_TYPE_CUISINE.equals(dataType))
+			entity_name = (String)solrDocument.get("cuisine_name");
+		if(Constants.AUTOCOMPLETION_DATA_TYPE_TAGS.equals(dataType))
+			entity_name = (String)solrDocument.get("tag_name");
+		
+		return entity_name;
 	}
 
 }
