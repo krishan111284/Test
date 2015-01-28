@@ -90,7 +90,6 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		changeQueryString(queryParam,nerMap);
 	}
 
-
 	private void changeQueryString(QueryParam queryParam,Map<String, ArrayList<String>> nerMap) {
 		if(nerMap.get(Constants.PROCESSED_QUERY).get(0).trim().isEmpty())
 			queryParam.updateParam("q", "*:*");
@@ -367,7 +366,8 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		if(req.isSearchExecuted()){
 			String query = nerMap.size()>0?nerMap.get(Constants.PROCESSED_QUERY).get(0).trim():req.getSearchname();
 			String[] tokens = query.split(" ");
-			queryParam.addParam("mm",tokens.length+"");
+			//queryParam.addParam("mm","100%");
+			queryParam.addParam("mm", tokens.length+"");
 		}
 		if(!StringUtils.isEmpty(req.getSearchname())){
 			setQfParams(queryParam);
