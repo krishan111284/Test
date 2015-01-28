@@ -10,12 +10,14 @@ public class Constants {
 	public static final MediaType JSON_MEDIA_TYPE = MediaType.valueOf("application/json;charset=UTF-8");      
 	
 	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	public static final String SPECIAL_CHAR_REGEX = "\\band\\b|\\bor\\b|[+&-]";
 	public static final String DEFAULT_FACET_LIMIT = "1000";
 	public static final String DEFAULT_FACET_MIN_COUNT = "1";
 	public static final String DEFAULT_START_INDEX = "0";
 	public static final String DEFAULT_NUM_ROWS = "10";
 	public static final String WILD_SEARCH_QUERY="*:*";
-	public static final String FIELD_LIST_ALL="*,score";
+	//public static final String FIELD_LIST_ALL="*,score";
+	public static final String FIELD_LIST_ALL="city_name,cuisine,locality_name,event_title,event_desc,rank,area_name,costFor2,secondary_family,locality_alias,avg_rating,r_id,profile_name,secondary_cuisine,url,landmark,booking_count,address,rest_alias,score";
 	
 	
 	/*****************Response Types *************************/

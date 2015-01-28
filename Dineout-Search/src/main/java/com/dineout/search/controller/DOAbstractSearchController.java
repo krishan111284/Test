@@ -1,5 +1,6 @@
 package com.dineout.search.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,8 +49,8 @@ public abstract class DOAbstractSearchController {
 		}
 	}
 	
-	protected Map<String,String> getNerMap(GenericDOSearchRequest request){
-		Map<String,String> nerMap = null;
+	protected Map<String,ArrayList<String>> getNerMap(GenericDOSearchRequest request){
+		Map<String,ArrayList<String>> nerMap = null;
 		if(!StringUtils.isBlank(request.getSearchname()) ){
 			NerRequest nerReq = new NerRequest();
 			nerReq.setQuery(request.getSearchname());
@@ -92,7 +93,7 @@ public abstract class DOAbstractSearchController {
 		return jsonresp;		
 	}
 	
-	protected DOSearchResponse getDOSearchResponse(List<DOSearchResult> results, String domain,SearchErrors errors,Map<String,String> nerMap){
+	protected DOSearchResponse getDOSearchResponse(List<DOSearchResult> results, String domain,SearchErrors errors,Map<String, ArrayList<String>> nerMap){
 		DOSearchResponse resp = new DOSearchResponse();
 		Header resheader = new Header(); 
 		DOResponseBody body = new DOResponseBody();

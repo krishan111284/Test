@@ -1,5 +1,6 @@
 package com.dineout.search.response;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import com.dineout.search.exception.SearchErrors;
@@ -11,7 +12,7 @@ public class Header {
 	private String responseType;
 	private String status;
 	SearchErrors errors;
-	private Map<String,String> nerEntities;
+	private Map<String,ArrayList<String>> nerEntities;
 	public String getResponseType() {
 		return responseType;
 	}
@@ -30,10 +31,10 @@ public class Header {
 	public void setErrors(SearchErrors errors) {
 		this.errors = errors;
 	}
-	public Map<String, String> getNerEntities() {
+	public Map<String, ArrayList<String>> getNerEntities() {
 		return nerEntities;
 	}
-	public void setNerEntities(Map<String, String> nerEntities) {
+	public void setNerEntities(Map<String, ArrayList<String>> nerEntities) {
 		this.nerEntities = nerEntities;
 	}
 }

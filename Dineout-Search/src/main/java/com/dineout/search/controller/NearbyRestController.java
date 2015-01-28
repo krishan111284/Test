@@ -1,5 +1,6 @@
 package com.dineout.search.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +57,7 @@ public class NearbyRestController extends DOAbstractSearchController{
 			jsonresp = processJSONResponse(null, null, errors);
 		}else{
 			processDOSearchRequest(request);
-			Map<String, String> nerMap = getNerMap(request);
+			Map<String, ArrayList<String>> nerMap = getNerMap(request);
 			searchResultList = restSearchService.getSearchResults(request,errors,nerMap);
 			DOSearchResponse resp = getDOSearchResponse(searchResultList, null,errors,nerMap);
 			if(!errors.hasErrors() && ((DOResponseBody)resp.getBody()).getNumFound() == 0){

@@ -31,7 +31,7 @@ public class RestSearchServiceImpl implements RestSearchService{
 	@Autowired 
 	SolrConnectionUtils solrConnectionUtils;
 
-	public List<DOSearchResult> getSearchResults(DORestSearchRequest request,SearchErrors errors,Map<String,String> nerMap) {
+	public List<DOSearchResult> getSearchResults(DORestSearchRequest request,SearchErrors errors,Map<String,ArrayList<String>> nerMap) {
 		List<DOSearchResult> result = new ArrayList<DOSearchResult>();
 		QueryParam tcqp = null;
 		QueryResponse qres = null;

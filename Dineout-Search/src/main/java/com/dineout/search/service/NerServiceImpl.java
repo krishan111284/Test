@@ -1,5 +1,6 @@
 package com.dineout.search.service;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -29,12 +30,12 @@ public class NerServiceImpl implements NerService{
 	@Autowired
 	SolrConnectionUtils solrConnectionUtils;
 	
-	LoadingCache<NerRequest, Map<String, String>> cache = null;
+	LoadingCache<NerRequest, Map<String, ArrayList<String>>> cache = null;
 	
 	
 	public NerServiceImpl(){
-		CacheLoader<NerRequest, Map<String,String>> loader = new CacheLoader<NerRequest, Map<String,String>>(){
-			public Map<String, String> load (NerRequest key){
+		CacheLoader<NerRequest, Map<String,ArrayList<String>>> loader = new CacheLoader<NerRequest, Map<String,ArrayList<String>>>(){
+			public Map<String, ArrayList<String>> load (NerRequest key){
 				logger.info("Loading for Key"+key.toString());
 				return loadNamedEntities(key);
 			}
@@ -43,8 +44,8 @@ public class NerServiceImpl implements NerService{
 	}
 	
 	
-	public Map<String,String> extactNamedEntities(NerRequest req){
-		Map<String, String> nerMap = null;
+	public Map<String, ArrayList<String>> extactNamedEntities(NerRequest req){
+		Map<String, ArrayList<String>> nerMap = null;
 		try {
 			nerMap = cache.get(req);
 		} catch (ExecutionException e) {
@@ -56,8 +57,8 @@ public class NerServiceImpl implements NerService{
 	}
 
 
-	public Map<String,String> loadNamedEntities(NerRequest req){
-		Map<String,String> resp = null;
+	public Map<String, ArrayList<String>> loadNamedEntities(NerRequest req){
+		Map<String, ArrayList<String>> resp = null;
 		SolrServer server = solrConnectionUtils.getNERSolrServer();
 		QueryParam tcqp = null;
 		try {

@@ -1,6 +1,10 @@
 package com.dineout.search.request;
 
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
+
+import com.dineout.search.utils.Constants;
 
 
 public abstract class GenericDOSearchRequest {
@@ -29,7 +33,9 @@ public abstract class GenericDOSearchRequest {
 	}
 	public void setSearchname(String searchname) {
 		//TO AVOID UN - INTENTIONAL BOOLEAN QUERY WITH EDISMAX
-		this.searchname = !StringUtils.isEmpty(searchname)?searchname.replaceAll("-"," "):searchname;
+        Pattern specialCharPatternRegex = Pattern.compile(Constants.SPECIAL_CHAR_REGEX);
+        this.searchname = !StringUtils.isEmpty(searchname)?specialCharPatternRegex.matcher(searchname).replaceAll(""):searchname;
+
 	}
 	public String getBycity() {
 		return bycity;

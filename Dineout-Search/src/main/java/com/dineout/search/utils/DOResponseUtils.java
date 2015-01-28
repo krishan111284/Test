@@ -2,10 +2,12 @@ package com.dineout.search.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.Group;
@@ -162,62 +164,44 @@ public class DOResponseUtils {
 		}
 		return isValidSuggestion;
 	}
-	private static boolean isValid(String input, String query){
-		boolean isValidSuggestion = true;
-		String queryProcessed = query.trim().toLowerCase();
-		String tokens[] = input.trim().replaceAll("^[,\\s]+", "").split("[,\\s]+");
-		for(String token:tokens){
-			if(!queryProcessed.contains(token.trim().toLowerCase()) && !token.contains("/")){
-				isValidSuggestion = false;
-				break;
-			}else if(token.contains("/")){
-				String t[] = token.split("/");
-				boolean found = false;
-				for(String tt:t){
-					if(queryProcessed.contains(tt.trim().toLowerCase())){
-						found = true;
-						break;
-					}
-				}
-				isValidSuggestion = found;
-			}
-		}
-		return isValidSuggestion;
-	}
 
-	public static Map<String, String> processStrictGroupQueryResponse(QueryResponse qRes, String query) {
-		Map<String, String> entityTypeValMap = new LinkedHashMap<String, String>();
+
+	public static Map<String, ArrayList<String>> processStrictGroupQueryResponse(QueryResponse qRes, String query) {
+		Map<String, ArrayList<String>> nerMap = new LinkedHashMap<String, ArrayList<String>>();
 		GroupCommand groupCommand = qRes.getGroupResponse().getValues().get(0);
 		List<Group> groups =groupCommand.getValues();
 		for(Group group:groups){
 			String eType = group.getGroupValue();
-
-
-			Iterator<SolrDocument>iter = group.getResult().iterator();
-			while(iter.hasNext()){
-				SolrDocument doc = iter.next();
-				if(entityTypeValMap.get(Constants.NER_CUISINE_KEY)==null &&  Constants.NER_CUISINE_KEY.equalsIgnoreCase(eType)){
-					String cuisine = (String)doc.get("parent_cuisine_name");
-					ArrayList<String> valCusines = (ArrayList<String>)doc.get("cuisine");
-					for(String cui:valCusines){
-						if(isStrictValid(cui, query)){
-							entityTypeValMap.put(Constants.NER_CUISINE_KEY,cui);
-							entityTypeValMap.put(Constants.NER_CUISINE_FAMILY_KEY,cuisine);
-							entityTypeValMap.put(Constants.PROCESSED_QUERY,processQuery(query, cui));
-							break;
+			if(Constants.NER_CUISINE_KEY.equalsIgnoreCase(eType)){
+				Set<String> familyList = new HashSet<String>();
+				Set<String> cuisineList = new HashSet<String>();
+				Set<String> queryList = new HashSet<String>();
+				Iterator<SolrDocument>iter = group.getResult().iterator();
+				while(iter.hasNext()){
+					SolrDocument doc = iter.next();
+					familyList.add((String)doc.get("parent_cuisine_name"));
+					@SuppressWarnings("unchecked")
+					ArrayList<String> childCuisines = (ArrayList<String>)doc.get("cuisine");
+					for(String cuisine:childCuisines){
+						if(isStrictValid(cuisine, query)){
+							cuisineList.add(cuisine);
 						}
 					}
 				}
+				queryList.add(processQuery(query,new ArrayList<String>(cuisineList)));
+				nerMap.put(Constants.NER_CUISINE_KEY, new ArrayList<String>(cuisineList));
+				nerMap.put(Constants.NER_CUISINE_FAMILY_KEY,  new ArrayList<String>(familyList));
+				nerMap.put(Constants.PROCESSED_QUERY,  new ArrayList<String>(queryList));	
 			}
+			//For next group/entity in future
 		}
-		return entityTypeValMap;
+		return nerMap;
 	}
 
-	private static String processQuery(String query,String cleanToken) {
+	private static String processQuery(String query,ArrayList<String> cuisineList) {
 		String processed = query.toLowerCase();
-		String[] tokens = cleanToken.toLowerCase().split("[,\\s/]");
-		for(String token:tokens){
-			processed = processed.replaceAll(token, "");
+		for(String token:cuisineList){
+			processed = processed.replaceAll(token.toLowerCase(), "");
 		}
 		return processed;
 	}
