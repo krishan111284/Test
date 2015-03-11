@@ -13,6 +13,8 @@ import com.dineout.search.exception.SearchError;
 import com.dineout.search.exception.SearchErrors;
 import com.dineout.search.request.GenericDOSearchRequest;
 import com.dineout.search.request.NerRequest;
+import com.dineout.search.response.DORecoResponseBody;
+import com.dineout.search.response.DORecoResult;
 import com.dineout.search.response.DOResponseBody;
 import com.dineout.search.response.DOSearchResponse;
 import com.dineout.search.response.DOSearchResult;
@@ -27,9 +29,9 @@ public abstract class DOAbstractSearchController {
 	GsonUtil gsonUtil;
 	@Autowired
 	NerService nerServiceImpl;
-	
+
 	Logger logger = Logger.getLogger(DOAbstractSearchController.class);
-	
+
 	/**
 	 * Processes the request:
 	 * - Sets isSearchExecuted as true if query string is not empty.
@@ -48,7 +50,7 @@ public abstract class DOAbstractSearchController {
 			request.setSpellcheckApplied(true);
 		}
 	}
-	
+
 	protected Map<String,ArrayList<String>> getNerMap(GenericDOSearchRequest request){
 		Map<String,ArrayList<String>> nerMap = null;
 		if(!StringUtils.isBlank(request.getSearchname()) ){
@@ -59,7 +61,7 @@ public abstract class DOAbstractSearchController {
 		}
 		return nerMap;
 	}
-	
+
 	/**
 	 * Process the doclist returned by the service and get the corresponding JSON
 	 * 
@@ -67,9 +69,9 @@ public abstract class DOAbstractSearchController {
 	 * @param domain
 	 * @return
 	 */
-	
+
 	protected String processJSONResponse(List<DOSearchResult> results, String domain,SearchErrors errors){
-		
+
 		String jsonresp = null;
 		DOSearchResponse resp = new DOSearchResponse();
 		Header resheader = new Header(); 
@@ -92,7 +94,29 @@ public abstract class DOAbstractSearchController {
 		jsonresp = gsonUtil.getGson().toJson(resp);
 		return jsonresp;		
 	}
-	
+
+	protected DOSearchResponse getRecoResponse(List<DORecoResult> results, SearchErrors errors, String domain){
+		DOSearchResponse resp = new DOSearchResponse();
+		Header resheader = new Header(); 
+		DORecoResponseBody body = new DORecoResponseBody();
+		resp.setHeader(resheader);
+		if(errors.hasErrors()){
+			resheader.setErrors(errors);
+			resheader.setStatus(Constants.RESPONSE_STATUS_ERROR);
+		}else{
+			resheader.setStatus(Constants.RESPONSE_STATUS_OK);
+			resp.setBody(body);
+			int numFound = 0;
+			for(DORecoResult SearchResult:results){
+				body.setRecommendations(SearchResult);
+				numFound = SearchResult.getDocs().size();
+			}
+			body.setMatches(numFound);
+		}
+		resheader.setResponseType(domain);
+		return resp;
+	}
+
 	protected DOSearchResponse getDOSearchResponse(List<DOSearchResult> results, String domain,SearchErrors errors,Map<String, ArrayList<String>> nerMap){
 		DOSearchResponse resp = new DOSearchResponse();
 		Header resheader = new Header(); 
@@ -115,7 +139,7 @@ public abstract class DOAbstractSearchController {
 		resheader.setResponseType(domain);
 		return resp;
 	}
-	
+
 	protected String getJSON(Object object){
 		return gsonUtil.getGson().toJson(object);
 	}
@@ -127,6 +151,6 @@ public abstract class DOAbstractSearchController {
 			errors.add(error);
 		}
 	}
-	
-	
+
+
 }

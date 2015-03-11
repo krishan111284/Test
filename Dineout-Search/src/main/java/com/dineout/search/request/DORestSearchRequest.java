@@ -24,6 +24,8 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	private String estfacetfl;
 	//Service Tags
 	private String[] byestservicetag;
+	private String restId;
+	private String avg_rating;
 	
 	public boolean isGrouprequest(){
 		return StringUtils.isEmpty(bygroup) && Constants.GROUP_TRUE.equals(group);
@@ -123,6 +125,18 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	}
 	public void setByestservicetag(String[] byestservicetag) {
 		this.byestservicetag = byestservicetag;
+	}
+	public String getRestId() {
+		return restId;
+	}
+	public void setRestId(String restId) {
+		this.restId = restId;
+	}
+	public String getAvg_rating() {
+		return avg_rating;
+	}
+	public void setAvg_rating(String avg_rating) {
+		this.avg_rating = avg_rating;
 	}
 	
 	

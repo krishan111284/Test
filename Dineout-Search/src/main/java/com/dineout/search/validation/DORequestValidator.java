@@ -6,9 +6,9 @@ import org.springframework.validation.Errors;
 
 import com.dineout.search.request.DOSearchHeader;
 
-@Component(value="tcRequestHeaderValidator")
-public class TCRequestHeaderValidator extends AbstractTCRequestValidator {
-	Logger logger = Logger.getLogger(TCRequestHeaderValidator.class);
+@Component(value="doRequestValidator")
+public class DORequestValidator extends AbstractDORequestValidator {
+	Logger logger = Logger.getLogger(DORequestValidator.class);
 	@Override
 	public boolean supports(Class<?> clazz) {
 		return DOSearchHeader.class.equals(clazz);

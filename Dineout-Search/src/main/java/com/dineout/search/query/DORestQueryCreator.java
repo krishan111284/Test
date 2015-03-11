@@ -55,9 +55,9 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 
 	private void applyGlobalBoosts(QueryParam queryParam,
 			DORestSearchRequest req) {
-		queryParam.addParam("boost", "product(booking_count,0.5)");
+		queryParam.addParam("boost", "product(scale(booking_count,1,5),0.5)");
 		queryParam.addParam("boost", "product(avg_rating,0.25)");
-		queryParam.addParam("boost", "product(rank,0.25)");
+		queryParam.addParam("boost", "product(div(sub(11,rank),2),0.25)");
 
 	}
 
@@ -204,10 +204,10 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 				sortfieldApplied = "fullfillment desc,booking_count desc";
 			}
 			if(Constants.SORT_OPTION_THREE.equals(bySort)){
-				sortfieldApplied = "fullfillment desc,est_two_price asc";
+				sortfieldApplied = "fullfillment desc,costFor2 asc";
 			}
-			if(Constants.SORT_OPTION_THREE.equals(bySort)){
-				sortfieldApplied = "fullfillment desc,est_two_price desc";
+			if(Constants.SORT_OPTION_FOUR.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,costFor2 desc";
 			}
 			if(Constants.SORT_OPTION_FIVE.equals(bySort)){
 				sortfieldApplied = "fullfillment desc,avg_rating asc";
@@ -216,7 +216,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 				sortfieldApplied = "fullfillment desc,avg_rating desc";
 			}
 		}else{
-			sortfieldApplied = "fullfillment desc";
+			sortfieldApplied = "fullfillment desc, score desc";
 		}
 		queryParam.addParam("sort", sortfieldApplied);
 	}
@@ -238,10 +238,10 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 				sortfieldApplied = "fullfillment desc,booking_count desc,"  + geoDistance + " asc";
 			}
 			if(Constants.SORT_OPTION_THREE.equals(bySort)){
-				sortfieldApplied = "fullfillment desc,est_two_price asc,"  + geoDistance + " asc";
+				sortfieldApplied = "fullfillment desc,costFor2 asc,"  + geoDistance + " asc";
 			}
-			if(Constants.SORT_OPTION_THREE.equals(bySort)){
-				sortfieldApplied = "fullfillment desc,est_two_price desc,"  + geoDistance + " asc";
+			if(Constants.SORT_OPTION_FOUR.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,costFor2 desc,"  + geoDistance + " asc";
 			}
 			if(Constants.SORT_OPTION_FIVE.equals(bySort)){
 				sortfieldApplied = "fullfillment desc,avg_rating asc,"  + geoDistance + " asc";
@@ -256,7 +256,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 				sortfieldApplied = geoDistance + " asc";
 			}
 		}else{
-			sortfieldApplied = "fullfillment desc";
+			sortfieldApplied = "fullfillment desc,score desc";
 			queryParam.addParam("boost","div(1,sqrt(sum(1,mul(0.4,sub(sum(abs(sub("+geoDistance+",0)),abs(sub("+geoDistance+","+Integer.parseInt(restSearchReq.getRadius())/2+"))),sub("+Integer.parseInt(restSearchReq.getRadius())/2+",0))))))");
 		}
 		queryParam.addParam("sort", sortfieldApplied);

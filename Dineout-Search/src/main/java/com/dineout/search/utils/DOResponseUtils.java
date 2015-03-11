@@ -18,11 +18,18 @@ import org.apache.solr.common.SolrDocument;
 
 import com.dineout.search.response.DOFacet;
 import com.dineout.search.response.DOHighlight;
+import com.dineout.search.response.DORecoResult;
 import com.dineout.search.response.DOSearchResult;
 import com.dineout.search.response.DOSpellCheck;
 
 public class DOResponseUtils {
 
+	public static DORecoResult processRecoQueryResponse(QueryResponse qres) {
+		DORecoResult result = new DORecoResult();
+		result.setDocs(getTCDocList(qres));
+		return result;
+	}
+	
 	public static DOSearchResult processQueryResponse(QueryResponse qres, String domain, boolean isSpellcheckApplied) {
 		DOSearchResult result = new DOSearchResult();
 		result.setDomain(domain);
@@ -204,5 +211,12 @@ public class DOResponseUtils {
 			processed = processed.replaceAll(token.toLowerCase(), "");
 		}
 		return processed;
+	}
+	
+	public static String[] getData(Object object){
+		ArrayList tempObject =(ArrayList)object;
+		String [] fieldData = (String[]) tempObject.toArray(new String[tempObject.size()]);
+		
+		return fieldData;
 	}
 }

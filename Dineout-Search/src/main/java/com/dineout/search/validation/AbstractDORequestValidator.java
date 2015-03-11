@@ -9,7 +9,7 @@ import com.dineout.search.exception.ErrorCode;
 import com.dineout.search.request.GenericDOSearchRequest;
 import com.dineout.search.utils.DORequestUtils;
 
-public abstract class AbstractTCRequestValidator implements Validator{
+public abstract class AbstractDORequestValidator implements Validator{
 	private  String[] params;
 	
 	public void validatorResourceData(Object target, Errors errors, String ... params){

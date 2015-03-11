@@ -6,7 +6,7 @@ import org.springframework.validation.Errors;
 import com.dineout.search.request.DORestSearchRequest;
 
 @Component(value="doRestRequestValidator")
-public class DoRestRequestValidator extends AbstractTCRequestValidator{
+public class DoRestRequestValidator extends AbstractDORequestValidator{
 
 	@Override
 	public boolean supports(Class<?> clazz) {
