@@ -39,6 +39,8 @@ public class Constants {
 	public static final String AUTOCOMPLETION_DATA_TYPE_LOCALITY = "Locality";
 	public static final String AUTOCOMPLETION_DATA_TYPE_QUERY = "Query";
 	public static final String AUTOCOMPLETION_DATA_TYPE_TAGS = "Tags";
+	public static final String AUTOCOMPLETION_DATA_TYPE_AREA = "Area";
+
 	/*****************************Group types*****************************************/
 	public static final String GROUP_TRUE = "true";
 	

@@ -5,6 +5,7 @@ public class DOAutoCompleteSuggestionEntry {
 	private String uid;
 	private String guid;
 	private String location_name;
+	private String area_name;
 	private String profile_name;
 	private String cuisine_name;
 	private String tag_name;
@@ -31,6 +32,12 @@ public class DOAutoCompleteSuggestionEntry {
 	}
 	public void setLocation_name(String location_name) {
 		this.location_name = location_name;
+	}
+	public String getArea_name() {
+		return area_name;
+	}
+	public void setArea_name(String area_name) {
+		this.area_name = area_name;
 	}
 	public String getSuggestion() {
 		return suggestion;
