@@ -40,7 +40,7 @@ public abstract class DOAbstractSearchController {
 	 * @param request
 	 */
 	protected void processDOSearchRequest(GenericDOSearchRequest request){
-		if(!StringUtils.isEmpty(request.getSearchname())){
+		if(!StringUtils.isBlank(request.getSearchname())){
 			request.setSearchExecuted(true);
 		}
 		if (DORequestUtils.isSpatial(request)){

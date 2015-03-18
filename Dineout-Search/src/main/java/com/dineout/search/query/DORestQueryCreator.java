@@ -34,7 +34,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		QueryParam queryParam = new QueryParam();
 		Map<String,String> excludeTagMap = new HashMap<String,String>();
 		initializeQueryCreator(req, queryParam, req.getEstfl());
-		queryString = !StringUtils.isEmpty(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY;
+		queryString = !StringUtils.isBlank(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY;
 		queryParam.addParam("q", queryString);
 		setQueryParser(queryParam, req,nerMap);
 		//handleGroupRequest(queryParam,req); TODO: Field to be shared
