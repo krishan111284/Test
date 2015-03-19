@@ -10,7 +10,7 @@ public class Constants {
 	public static final MediaType JSON_MEDIA_TYPE = MediaType.valueOf("application/json;charset=UTF-8");      
 	
 	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-	public static final String SPECIAL_CHAR_REGEX = "\\band\\b|\\bor\\b|[+&-]";
+	public static final String SPECIAL_CHAR_REGEX = "\\band\\b|\\bor\\b|[+-]";
 	public static final String DEFAULT_FACET_LIMIT = "1000";
 	public static final String DEFAULT_FACET_MIN_COUNT = "1";
 	public static final String DEFAULT_START_INDEX = "0";
