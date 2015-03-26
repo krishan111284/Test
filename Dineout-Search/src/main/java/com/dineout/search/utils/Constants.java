@@ -17,7 +17,7 @@ public class Constants {
 	public static final String DEFAULT_NUM_ROWS = "10";
 	public static final String WILD_SEARCH_QUERY="*:*";
 	//public static final String FIELD_LIST_ALL="*,score";
-	public static final String FIELD_LIST_ALL="city_name,cuisine,locality_name,event_title,event_desc,rank,area_name,costFor2,secondary_family,locality_alias,avg_rating,r_id,profile_name,secondary_cuisine,url,landmark,booking_count,address,rest_alias,score,img,n_offers,lat_lng,fullfillment";
+	public static final String FIELD_LIST_ALL="city_name,cuisine,primary_cuisine,secondary_cuisine,primary_family,secondary_family,locality_name,event_title,event_desc,rank,area_name,costFor2,locality_alias,avg_rating,r_id,profile_name,url,landmark,booking_count,address,rest_alias,score,img,n_offers,lat_lng,fullfillment,rest_alias";
 	
 	
 	/*****************Response Types *************************/

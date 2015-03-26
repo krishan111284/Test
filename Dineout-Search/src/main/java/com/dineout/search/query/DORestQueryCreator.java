@@ -55,9 +55,9 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 
 	private void applyGlobalBoosts(QueryParam queryParam,
 			DORestSearchRequest req) {
-		queryParam.addParam("boost", "product(scale(booking_count,1,5),0.5)");
-		queryParam.addParam("boost", "product(avg_rating,0.25)");
-		queryParam.addParam("boost", "product(div(sub(11,rank),2),0.25)");
+		queryParam.addParam("boost", "product(scale(booking_count,1,5),0.35)");
+		queryParam.addParam("boost", "product(sum(avg_rating,1),0.35)");
+		queryParam.addParam("boost", "product(div(sub(11,rank),2),0.15)");
 
 	}
 
@@ -99,8 +99,8 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 
 	private void applyCuisineBoosts(QueryParam queryParam,Map<String, ArrayList<String>> nerMap) {
 		for(String childCuisine:nerMap.get(Constants.NER_CUISINE_KEY)){
-			queryParam.addParam("bq", "(primary_cuisine_ft:"+childCuisine+")^10000");
-			queryParam.addParam("bq", "(secondary_cuisine_ft:"+childCuisine+")^5000");	
+			queryParam.addParam("bq", "(primary_cuisine_ft:"+childCuisine+")^40000");
+			queryParam.addParam("bq", "(secondary_cuisine_ft:"+childCuisine+")^10000");	
 		}
 	}
 
