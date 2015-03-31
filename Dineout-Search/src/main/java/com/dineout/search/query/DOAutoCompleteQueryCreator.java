@@ -23,7 +23,7 @@ public class DOAutoCompleteQueryCreator {
 		queryParam.addParam("qf", "area_name^2 area_name_string_ngram^2 location_name^2 location_name_string_ngram^2 profile_name^2 profile_name_string_ngram^2 cuisine_name^2 cuisine_name_string_ngram^2 tag_name^2 tag_name_string_ngram^2 title_bm_gram^2");
 		queryParam.addParam("group", "true");
 		queryParam.addParam("group.field", "data_type");
-		queryParam.addParam("group.limit", "3");
+		queryParam.addParam("group.limit", "5");
 		queryParam.addParam("limit", "12");
 		queryParam.addParam("fl", "uid,area_name,location_name,profile_name,cuisine_name,guid,score,tag_name");
 		queryParam.addParam("fq", "((-city_name:[* TO *] AND *:*) OR city_name:"+req.getBycity()+")");

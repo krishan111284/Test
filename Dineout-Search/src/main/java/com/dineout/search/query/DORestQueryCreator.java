@@ -257,7 +257,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			}
 		}else{
 			sortfieldApplied = "fullfillment desc,score desc";
-			queryParam.addParam("boost","div(1,sqrt(sum(1,mul(0.4,sub(sum(abs(sub("+geoDistance+",0)),abs(sub("+geoDistance+","+Integer.parseInt(restSearchReq.getRadius())/2+"))),sub("+Integer.parseInt(restSearchReq.getRadius())/2+",0))))))");
+			queryParam.addParam("boost","div(1,sqrt(sum(1,product(0.4,sub(sum(abs(sub("+geoDistance+",0)),abs(sub("+geoDistance+","+Double.parseDouble(restSearchReq.getRadius())/2.2+"))),sub("+Double.parseDouble(restSearchReq.getRadius())/2.2+",0))))))");
 		}
 		queryParam.addParam("sort", sortfieldApplied);
 	}
