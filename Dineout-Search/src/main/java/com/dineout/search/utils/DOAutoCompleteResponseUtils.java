@@ -45,9 +45,9 @@ public class DOAutoCompleteResponseUtils {
 			SolrDocument solrDocument) {
 		String entity_name = null;
 		if(Constants.AUTOCOMPLETION_DATA_TYPE_RESTAURANT.equals(dataType))
-				entity_name = (String)solrDocument.get("profile_name");
+				entity_name = (String)solrDocument.get("profile_location_name");
 		if(Constants.AUTOCOMPLETION_DATA_TYPE_LOCALITY.equals(dataType))
-			entity_name = (String)solrDocument.get("location_name");
+			entity_name = (String)solrDocument.get("loc_area_name");
 		if(Constants.AUTOCOMPLETION_DATA_TYPE_AREA.equals(dataType))
 			entity_name = (String)solrDocument.get("area_name");
 		if(Constants.AUTOCOMPLETION_DATA_TYPE_CUISINE.equals(dataType))
