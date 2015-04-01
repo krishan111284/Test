@@ -24,8 +24,8 @@ public class DOAutoCompleteQueryCreator {
 		queryParam.addParam("group", "true");
 		queryParam.addParam("group.field", "data_type");
 		queryParam.addParam("group.limit", "5");
-		queryParam.addParam("limit", "12");
-		queryParam.addParam("fl", "uid,area_name,location_name,profile_name,cuisine_name,guid,score,tag_name");
+		queryParam.addParam("limit", "20");
+		queryParam.addParam("fl", "uid,area_name,loc_area_name,profile_location_name,cuisine_name,guid,score,tag_name");
 		queryParam.addParam("fq", "((-city_name:[* TO *] AND *:*) OR city_name:"+req.getBycity()+")");
 		queryParam.addParam("q", req.getSearchname());
 		//queryParam.addParam("group.sort", "POPULARITY desc,query_pop desc");

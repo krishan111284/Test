@@ -27,11 +27,11 @@ public class DOAutoCompleteResponseUtils {
 				DOAutoCompleteSuggestionEntry entry = new DOAutoCompleteSuggestionEntry();
 				entry.setUid((String)solrDocument.get("uid"));
 				entry.setGuid((String)solrDocument.get("guid"));
-				entry.setProfile_name((String)solrDocument.get("profile_name"));
+				entry.setProfile_name((String)solrDocument.get("profile_location_name"));
 				entry.setCuisine_name((String)solrDocument.get("cuisine_name"));
 				entry.setScore((Float)solrDocument.get("score"));
 				entry.setTag_name((String)solrDocument.get("tag_name"));
-				entry.setLocation_name(solrDocument.get("location_name")!=null?(String)solrDocument.get("location_name"):null);
+				entry.setLocation_name(solrDocument.get("loc_area_name")!=null?(String)solrDocument.get("loc_area_name"):null);
 				entry.setArea_name(solrDocument.get("area_name")!=null?(String)solrDocument.get("area_name"):null);
 				entry.setSuggestion(getSuggestion(dataType,solrDocument));	
 				entryList.add(entry);
