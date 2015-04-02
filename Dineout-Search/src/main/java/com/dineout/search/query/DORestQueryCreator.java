@@ -57,7 +57,8 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			DORestSearchRequest req) {
 		queryParam.addParam("boost", "product(scale(booking_count,1,5),0.35)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.35)");
-		queryParam.addParam("boost", "product(div(sub(11,rank),2),0.15)");
+		//queryParam.addParam("boost", "product(div(sub(11,rank),2),0.15)");
+		queryParam.addParam("boost", "if(exists(rank),product(div(sub(11,rank),2),0.15),0.01)");
 
 	}
 
@@ -257,7 +258,8 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			}
 		}else{
 			sortfieldApplied = "fullfillment desc,score desc";
-			queryParam.addParam("boost","div(1,sqrt(sum(1,product(0.4,sub(sum(abs(sub("+geoDistance+",0)),abs(sub("+geoDistance+","+Double.parseDouble(restSearchReq.getRadius())/2.2+"))),sub("+Double.parseDouble(restSearchReq.getRadius())/2.2+",0))))))");
+			//queryParam.addParam("boost","div(1,sqrt(sum(1,product(0.4,sub(sum(abs(sub("+geoDistance+",0)),abs(sub("+geoDistance+","+Double.parseDouble(restSearchReq.getRadius())/2.2+"))),sub("+Double.parseDouble(restSearchReq.getRadius())/2.2+",0))))))");
+			queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getLat()+","+restSearchReq.getLng()+")))),0,5)");
 		}
 		queryParam.addParam("sort", sortfieldApplied);
 	}
