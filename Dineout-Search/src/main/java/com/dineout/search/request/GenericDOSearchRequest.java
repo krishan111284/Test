@@ -34,7 +34,7 @@ public abstract class GenericDOSearchRequest {
 	public void setSearchname(String searchname) {
 		//TO AVOID UN - INTENTIONAL BOOLEAN QUERY WITH EDISMAX
         Pattern specialCharPatternRegex = Pattern.compile(Constants.SPECIAL_CHAR_REGEX);
-        this.searchname = !StringUtils.isEmpty(searchname)?specialCharPatternRegex.matcher(searchname).replaceAll(""):searchname;
+        this.searchname = !StringUtils.isEmpty(searchname)?specialCharPatternRegex.matcher(searchname).replaceAll(" "):searchname;
 
 	}
 	public String getBycity() {
