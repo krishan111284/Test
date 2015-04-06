@@ -368,7 +368,6 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		if(req.isSearchExecuted()){
 			String query = nerMap.size()>0?nerMap.get(Constants.PROCESSED_QUERY).get(0).trim():req.getSearchname();
 			String[] tokens = query.split(" ");
-			//queryParam.addParam("mm","100%");
 			queryParam.addParam("mm", tokens.length+"");
 		}
 		if(!StringUtils.isEmpty(req.getSearchname())){
