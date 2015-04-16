@@ -33,7 +33,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		String queryString = null;
 		QueryParam queryParam = new QueryParam();
 		Map<String,String> excludeTagMap = new HashMap<String,String>();
-		initializeQueryCreator(req, queryParam, req.getEstfl());
+		initializeQueryCreator(req, queryParam, req.getEstfl(),rb.getString("dineout.search.fl"));
 		queryString = !StringUtils.isBlank(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY;
 		queryParam.addParam("q", queryString);
 		setQueryParser(queryParam, req,nerMap);
@@ -57,7 +57,6 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			DORestSearchRequest req) {
 		queryParam.addParam("boost", "product(scale(booking_count,1,5),0.35)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.35)");
-		//queryParam.addParam("boost", "product(div(sub(11,rank),2),0.15)");
 		queryParam.addParam("boost", "if(exists(rank),product(div(sub(11,rank),2),0.15),0.01)");
 
 	}

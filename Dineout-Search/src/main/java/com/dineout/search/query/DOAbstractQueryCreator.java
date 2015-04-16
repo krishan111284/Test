@@ -8,8 +8,8 @@ import com.dineout.search.utils.Constants;
 public abstract class DOAbstractQueryCreator {
 	
 		
-	public void initializeQueryCreator(GenericDOSearchRequest request,QueryParam queryParam, String fl){
-		addFlParams(request,queryParam,fl);
+	public void initializeQueryCreator(GenericDOSearchRequest request,QueryParam queryParam, String reqFl, String fl){
+		addFlParams(request,queryParam,reqFl,fl);
 		addSpellCheckParams(request,queryParam);
 	}
 
@@ -30,9 +30,9 @@ public abstract class DOAbstractQueryCreator {
 		
 	}
 
-	protected void addFlParams(GenericDOSearchRequest request, QueryParam queryParam, String fl) {
-		fl = StringUtils.isEmpty(fl) ? Constants.FIELD_LIST_ALL:fl;
-		StringBuilder sb = new StringBuilder(fl);
+	protected void addFlParams(GenericDOSearchRequest request, QueryParam queryParam, String reqFl, String fl) {
+		reqFl = StringUtils.isEmpty(reqFl) ? fl:reqFl;
+		StringBuilder sb = new StringBuilder(reqFl);
 		if(request.isSpatialQuery()){
 			String geoDistance = "geodist(lat_lng," + request.getLat() +","+request.getLng()+")";
 			sb.append(",").append("geo_distance:"+geoDistance);
