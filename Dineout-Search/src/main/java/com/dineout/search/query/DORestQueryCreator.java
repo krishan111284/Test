@@ -72,8 +72,36 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		handlePriceFilters(queryParam,req,excludeTagMap);
 		handleTagsFilters(queryParam, req, excludeTagMap);
 		handleRatingsFilters(queryParam, req,excludeTagMap);
-
+		//handleAreaLocationFilters(queryParam,req,excludeTagMap);
 	}
+
+	/*private void handleAreaLocationFilters(QueryParam queryParam,
+			DORestSearchRequest req, Map<String, String> excludeTagMap) {
+		ArrayList<String>commonList = new ArrayList<String>();
+		StringBuilder areaLocFacetQr = new StringBuilder();
+
+		if(req.getByarea()!=null && req.getByarea().length>0){
+			for(String area:req.getByarea()){
+				commonList.add("area_name_ft:"+"\""+area+"\"");
+			}
+		}
+
+		if(req.getBylocation()!=null && req.getBylocation().length>0){
+			for(String location:req.getBylocation()){
+				commonList.add("locality_name_ft:"+"\""+location+"\"");
+			}
+		}
+
+		for (String alFilter: commonList){
+			areaLocFacetQr.append(alFilter).append(" OR ");
+		}
+		if(commonList.size()>0){
+			String areaLocFilter = areaLocFacetQr.substring(0,areaLocFacetQr.lastIndexOf(" OR "));
+			queryParam.addParam("fq", "{!tag=area_loc_ft_tag}("+areaLocFilter+")");
+			excludeTagMap.put("area_loc", "{!ex=area_loc_ft_tag}");
+		}
+	}*/
+
 	private void handleNerEntity(QueryParam queryParam,
 			Map<String, ArrayList<String>> nerMap,DORestSearchRequest req) {
 		if(nerMap!=null && nerMap.size()>0){
@@ -130,7 +158,6 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		excludeTagMap.put("rate", "{!ex=avg_rating_tag}");
 		}
 	}
-
 
 	//NEED TO GET FIELD FOR GROUPING!!
 	/*	private void handleGroupRequest(QueryParam queryParam,
@@ -221,7 +248,6 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		queryParam.addParam("sort", sortfieldApplied);
 	}
 
-
 	private void handleSpatialSortingRequest(QueryParam queryParam,
 			DORestSearchRequest restSearchReq) {
 		String geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
@@ -263,7 +289,6 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		queryParam.addParam("sort", sortfieldApplied);
 	}
 
-
 	private void handlePriceFilters(QueryParam queryParam,
 			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) throws SearchException {
 		if(restSearchReq.getByprice()!=null && restSearchReq.getByprice().length>0){
@@ -285,7 +310,6 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			excludeTagMap.put("price", "{!ex=costFor2_tag}");
 		}
 	}
-
 
 	private void handleTagsFilters(QueryParam queryParam,
 			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
@@ -351,12 +375,24 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
 		if(restSearchReq.getBycuisine()!=null && restSearchReq.getBycuisine().length>0){
 			StringBuilder cuisineFacetQr = new StringBuilder();
+			StringBuilder primaryCuisineFacetQr = new StringBuilder();
+			StringBuilder secondaryCuisineFacetQr = new StringBuilder();
 			String cuisineFacetQrStr = null;
+			String primaryCuisineFacetQrStr = null;
+			String secondaryCuisineFacetQrStr = null;
 			for(String cuisine:restSearchReq.getBycuisine()){
 				cuisine.replaceAll("~","/");
 				cuisineFacetQr.append("cuisine_ft:"+"\""+cuisine+"\"").append(" OR ");
+				primaryCuisineFacetQr.append("primary_cuisine_ft:"+"\""+cuisine+"\"").append(" OR ");
+				secondaryCuisineFacetQr.append("secondary_cuisine_ft:"+"\""+cuisine+"\"").append(" OR ");
 			}
 			cuisineFacetQrStr = cuisineFacetQr.substring(0,cuisineFacetQr.lastIndexOf(" OR "));
+			primaryCuisineFacetQrStr = primaryCuisineFacetQr.substring(0,primaryCuisineFacetQr.lastIndexOf(" OR "));
+			secondaryCuisineFacetQrStr = secondaryCuisineFacetQr.substring(0,secondaryCuisineFacetQr.lastIndexOf(" OR "));
+			//to give extra boost to primary cuisine when applying filter
+			queryParam.addParam("bq", "("+primaryCuisineFacetQrStr+")^40000");
+			queryParam.addParam("bq", "("+secondaryCuisineFacetQrStr+")^10000");	
+			
 			queryParam.addParam("fq", "{!tag=cuisine_ft_tag}("+cuisineFacetQrStr.toString()+")");
 			excludeTagMap.put("cuisine", "{!ex=cuisine_ft_tag}");
 		}
