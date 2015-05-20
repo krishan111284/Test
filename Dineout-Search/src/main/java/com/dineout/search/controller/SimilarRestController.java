@@ -1,5 +1,6 @@
 package com.dineout.search.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,8 +53,10 @@ public class SimilarRestController extends DOAbstractSearchController{
 			processValidationErrors(bindingResult.getAllErrors(),errors);
 			jsonresp = processJSONResponse(null, null, errors);
 		}else{
+			long start = new Date().getTime();
 			searchResultList = similarRecoSearchService.getSearchResults(request,errors);
-			DOSearchResponse resp = getRecoResponse(searchResultList,errors,"Similar");
+			long responseTime = new Date().getTime() - start;
+			DOSearchResponse resp = getRecoResponse(searchResultList,errors,"Similar",responseTime);
 			if(!errors.hasErrors() && ((DORecoResponseBody)resp.getBody()).getMatches() == 0){
 				logger.error(request.getSearchname());
 			}

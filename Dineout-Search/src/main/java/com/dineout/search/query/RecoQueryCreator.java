@@ -22,6 +22,7 @@ public class RecoQueryCreator {
 		queryParam.addParam("fq", "r_id:"+req.getRestId());
 		queryParam.addParam("defType","edismax");
 		queryParam.addParam("q", Constants.WILD_SEARCH_QUERY);
+		queryParam.addParam("fl", "profile_name,costFor2,avg_rating,cuisine,tags,city_name,r_id,lat_lng");
 		return queryParam;
 	}
 
@@ -34,9 +35,11 @@ public class RecoQueryCreator {
 		applyCityRestFilter(queryParam,req);
 		applyNearbyFilter(queryParam,req);
 		applyNearbyBoosts(queryParam,req);
+		handleGroupsAndChain(queryParam,req);
+		handleFulfillment(queryParam, req);
 		return queryParam;
 	}
-	
+
 	public QueryParam getSimilarRestaurantQuery(DORestSearchRequest req) throws SearchException {
 		QueryParam queryParam = new QueryParam();
 		queryParam.addParam("q", Constants.WILD_SEARCH_QUERY);
@@ -45,7 +48,26 @@ public class RecoQueryCreator {
 		setResponseNumLimit(queryParam,req);
 		applyCityRestFilter(queryParam,req);
 		applySimilarBoosts(queryParam,req);
+		handleGroupsAndChain(queryParam,req);
+		handleFulfillment(queryParam, req);
 		return queryParam;
+	}
+
+	private void handleFulfillment(QueryParam queryParam, DORestSearchRequest req){
+		String sortfieldApplied = "";
+		if(!StringUtils.isEmpty(req.getBysort())){
+			if(Constants.SORT_OPTION_ONE.equals(req.getBysort())){
+				sortfieldApplied = "fullfillment desc,score desc";
+			}
+			queryParam.addParam("sort", sortfieldApplied);
+		}
+	}
+
+	private void handleGroupsAndChain(QueryParam queryParam, DORestSearchRequest req) {
+		queryParam.addParam("group","true");
+		queryParam.addParam("group.field","profile_name");
+		queryParam.addParam("group.limit", "1");
+		queryParam.addParam("fq", "-profile_name:"+"\""+req.getProfile_name()+"\"");
 	}
 
 	private void setNearbyFlFields(QueryParam queryParam, DORestSearchRequest req) {
@@ -53,7 +75,7 @@ public class RecoQueryCreator {
 		String geoDistance = "geo_distance:geodist(lat_lng," + req.getLat() +","+req.getLng()+")";
 		queryParam.addParam("fl", fl+","+geoDistance);
 	}
-	
+
 	private void setSimilarFlFields(QueryParam queryParam, DORestSearchRequest req) {
 		String fl="r_id,costFor2,avg_rating,profile_name,cuisine_ft,tags_ft,locality_name_ft,score";
 		queryParam.addParam("fl", fl);
@@ -61,9 +83,8 @@ public class RecoQueryCreator {
 
 	private void applyCityRestFilter(QueryParam queryParam, DORestSearchRequest req) {
 		queryParam.addParam("fq", "city_name:"+req.getBycity());
-		queryParam.addParam("fq", "-r_id:"+req.getRestId());
 	}
-	
+
 	private void applyNearbyFilter(QueryParam queryParam, DORestSearchRequest req) {
 		String spatialQuery = "{!geofilt sfield=lat_lng pt=" + req.getLat() + "," + req.getLng() + " d=3}";
 		queryParam.addParam("fq", spatialQuery);
@@ -76,7 +97,7 @@ public class RecoQueryCreator {
 		applyCuisineBoost(queryParam,req);
 		applyTagsBoost(queryParam,req);
 	}
-	
+
 	private void applySimilarBoosts(QueryParam queryParam, DORestSearchRequest req) {
 		applyRatingsBoost(queryParam,req);
 		applyPriceBoost(queryParam,req);
@@ -99,7 +120,7 @@ public class RecoQueryCreator {
 			StringBuilder tags = new StringBuilder();
 			String tagsQrStr = null;
 			for(String tag:req.getBytags()){
-				tags.append("tags_ft:\""+tag+"\""+"^10").append(" OR ");
+				tags.append("tags_ft:\""+tag+"\""+"^300").append(" OR ");
 			}
 			tagsQrStr = tags.substring(0,tags.lastIndexOf(" OR "));
 			queryParam.addParam("bq", tagsQrStr);
@@ -111,7 +132,6 @@ public class RecoQueryCreator {
 			StringBuilder cuisines = new StringBuilder();
 			String CuisineQrStr = null;
 			for(String cuisine:req.getBycuisine()){
-				//cuisines.append("cuisine_ft:\""+cuisine+"\"").append(" OR ");
 				cuisines.append("cuisine_ft:\""+cuisine+"\""+"^70").append(" OR ");
 			}
 			CuisineQrStr = cuisines.substring(0,cuisines.lastIndexOf(" OR "));

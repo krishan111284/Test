@@ -2,6 +2,7 @@ package com.dineout.search.response;
 
 public class DOAutoCompleteSuggestionEntry {
 	
+	private String r_id;
 	private String uid;
 	private String guid;
 	private String location_name;
@@ -68,6 +69,12 @@ public class DOAutoCompleteSuggestionEntry {
 	}
 	public void setTag_name(String tag_name) {
 		this.tag_name = tag_name;
+	}
+	public String getR_id() {
+		return r_id;
+	}
+	public void setR_id(String r_id) {
+		this.r_id = r_id;
 	}
 	
 }

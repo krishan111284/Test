@@ -26,6 +26,7 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	private String[] byestservicetag;
 	private String restId;
 	private String avg_rating;
+	private String profile_name;
 	
 	public boolean isGrouprequest(){
 		return StringUtils.isEmpty(bygroup) && Constants.GROUP_TRUE.equals(group);
@@ -138,6 +139,10 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	public void setAvg_rating(String avg_rating) {
 		this.avg_rating = avg_rating;
 	}
-	
-	
+	public String getProfile_name() {
+		return profile_name;
+	}
+	public void setProfile_name(String profile_name) {
+		this.profile_name = profile_name;
+	}
 }

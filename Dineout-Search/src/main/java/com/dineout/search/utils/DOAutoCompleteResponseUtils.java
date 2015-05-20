@@ -26,6 +26,7 @@ public class DOAutoCompleteResponseUtils {
 				SolrDocument solrDocument = iter.next();
 				DOAutoCompleteSuggestionEntry entry = new DOAutoCompleteSuggestionEntry();
 				entry.setUid((String)solrDocument.get("uid"));
+				entry.setR_id((String)solrDocument.get("r_id"));
 				entry.setGuid((String)solrDocument.get("guid"));
 				entry.setProfile_name((String)solrDocument.get("profile_name"));
 				entry.setCuisine_name((String)solrDocument.get("cuisine_name"));

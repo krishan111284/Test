@@ -1,5 +1,6 @@
 package com.dineout.search.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +43,7 @@ public class NearbyRestController extends DOAbstractSearchController{
 	public @ResponseBody ResponseEntity<String> getKeywordresults(@ModelAttribute("searchHeader")DOSearchHeader header,
 			@ModelAttribute("restSearchRequest")DORestSearchRequest request, BindingResult bindingResult,
 			HttpServletResponse response, HttpSession session,HttpServletRequest httpReq){
+		
 		String jsonresp = null;
 		HttpHeaders responseHeaders = new HttpHeaders();
 		List<DORecoResult> searchResultList = null;
@@ -52,8 +54,10 @@ public class NearbyRestController extends DOAbstractSearchController{
 			processValidationErrors(bindingResult.getAllErrors(),errors);
 			jsonresp = processJSONResponse(null, null, errors);
 		}else{
+			long start = new Date().getTime();
 			searchResultList = nearbyRecoSearchService.getSearchResults(request,errors);
-			DOSearchResponse resp = getRecoResponse(searchResultList,errors,"Nearby");
+			long responseTime = new Date().getTime() - start; 
+			DOSearchResponse resp = getRecoResponse(searchResultList,errors,"Nearby",responseTime);
 			if(!errors.hasErrors() && ((DORecoResponseBody)resp.getBody()).getMatches() == 0){
 				logger.error(request.getSearchname());
 			}

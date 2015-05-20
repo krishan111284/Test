@@ -79,6 +79,7 @@ public class Constants {
 	public static final String PROCESSED_QUERY = "PROCESSED_QUERY";
 	public static final String IS_NEARBY_ENABLED = "true";
 	public static final String NER_FEATURE_KEY = "Feature";
+	public static final String IS_FULFILLMENT = "true";
 
 	/******************Sort options**********************************/
 	public static final String SORT_OPTION_ONE= "1";

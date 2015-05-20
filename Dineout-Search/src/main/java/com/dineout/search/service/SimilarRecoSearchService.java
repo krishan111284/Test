@@ -46,8 +46,9 @@ public class SimilarRecoSearchService implements RecoSearchService{
 				request.setByprice(restDoc.get("costFor2")!=null?new String[] {Float.toString((Float)restDoc.get("costFor2"))}:null);
 				request.setAvg_rating(restDoc.get("avg_rating")!=null?Float.toString((Float)restDoc.get("avg_rating")):null);
 				request.setBycuisine(restDoc.get("cuisine")!=null?DOResponseUtils.getData(restDoc.get("cuisine")):null);
-				request.setBytags(restDoc.get("tags")!=null?new String[]{(String)restDoc.get("tags")}:null);
+				request.setBytags(restDoc.get("tags")!=null?DOResponseUtils.getData(restDoc.get("tags")):null);
 				request.setBycity(restDoc.get("city_name")!=null?(String)restDoc.get("city_name"):null);
+				request.setProfile_name(restDoc.get("profile_name")!=null?(String)restDoc.get("profile_name"):null);
 
 				if(restDoc.get("lat_lng")!=null)
 				{

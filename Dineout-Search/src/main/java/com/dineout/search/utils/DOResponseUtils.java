@@ -25,11 +25,9 @@ import com.dineout.search.response.DOSpellCheck;
 public class DOResponseUtils {
 
 	public static DORecoResult processRecoQueryResponse(QueryResponse qres) {
-		DORecoResult result = new DORecoResult();
-		result.setDocs(getTCDocList(qres));
-		return result;
+		return processGroupQueryResponseForReco(qres);
 	}
-	
+
 	public static DOSearchResult processQueryResponse(QueryResponse qres, String domain, boolean isSpellcheckApplied) {
 		DOSearchResult result = new DOSearchResult();
 		result.setDomain(domain);
@@ -124,6 +122,20 @@ public class DOResponseUtils {
 		return tcDoc;
 	}
 
+	public static DORecoResult processGroupQueryResponseForReco(QueryResponse qRes) {
+		DORecoResult result = new DORecoResult();
+		GroupCommand groupCommand = qRes.getGroupResponse().getValues().get(0);
+		List<Group> groups =groupCommand.getValues();
+		List<Map<Object, Object>> docList = new ArrayList<Map<Object, Object>>();
+		for(Group group:groups){
+			Iterator<SolrDocument> iter = group.getResult().iterator();
+			Map<Object, Object> doc = getDODoc(iter.next());
+			docList.add(doc);
+		}
+		result.setDocs(docList);
+		return result;
+	}
+
 	public static DOSearchResult processGroupQueryResponse(QueryResponse qRes,
 			String domain,boolean isSpellcheckApplied) {
 		DOSearchResult result = new DOSearchResult();
@@ -212,11 +224,11 @@ public class DOResponseUtils {
 		}
 		return processed;
 	}
-	
+
 	public static String[] getData(Object object){
 		ArrayList tempObject =(ArrayList)object;
 		String [] fieldData = (String[]) tempObject.toArray(new String[tempObject.size()]);
-		
+
 		return fieldData;
 	}
 }

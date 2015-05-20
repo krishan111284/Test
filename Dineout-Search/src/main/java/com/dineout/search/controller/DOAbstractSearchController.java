@@ -95,7 +95,7 @@ public abstract class DOAbstractSearchController {
 		return jsonresp;		
 	}
 
-	protected DOSearchResponse getRecoResponse(List<DORecoResult> results, SearchErrors errors, String domain){
+	protected DOSearchResponse getRecoResponse(List<DORecoResult> results, SearchErrors errors, String domain, long responseTime){
 		DOSearchResponse resp = new DOSearchResponse();
 		Header resheader = new Header(); 
 		DORecoResponseBody body = new DORecoResponseBody();
@@ -112,6 +112,7 @@ public abstract class DOAbstractSearchController {
 				numFound = SearchResult.getDocs().size();
 			}
 			body.setMatches(numFound);
+			body.setResponseTime(responseTime);
 		}
 		resheader.setResponseType(domain);
 		return resp;
