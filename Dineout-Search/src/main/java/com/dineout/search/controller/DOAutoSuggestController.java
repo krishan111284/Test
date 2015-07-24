@@ -1,5 +1,7 @@
 package com.dineout.search.controller;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -39,6 +41,7 @@ public class DOAutoSuggestController extends DOAbstractSearchController{
 											    @ModelAttribute("autocompleteSearchRequest")DOAutoSearchRequest doAutocompleteSearchRequest, 
 											    BindingResult bindingResult,
 												 HttpServletResponse response){
+		long start = new Date().getTime();
 		Logger logger = Logger.getLogger(DOAutoSuggestController.class);
 		String jsonresp = null;
 		if(jsonresp == null){
@@ -51,6 +54,7 @@ public class DOAutoSuggestController extends DOAbstractSearchController{
 			resp.setBody(body);
 			DOAutoCompleteSearchResult result = null;
 			result = autoCompleteService.getSuggestion(doAutocompleteSearchRequest,errors);
+			long responseTime = new Date().getTime() - start;
 			if(errors.hasErrors()){
 				resheader.setErrors(errors);
 				resheader.setStatus(Constants.RESPONSE_STATUS_ERROR);
@@ -59,6 +63,7 @@ public class DOAutoSuggestController extends DOAbstractSearchController{
 				body.setResult(result);
 				resheader.setStatus(Constants.RESPONSE_STATUS_OK);
 			}
+			resheader.setResponseTime(responseTime);
 			jsonresp=gsonUtil.getGson().toJson(resp);
 		}
 		HttpHeaders responseHeaders = new HttpHeaders();

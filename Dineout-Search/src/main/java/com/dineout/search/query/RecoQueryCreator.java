@@ -54,13 +54,13 @@ public class RecoQueryCreator {
 	}
 
 	private void handleFulfillment(QueryParam queryParam, DORestSearchRequest req){
-		String sortfieldApplied = "";
+		String sortfieldApplied = "fullfillment desc,score desc";
 		if(!StringUtils.isEmpty(req.getBysort())){
 			if(Constants.SORT_OPTION_ONE.equals(req.getBysort())){
-				sortfieldApplied = "fullfillment desc,score desc";
+				sortfieldApplied = "score desc";
 			}
-			queryParam.addParam("sort", sortfieldApplied);
 		}
+		queryParam.addParam("sort", sortfieldApplied);
 	}
 
 	private void handleGroupsAndChain(QueryParam queryParam, DORestSearchRequest req) {
@@ -71,13 +71,13 @@ public class RecoQueryCreator {
 	}
 
 	private void setNearbyFlFields(QueryParam queryParam, DORestSearchRequest req) {
-		String fl="r_id,costFor2,avg_rating,profile_name,cuisine_ft,tags_ft,locality_name_ft,score";
+		String fl="r_id,costFor2,avg_rating,profile_name,cuisine_ft,tags_ft,locality_name_ft,img,url,fullfillment,n_offers,score";
 		String geoDistance = "geo_distance:geodist(lat_lng," + req.getLat() +","+req.getLng()+")";
 		queryParam.addParam("fl", fl+","+geoDistance);
 	}
 
 	private void setSimilarFlFields(QueryParam queryParam, DORestSearchRequest req) {
-		String fl="r_id,costFor2,avg_rating,profile_name,cuisine_ft,tags_ft,locality_name_ft,score";
+		String fl="r_id,costFor2,avg_rating,profile_name,cuisine_ft,tags_ft,locality_name_ft,img,url,fullfillment,n_offers,score";
 		queryParam.addParam("fl", fl);
 	}
 
@@ -132,7 +132,7 @@ public class RecoQueryCreator {
 			StringBuilder cuisines = new StringBuilder();
 			String CuisineQrStr = null;
 			for(String cuisine:req.getBycuisine()){
-				cuisines.append("cuisine_ft:\""+cuisine+"\""+"^70").append(" OR ");
+				cuisines.append("cuisine_ft:\""+cuisine+"\""+"^100").append(" OR ");
 			}
 			CuisineQrStr = cuisines.substring(0,cuisines.lastIndexOf(" OR "));
 			queryParam.addParam("bq", CuisineQrStr);

@@ -43,6 +43,7 @@ public class SimilarRestController extends DOAbstractSearchController{
 	public @ResponseBody ResponseEntity<String> getKeywordresults(@ModelAttribute("searchHeader")DOSearchHeader header,
 			@ModelAttribute("restSearchRequest")DORestSearchRequest request, BindingResult bindingResult,
 			HttpServletResponse response, HttpSession session,HttpServletRequest httpReq){
+		long start = new Date().getTime();
 		String jsonresp = null;
 		HttpHeaders responseHeaders = new HttpHeaders();
 		List<DORecoResult> searchResultList = null;
@@ -53,7 +54,6 @@ public class SimilarRestController extends DOAbstractSearchController{
 			processValidationErrors(bindingResult.getAllErrors(),errors);
 			jsonresp = processJSONResponse(null, null, errors);
 		}else{
-			long start = new Date().getTime();
 			searchResultList = similarRecoSearchService.getSearchResults(request,errors);
 			long responseTime = new Date().getTime() - start;
 			DOSearchResponse resp = getRecoResponse(searchResultList,errors,"Similar",responseTime);

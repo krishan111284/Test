@@ -1,6 +1,7 @@
 package com.dineout.search.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,7 @@ public class DORestSearchController extends DOAbstractSearchController{
 			@ModelAttribute("restSearchRequest")DORestSearchRequest request, BindingResult bindingResult,
 			HttpServletResponse response,
 			HttpSession session,HttpServletRequest httpReq){
+		long start = new Date().getTime();
 		String jsonresp = null;
 		HttpHeaders responseHeaders = new HttpHeaders();
 		List<DOSearchResult> searchResultList = null;
@@ -57,7 +59,8 @@ public class DORestSearchController extends DOAbstractSearchController{
 			processDOSearchRequest(request);
 			Map<String, ArrayList<String>> nerMap = getNerMap(request);
 			searchResultList = restSearchService.getSearchResults(request,errors,nerMap);
-			DOSearchResponse resp = getDOSearchResponse(searchResultList, null,errors,nerMap);
+			long responseTime = new Date().getTime() - start;
+			DOSearchResponse resp = getDOSearchResponse(searchResultList, null,errors,nerMap,responseTime);
 			if(!errors.hasErrors() && ((DOResponseBody)resp.getBody()).getNumFound() == 0){
 				logger.error(request.getSearchname());
 			}

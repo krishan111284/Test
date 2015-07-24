@@ -112,13 +112,13 @@ public abstract class DOAbstractSearchController {
 				numFound = SearchResult.getDocs().size();
 			}
 			body.setMatches(numFound);
-			body.setResponseTime(responseTime);
+			resheader.setResponseTime(responseTime);
 		}
 		resheader.setResponseType(domain);
 		return resp;
 	}
 
-	protected DOSearchResponse getDOSearchResponse(List<DOSearchResult> results, String domain,SearchErrors errors,Map<String, ArrayList<String>> nerMap){
+	protected DOSearchResponse getDOSearchResponse(List<DOSearchResult> results, String domain,SearchErrors errors,Map<String, ArrayList<String>> nerMap, long responseTime){
 		DOSearchResponse resp = new DOSearchResponse();
 		Header resheader = new Header(); 
 		DOResponseBody body = new DOResponseBody();
@@ -138,6 +138,7 @@ public abstract class DOAbstractSearchController {
 			body.setNumFound(numFound);
 		}
 		resheader.setResponseType(domain);
+		resheader.setResponseTime(responseTime);
 		return resp;
 	}
 

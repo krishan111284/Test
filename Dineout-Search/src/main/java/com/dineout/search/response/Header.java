@@ -10,6 +10,7 @@ import com.dineout.search.exception.SearchErrors;
 public class Header {
 	
 	private String responseType;
+	private long responseTime;
 	private String status;
 	SearchErrors errors;
 	private Map<String,ArrayList<String>> nerEntities;
@@ -18,6 +19,12 @@ public class Header {
 	}
 	public void setResponseType(String responseType) {
 		this.responseType = responseType;
+	}
+	public long getResponseTime() {
+		return responseTime;
+	}
+	public void setResponseTime(long responseTime) {
+		this.responseTime = responseTime;
 	}
 	public String getStatus() {
 		return status;
