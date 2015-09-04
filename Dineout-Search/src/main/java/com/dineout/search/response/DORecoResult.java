@@ -12,6 +12,4 @@ public class DORecoResult {
 	public void setDocs(List<Map<Object, Object>> docs) {
 		this.docs = docs;
 	}
-
-
 }
