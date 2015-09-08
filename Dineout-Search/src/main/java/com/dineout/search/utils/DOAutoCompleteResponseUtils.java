@@ -34,6 +34,8 @@ public class DOAutoCompleteResponseUtils {
 				entry.setTag_name((String)solrDocument.get("tag_name"));
 				entry.setLocation_name(solrDocument.get("location_name")!=null?(String)solrDocument.get("location_name"):null);
 				entry.setArea_name(solrDocument.get("area_name")!=null?(String)solrDocument.get("area_name"):null);
+				entry.setBookingCount(solrDocument.get("booking_count")!=null?(Float)solrDocument.get("booking_count"):0);
+				entry.setFulfillment((String)solrDocument.get("fullfillment"));
 				entry.setSuggestion(getSuggestion(dataType,solrDocument));	
 				entryList.add(entry);
 			}

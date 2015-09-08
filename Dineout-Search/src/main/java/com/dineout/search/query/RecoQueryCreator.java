@@ -86,7 +86,8 @@ public class RecoQueryCreator {
 	}
 
 	private void applyNearbyFilter(QueryParam queryParam, DORestSearchRequest req) {
-		String spatialQuery = "{!geofilt sfield=lat_lng pt=" + req.getLat() + "," + req.getLng() + " d=3}";
+		String radius = req.getRadius()!=null?req.getRadius():"5";
+		String spatialQuery = "{!geofilt sfield=lat_lng pt=" + req.getLat() + "," + req.getLng() + " d="+radius+"}";
 		queryParam.addParam("fq", spatialQuery);
 	}
 

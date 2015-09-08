@@ -20,15 +20,18 @@ public class DOAutoCompleteQueryCreator {
 		QueryParam queryParam = new QueryParam();
 		queryParam.addParam("defType", "edismax");
 		queryParam.addParam("mm", "100%");
-		queryParam.addParam("qf", "area_name^2 area_name_string_ngram^2 location_name^2 location_name_string_ngram^2 profile_name^2 profile_name_string_ngram^2 cuisine_name^2 cuisine_name_string_ngram^2 tag_name^2 tag_name_string_ngram^2 title_bm_gram^2");
+		if(req.getSearchname().split(" ").length>1)
+			queryParam.addParam("qf", "area_name^50 area_name_string_ngram^100 location_name^50 location_name_string_ngram^100 profile_name^50 profile_name_string_ngram^100 cuisine_name^50 cuisine_name_string_ngram^100 tag_name^50 tag_name_string_ngram^100 title_specialchars^10 title_bm_gram");
+		else
+			queryParam.addParam("qf", "area_name^50 area_name_string_ngram^100 location_name^50 location_name_string_ngram^100 profile_name^50 profile_name_string_ngram^100 cuisine_name^50 cuisine_name_string_ngram^100 tag_name^50 tag_name_string_ngram^100 title_specialchars^10");
 		queryParam.addParam("group", "true");
 		queryParam.addParam("group.field", "data_type");
-		queryParam.addParam("group.limit", "5");
-		queryParam.addParam("limit", "20");
-		queryParam.addParam("fl", "r_id,uid,area_name,location_name,loc_area_name,profile_name,profile_location_name,cuisine_name,guid,score,tag_name");
+		queryParam.addParam("group.limit", "10");
+		queryParam.addParam("limit", "40");
+		queryParam.addParam("fl", "r_id,uid,area_name,location_name,loc_area_name,profile_name,profile_location_name,cuisine_name,guid,score,tag_name,fullfillment,booking_count");
 		queryParam.addParam("fq", "((-city_name:[* TO *] AND *:*) OR city_name:"+req.getBycity()+")");
 		queryParam.addParam("q", req.getSearchname());
-		//queryParam.addParam("group.sort", "POPULARITY desc,query_pop desc");
+		queryParam.addParam("group.sort", "fullfillment desc,booking_count desc,score desc");
 		return queryParam;
 	}
 }

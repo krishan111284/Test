@@ -10,6 +10,8 @@ public class DOAutoCompleteSuggestionEntry {
 	private String profile_name;
 	private String cuisine_name;
 	private String tag_name;
+	private String fulfillment;
+	private float bookingCount;
 
 	private Float score;
 	
@@ -75,6 +77,18 @@ public class DOAutoCompleteSuggestionEntry {
 	}
 	public void setR_id(String r_id) {
 		this.r_id = r_id;
+	}
+	public String getFulfillment() {
+		return fulfillment;
+	}
+	public void setFulfillment(String fulfillment) {
+		this.fulfillment = fulfillment;
+	}
+	public float getBookingCount() {
+		return bookingCount;
+	}
+	public void setBookingCount(float bookingCount) {
+		this.bookingCount = bookingCount;
 	}
 	
 }
