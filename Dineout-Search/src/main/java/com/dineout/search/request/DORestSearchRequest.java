@@ -22,12 +22,32 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	private String esthlfl;
 	private String disableestfacet;
 	private String estfacetfl;
-	//Service Tags
 	private String[] byestservicetag;
 	private String restId;
 	private String avg_rating;
 	private String profile_name;
+	private String[] byfeatures;
+	private String[] bychain;
+	private String[] byhotel;
 	
+	public String[] getByhotel() {
+		return byhotel;
+	}
+	public void setByhotel(String[] byhotel) {
+		this.byhotel = byhotel;
+	}
+	public String[] getBychain() {
+		return bychain;
+	}
+	public void setBychain(String[] bychain) {
+		this.bychain = bychain;
+	}
+	public String[] getByfeatures() {
+		return byfeatures;
+	}
+	public void setByfeatures(String[] byfeatures) {
+		this.byfeatures = byfeatures;
+	}
 	public boolean isGrouprequest(){
 		return StringUtils.isEmpty(bygroup) && Constants.GROUP_TRUE.equals(group);
 	}

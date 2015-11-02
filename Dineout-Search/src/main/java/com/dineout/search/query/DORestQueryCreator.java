@@ -72,6 +72,9 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		handlePriceFilters(queryParam,req,excludeTagMap);
 		handleTagsFilters(queryParam, req, excludeTagMap);
 		handleRatingsFilters(queryParam, req,excludeTagMap);
+		handleFeaturesFilters(queryParam, req,excludeTagMap);
+		handleHotelFilters(queryParam, req,excludeTagMap);
+		handleChainFilters(queryParam, req,excludeTagMap);
 		//handleAreaLocationFilters(queryParam,req,excludeTagMap);
 	}
 
@@ -101,6 +104,49 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			excludeTagMap.put("area_loc", "{!ex=area_loc_ft_tag}");
 		}
 	}*/
+
+	private void handleChainFilters(QueryParam queryParam,DORestSearchRequest req, Map<String, String> excludeTagMap) {
+		if(req.getBychain()!=null && req.getBychain().length>0){
+			StringBuilder chainFacetQr = new StringBuilder();
+			String chainFacetQrStr=null;
+			for(String hotel:req.getBychain()){
+				chainFacetQr.append("chain_name:\""+hotel+"\"").append(" OR ");
+			}
+			chainFacetQrStr = chainFacetQr.substring(0,chainFacetQr.lastIndexOf(" OR "));
+
+			queryParam.addParam("fq", "{!tag=chain_ft_tag}("+chainFacetQrStr.toString()+")");
+			excludeTagMap.put("chain", "{!ex=chain_ft_tag}");
+		}			
+			
+	}
+
+	private void handleHotelFilters(QueryParam queryParam, DORestSearchRequest req, Map<String, String> excludeTagMap) {
+		if(req.getByhotel()!=null && req.getByhotel().length>0){
+			StringBuilder hotelFacetQr = new StringBuilder();
+			String hotelFacetQrStr=null;
+			for(String hotel:req.getByhotel()){
+				hotelFacetQr.append("hotel_ft:\""+hotel+"\"").append(" OR ");
+			}
+			hotelFacetQrStr = hotelFacetQr.substring(0,hotelFacetQr.lastIndexOf(" OR "));
+
+			queryParam.addParam("fq", "{!tag=hotel_ft_tag}("+hotelFacetQrStr.toString()+")");
+			excludeTagMap.put("hotel", "{!ex=hotel_ft_tag}");
+		}			
+	}
+
+	private void handleFeaturesFilters(QueryParam queryParam, DORestSearchRequest req, Map<String, String> excludeTagMap) {
+		if(req.getByfeatures()!=null && req.getByfeatures().length>0){
+			StringBuilder featureFacetQr = new StringBuilder();
+			String featureFacetQrStr=null;
+			for(String feature:req.getByfeatures()){
+				featureFacetQr.append("features_ft:\""+feature+"\"").append(" OR ");
+			}
+			featureFacetQrStr = featureFacetQr.substring(0,featureFacetQr.lastIndexOf(" OR "));
+
+			queryParam.addParam("fq", "{!tag=features_ft_tag}("+featureFacetQrStr.toString()+")");
+			excludeTagMap.put("features", "{!ex=features_ft_tag}");
+		}		
+	}
 
 	private void handleNerEntity(QueryParam queryParam,
 			Map<String, ArrayList<String>> nerMap,DORestSearchRequest req) {
@@ -197,6 +243,9 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			if(facetSet.contains("locality_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("location")!=null?excludeTagMap.get("location"):"")+"locality_name_ft");}
 			if(facetSet.contains("cuisine_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("cuisine")!=null?excludeTagMap.get("cuisine"):"")+"cuisine_ft");}
 			if(facetSet.contains("landmark_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("landmark")!=null?excludeTagMap.get("landmark"):"")+"landmark_ft");}
+			if(facetSet.contains("hotel_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("hotel")!=null?excludeTagMap.get("hotel"):"")+"hotel_ft");}
+			if(facetSet.contains("chain_name")){queryParam.addParam("facet.field",(excludeTagMap.get("chain")!=null?excludeTagMap.get("chain"):"")+"chain_name");}
+			if(facetSet.contains("features_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("features")!=null?excludeTagMap.get("features"):"")+"features_ft");}
 			if(facetSet.contains("area_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("area")!=null?excludeTagMap.get("area"):"")+"area_name_ft");}
 			if(facetSet.contains("tags_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("tags")!=null?excludeTagMap.get("tags"):"")+"tags_ft");}
 			if(facetSet.contains("costFor2")){
@@ -392,7 +441,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			//to give extra boost to primary cuisine when applying filter
 			queryParam.addParam("bq", "("+primaryCuisineFacetQrStr+")^40000");
 			queryParam.addParam("bq", "("+secondaryCuisineFacetQrStr+")^10000");	
-			
+
 			queryParam.addParam("fq", "{!tag=cuisine_ft_tag}("+cuisineFacetQrStr.toString()+")");
 			excludeTagMap.put("cuisine", "{!ex=cuisine_ft_tag}");
 		}
