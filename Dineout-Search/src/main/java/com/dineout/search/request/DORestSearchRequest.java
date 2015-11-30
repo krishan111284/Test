@@ -29,6 +29,9 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	private String[] byfeatures;
 	private String[] bychain;
 	private String[] byhotel;
+	private String elat;
+	private String elng;
+	private boolean isEntitySpatialQuery;
 	
 	public String[] getByhotel() {
 		return byhotel;
@@ -164,5 +167,23 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	}
 	public void setProfile_name(String profile_name) {
 		this.profile_name = profile_name;
+	}
+	public String getElat() {
+		return elat;
+	}
+	public void setElat(String elat) {
+		this.elat = elat;
+	}
+	public String getElng() {
+		return elng;
+	}
+	public void setElng(String elng) {
+		this.elng = elng;
+	}
+	public boolean isEntitySpatialQuery() {
+		return isEntitySpatialQuery;
+	}
+	public void setEntitySpatialQuery(boolean isEntitySpatialQuery) {
+		this.isEntitySpatialQuery = isEntitySpatialQuery;
 	}
 }

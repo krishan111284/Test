@@ -21,9 +21,9 @@ public class DOAutoCompleteQueryCreator {
 		queryParam.addParam("defType", "edismax");
 		queryParam.addParam("mm", "100%");
 		if(req.getSearchname().split(" ").length>1)
-			queryParam.addParam("qf", "area_name^50 area_name_string_ngram^100 location_name^50 location_name_string_ngram^100 profile_name^50 profile_name_string_ngram^100 cuisine_name^50 cuisine_name_string_ngram^100 tag_name^50 tag_name_string_ngram^100 title_specialchars^10 title_bm_gram");
+			queryParam.addParam("qf", "area_name^50 area_name_string_ngram^100 area_alias^50 location_name^50 location_name_string_ngram^100 location_alias^50 profile_name^50 profile_name_string_ngram^100 cuisine_name^50 cuisine_name_string_ngram^100 tag_name^50 tag_name_string_ngram^100 title_specialchars^10 title_bm_gram");
 		else
-			queryParam.addParam("qf", "area_name^50 area_name_string_ngram^100 location_name^50 location_name_string_ngram^100 profile_name^50 profile_name_string_ngram^100 cuisine_name^50 cuisine_name_string_ngram^100 tag_name^50 tag_name_string_ngram^100 title_specialchars^10");
+			queryParam.addParam("qf", "area_name^50 area_name_string_ngram^100 area_alias^50 location_name^50 location_name_string_ngram^100 location_alias^50 profile_name^50 profile_name_string_ngram^100 cuisine_name^50 cuisine_name_string_ngram^100 tag_name^50 tag_name_string_ngram^100 title_specialchars^10");
 		queryParam.addParam("group", "true");
 		queryParam.addParam("group.field", "data_type");
 		queryParam.addParam("group.limit", "10");

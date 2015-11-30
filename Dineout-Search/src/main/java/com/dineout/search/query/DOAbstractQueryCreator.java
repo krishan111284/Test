@@ -6,8 +6,7 @@ import com.dineout.search.request.GenericDOSearchRequest;
 import com.dineout.search.utils.Constants;
 
 public abstract class DOAbstractQueryCreator {
-	
-		
+
 	public void initializeQueryCreator(GenericDOSearchRequest request,QueryParam queryParam, String reqFl, String fl){
 		addFlParams(request,queryParam,reqFl,fl);
 		addSpellCheckParams(request,queryParam);
@@ -27,7 +26,6 @@ public abstract class DOAbstractQueryCreator {
 			queryParam.addParam("spellcheck.maxCollations", "5");
 			queryParam.addParam("spellcheck.collateParam.mm", "100%");
 		}
-		
 	}
 
 	protected void addFlParams(GenericDOSearchRequest request, QueryParam queryParam, String reqFl, String fl) {
@@ -39,7 +37,7 @@ public abstract class DOAbstractQueryCreator {
 		}
 		queryParam.addParam("fl",sb.toString());
 	}
-	
+
 	public void setResponseNumLimit(QueryParam queryParam,
 			GenericDOSearchRequest req) {
 		String start = !StringUtils.isEmpty(req.getStart())? req.getStart():Constants.DEFAULT_START_INDEX;

@@ -11,6 +11,8 @@ import org.springframework.validation.ObjectError;
 
 import com.dineout.search.exception.SearchError;
 import com.dineout.search.exception.SearchErrors;
+import com.dineout.search.request.DOLocationSearchRequest;
+import com.dineout.search.request.DORestSearchRequest;
 import com.dineout.search.request.GenericDOSearchRequest;
 import com.dineout.search.request.NerRequest;
 import com.dineout.search.response.DORecoResponseBody;
@@ -39,16 +41,29 @@ public abstract class DOAbstractSearchController {
 	 * 
 	 * @param request
 	 */
-	protected void processDOSearchRequest(GenericDOSearchRequest request){
+	protected void processDOSearchRequest(DORestSearchRequest request){
 		if(!StringUtils.isBlank(request.getSearchname())){
 			request.setSearchExecuted(true);
 		}
 		if (DORequestUtils.isSpatial(request)){
 			request.setSpatialQuery(true);
 		}
+		if (DORequestUtils.isESpatial(request)){
+			request.setEntitySpatialQuery(true);
+		}
+		
 		if(!StringUtils.isEmpty(request.getSpellcheck()) && Constants.TC_SPELL_CHECK_TRUE.equals(request.getSpellcheck())){
 			request.setSpellcheckApplied(true);
 		}
+	}
+
+	protected void processLocationSearchRequest(DOLocationSearchRequest request){
+		if(StringUtils.isEmpty(request.getSearchname()))
+			request.setGPSQuery(true);
+		else if(!StringUtils.isEmpty(request.getLat()) && !StringUtils.isEmpty(request.getLng()))
+			request.setDistanceSearchQuery(true);
+		else
+			request.setSearchQuery(true);
 	}
 
 	protected Map<String,ArrayList<String>> getNerMap(GenericDOSearchRequest request){

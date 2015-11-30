@@ -42,7 +42,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		handleNerEntity(queryParam, nerMap, req);
 		handleFacetingRequest(queryParam, req, excludeTagMap);
 		applyGlobalBoosts(queryParam,req);
-		if(req.isSpatialQuery()){
+		if(req.isSpatialQuery() || req.isEntitySpatialQuery()){
 			handleSpatialSortingRequest(queryParam,req);
 		}else{
 			handleSortingRequest(queryParam,req);
@@ -117,7 +117,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			queryParam.addParam("fq", "{!tag=chain_ft_tag}("+chainFacetQrStr.toString()+")");
 			excludeTagMap.put("chain", "{!ex=chain_ft_tag}");
 		}			
-			
+
 	}
 
 	private void handleHotelFilters(QueryParam queryParam, DORestSearchRequest req, Map<String, String> excludeTagMap) {
@@ -297,12 +297,29 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		queryParam.addParam("sort", sortfieldApplied);
 	}
 
-	private void handleSpatialSortingRequest(QueryParam queryParam,
-			DORestSearchRequest restSearchReq) {
-		String geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
+	private void handleSpatialSortingRequest(QueryParam queryParam, DORestSearchRequest restSearchReq) {
+		String spatialQuery = "";
+		String geoDistance = "";
+
+		if(restSearchReq.isSpatialQuery() && restSearchReq.isEntitySpatialQuery()){
+			spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getElat() + "," + restSearchReq.getElng() + " d=" + restSearchReq.getRadius() + "}";
+			geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
+			queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getLat()+","+restSearchReq.getLng()+")))),0,5)");
+		}
+		else if(restSearchReq.isEntitySpatialQuery()){
+			spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getElat() + "," + restSearchReq.getElng() + " d=" + restSearchReq.getRadius() + "}";
+			geoDistance = "geodist(lat_lng," + restSearchReq.getElat() +","+restSearchReq.getElng()+")";
+			queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getElat()+","+restSearchReq.getElng()+")))),0,5)");
+		}
+		else if(restSearchReq.isSpatialQuery()){
+			spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getLat() + "," + restSearchReq.getLng() + " d=" + restSearchReq.getRadius() + "}";
+			geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
+			queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getLat()+","+restSearchReq.getLng()+")))),0,5)");
+		}
+
 		String sortfieldApplied = "";
 		String bySort = restSearchReq.getBysort();
-		String spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getLat() + "," + restSearchReq.getLng() + " d=" + restSearchReq.getRadius() + "}";
+
 		queryParam.addParam("fq", spatialQuery);
 
 		if(!StringUtils.isEmpty(bySort)){
@@ -332,8 +349,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			}
 		}else{
 			sortfieldApplied = "fullfillment desc,score desc";
-			//queryParam.addParam("boost","div(1,sqrt(sum(1,product(0.4,sub(sum(abs(sub("+geoDistance+",0)),abs(sub("+geoDistance+","+Double.parseDouble(restSearchReq.getRadius())/2.2+"))),sub("+Double.parseDouble(restSearchReq.getRadius())/2.2+",0))))))");
-			queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getLat()+","+restSearchReq.getLng()+")))),0,5)");
+			//queryParam.addParam("boost","div(1,sqrt(sum(1,product(0.4,sub(sum(abs(sub("+geoDistance+",0)),abs(sub("+geoDistance+","+Double.parseDouble(restSearchReq.getRadius())/2.2+"))),sub("+Double.parseDouble(restSearchReq.getRadius())/2.2+",0))))))");				
 		}
 		queryParam.addParam("sort", sortfieldApplied);
 	}

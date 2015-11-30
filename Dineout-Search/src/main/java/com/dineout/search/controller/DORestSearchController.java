@@ -62,7 +62,7 @@ public class DORestSearchController extends DOAbstractSearchController{
 			long responseTime = new Date().getTime() - start;
 			DOSearchResponse resp = getDOSearchResponse(searchResultList, null,errors,nerMap,responseTime);
 			if(!errors.hasErrors() && ((DOResponseBody)resp.getBody()).getNumFound() == 0){
-				logger.error(request.getSearchname());
+				logger.info("NULL QUERY: "+httpReq.getRequestURL()+"?" + httpReq.getQueryString());
 			}
 			jsonresp = getJSON(resp);
 		}
