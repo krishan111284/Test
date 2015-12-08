@@ -39,6 +39,9 @@ public class DOLocationQueryCreator extends DOAbstractQueryCreator {
 		if(req.isGPSQuery())
 		{
 			handleLimit(queryParam,req);
+			String radius = req.getRadius()!=null?req.getRadius():"100";
+			String spatialQuery = "{!geofilt sfield=lat_lng pt=" + req.getLat() + "," + req.getLng() + " d=" + radius + "}";
+			queryParam.addParam("fq", spatialQuery);
 			handleSpatialSortingRequest(queryParam, req);
 			queryParam.addParam("group.limit", "1");	
 		}
@@ -46,7 +49,7 @@ public class DOLocationQueryCreator extends DOAbstractQueryCreator {
 			queryParam.addParam("group.limit", "10");
 			queryParam.addParam("sort", "city_name asc");
 			queryParam.addParam("group.sort", "score desc");
-			
+
 		}
 
 	}
