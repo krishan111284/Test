@@ -79,7 +79,8 @@ public class DOAutoCompleteResponseUtils {
 				entry.setArea_name(solrDocument.get("area_name")!=null?(String)solrDocument.get("area_name"):null);
 				entry.setCity_name(solrDocument.get("city_name")!=null?(String)solrDocument.get("city_name"):null);
 				entry.setSuggestion(solrDocument.get("suggestion")!=null?(String)solrDocument.get("suggestion"):null);	
-				entry.setCity(solrDocument.get("city")!=null?(String)solrDocument.get("city"):null);	
+				entry.setCity(solrDocument.get("city")!=null?(String)solrDocument.get("city"):null);
+				entry.setCity_id(solrDocument.get("c_id")!=null?(String)solrDocument.get("c_id"):null);	
 				getLatLong(solrDocument.get("lat_lng")!=null?(String)solrDocument.get("lat_lng"):null,entry);
 				entryList.add(entry);
 			}
