@@ -13,6 +13,7 @@ import com.dineout.search.response.DOAutoCompleteSearchResult;
 import com.dineout.search.response.DOAutoCompleteSuggestionEntry;
 import com.dineout.search.response.DOLocationSearchResponseEntry;
 import com.dineout.search.response.DOLocationSearchResult;
+import com.dineout.search.response.ILocationResponseEntity;
 
 public class DOAutoCompleteResponseUtils {
 
@@ -36,9 +37,10 @@ public class DOAutoCompleteResponseUtils {
 				entry.setTag_name((String)solrDocument.get("tag_name"));
 				entry.setLocation_name(solrDocument.get("location_name")!=null?(String)solrDocument.get("location_name"):null);
 				entry.setArea_name(solrDocument.get("area_name")!=null?(String)solrDocument.get("area_name"):null);
-				entry.setBookingCount(solrDocument.get("booking_count")!=null?(Float)solrDocument.get("booking_count"):0);
+				entry.setBookingCount(solrDocument.get("booking_count")!=null?((Float)solrDocument.get("booking_count")).toString():null);
 				entry.setFulfillment((String)solrDocument.get("fullfillment"));
 				entry.setSuggestion(getSuggestion(dataType,solrDocument));	
+				getLatLong(solrDocument.get("lat_lng")!=null?(String)solrDocument.get("lat_lng"):null,entry);
 				entryList.add(entry);
 			}
 			result.getSuggestionsMap().put(dataType, entryList);
@@ -89,7 +91,7 @@ public class DOAutoCompleteResponseUtils {
 		return result;
 	}
 
-	private static void getLatLong(String latlng, DOLocationSearchResponseEntry entry) {
+	private static void getLatLong(String latlng, ILocationResponseEntity entry) {
 		if(latlng!=null)
 		{
 			String[] lat_lng = latlng.split(",");			

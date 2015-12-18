@@ -1,6 +1,6 @@
 package com.dineout.search.response;
 
-public class DOLocationSearchResponseEntry {
+public class DOLocationSearchResponseEntry implements ILocationResponseEntity{
 
 	private String uid;
 	private String location_name;

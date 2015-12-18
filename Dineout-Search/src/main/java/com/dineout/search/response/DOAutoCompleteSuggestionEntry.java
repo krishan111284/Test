@@ -1,7 +1,7 @@
 package com.dineout.search.response;
 
-public class DOAutoCompleteSuggestionEntry {
-	
+public class DOAutoCompleteSuggestionEntry implements ILocationResponseEntity{
+
 	private String r_id;
 	private String uid;
 	private String guid;
@@ -11,19 +11,21 @@ public class DOAutoCompleteSuggestionEntry {
 	private String cuisine_name;
 	private String tag_name;
 	private String fulfillment;
-	private float bookingCount;
+	private String bookingCount;
+	private String lat;
+	private String lng;
 
 	private Float score;
-	
+
 	public Float getScore() {
 		return score;
 	}
 	public void setScore(Float score) {
 		this.score = score;
 	}
-	
+
 	private String suggestion;
-	
+
 	public String getUid() {
 		return uid;
 	}
@@ -84,11 +86,23 @@ public class DOAutoCompleteSuggestionEntry {
 	public void setFulfillment(String fulfillment) {
 		this.fulfillment = fulfillment;
 	}
-	public float getBookingCount() {
+	public String getBookingCount() {
 		return bookingCount;
 	}
-	public void setBookingCount(float bookingCount) {
+	public void setBookingCount(String bookingCount) {
 		this.bookingCount = bookingCount;
 	}
-	
+	public String getLat() {
+		return lat;
+	}
+	public void setLat(String lat) {
+		this.lat = lat;
+	}
+	public String getLng() {
+		return lng;
+	}
+	public void setLng(String lng) {
+		this.lng = lng;
+	}
+
 }
