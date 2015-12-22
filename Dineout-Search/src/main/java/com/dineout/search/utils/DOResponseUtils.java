@@ -27,6 +27,14 @@ public class DOResponseUtils {
 	public static DORecoResult processRecoQueryResponse(QueryResponse qres) {
 		return processGroupQueryResponseForReco(qres);
 	}
+	
+	public static DOSearchResult processIdQueryResponse(QueryResponse qres, String domain) {
+		DOSearchResult result = new DOSearchResult();
+		result.setDomain(domain);
+		result.setMatches((Long)qres.getResults().getNumFound());
+		result.setDocs(getTCDocList(qres));
+		return result;
+	}
 
 	public static DOSearchResult processQueryResponse(QueryResponse qres, String domain, boolean isSpellcheckApplied) {
 		DOSearchResult result = new DOSearchResult();

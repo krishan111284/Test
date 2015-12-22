@@ -8,13 +8,15 @@ import com.dineout.search.utils.Constants;
 
 
 public abstract class GenericDOSearchRequest {
-	
+
 	private String searchname;
 	private String bycity;
 	private String bysort;
 	/**Lat-long**/
 	private String lat;
 	private String lng;
+	private String elat;
+	private String elng;
 	private String radius;
 	private String facetlimit;
 	private String facetsorttype;
@@ -22,19 +24,21 @@ public abstract class GenericDOSearchRequest {
 	private String start;
 	private String limit;
 	private String spellcheck;
-	
+
 	/**Flags**/
 	private boolean isSearchExecuted;
 	private boolean isSpatialQuery;
+	private boolean isEntitySpatialQuery;
 	private boolean isSpellcheckApplied;
+	private String searchType;
 
 	public String getSearchname() {
 		return searchname;
 	}
 	public void setSearchname(String searchname) {
 		//TO AVOID UN - INTENTIONAL BOOLEAN QUERY WITH EDISMAX
-        Pattern specialCharPatternRegex = Pattern.compile(Constants.SPECIAL_CHAR_REGEX);
-        this.searchname = !StringUtils.isEmpty(searchname)?specialCharPatternRegex.matcher(searchname).replaceAll(" "):searchname;
+		Pattern specialCharPatternRegex = Pattern.compile(Constants.SPECIAL_CHAR_REGEX);
+		this.searchname = !StringUtils.isEmpty(searchname)?specialCharPatternRegex.matcher(searchname).replaceAll(" "):searchname;
 
 	}
 	public String getBycity() {
@@ -60,6 +64,18 @@ public abstract class GenericDOSearchRequest {
 	}
 	public void setLng(String lng) {
 		this.lng = lng;
+	}
+	public String getElat() {
+		return elat;
+	}
+	public void setElat(String elat) {
+		this.elat = elat;
+	}
+	public String getElng() {
+		return elng;
+	}
+	public void setElng(String elng) {
+		this.elng = elng;
 	}
 	public String getRadius() {
 		return radius;
@@ -112,6 +128,12 @@ public abstract class GenericDOSearchRequest {
 	public boolean isSpatialQuery() {
 		return isSpatialQuery;
 	}
+	public boolean isEntitySpatialQuery() {
+		return isEntitySpatialQuery;
+	}
+	public void setEntitySpatialQuery(boolean isEntitySpatialQuery) {
+		this.isEntitySpatialQuery = isEntitySpatialQuery;
+	}
 	public void setSpatialQuery(boolean isSpatialQuery) {
 		this.isSpatialQuery = isSpatialQuery;
 	}
@@ -121,6 +143,12 @@ public abstract class GenericDOSearchRequest {
 	public void setSpellcheckApplied(boolean isSpellcheckApplied) {
 		this.isSpellcheckApplied = isSpellcheckApplied;
 	}
-	
-	
+	public String getSearchType() {
+		return searchType;
+	}
+	public void setSearchType(String searchType) {
+		this.searchType = searchType;
+	}
+
+
 }

@@ -55,9 +55,15 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 
 	private void applyGlobalBoosts(QueryParam queryParam,
 			DORestSearchRequest req) {
-		queryParam.addParam("boost", "product(scale(booking_count,1,5),0.35)");
-		queryParam.addParam("boost", "product(sum(avg_rating,1),0.35)");
-		queryParam.addParam("boost", "if(exists(rank),product(div(sub(11,rank),2),0.15),0.01)");
+		//queryParam.addParam("boost", "product(scale(booking_count,1,5),0.35)");
+
+		queryParam.addParam("boost", "product(scale(booking_last_7,1,5),0.45)");
+		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
+		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
+		queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recency)))),0.1)");
+		//queryParam.addParam("boost", "recip(recency,3.16e-11,1,1)" );
+
+		//queryParam.addParam("boost", "if(exists(rank),product(div(sub(11,rank),2),0.15),0.01)");
 
 	}
 
@@ -312,7 +318,8 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getElat()+","+restSearchReq.getElng()+")))),0,5)");
 		}
 		else if(restSearchReq.isSpatialQuery()){
-			spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getLat() + "," + restSearchReq.getLng() + " d=" + restSearchReq.getRadius() + "}";
+			if(restSearchReq.getSearchType()==null || !restSearchReq.getSearchType().equalsIgnoreCase(rb.getString("dineout.search.type.explicit")))
+				spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getLat() + "," + restSearchReq.getLng() + " d=" + restSearchReq.getRadius() + "}";
 			geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
 			queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getLat()+","+restSearchReq.getLng()+")))),0,5)");
 		}

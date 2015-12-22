@@ -83,6 +83,7 @@ public class DOAutoCompleteResponseUtils {
 				entry.setSuggestion(solrDocument.get("suggestion")!=null?(String)solrDocument.get("suggestion"):null);	
 				entry.setCity(solrDocument.get("city")!=null?(String)solrDocument.get("city"):null);
 				entry.setCity_id(solrDocument.get("c_id")!=null?(String)solrDocument.get("c_id"):null);	
+				entry.setEntity_type(solrDocument.get("data_type")!=null?(String)solrDocument.get("data_type"):null);
 				getLatLong(solrDocument.get("lat_lng")!=null?(String)solrDocument.get("lat_lng"):null,entry);
 				entryList.add(entry);
 			}

@@ -11,6 +11,7 @@ public class DOLocationSearchResponseEntry implements ILocationResponseEntity{
 	private String suggestion;
 	private String city;
 	private String city_id;
+	private String entity_type;
 
 	public String getUid() {
 		return uid;
@@ -65,6 +66,12 @@ public class DOLocationSearchResponseEntry implements ILocationResponseEntity{
 	}
 	public void setCity_id(String city_id) {
 		this.city_id = city_id;
+	}
+	public String getEntity_type() {
+		return entity_type;
+	}
+	public void setEntity_type(String entity_type) {
+		this.entity_type = entity_type;
 	}
 
 }
