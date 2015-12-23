@@ -30,7 +30,14 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	private String[] bychain;
 	private String[] byhotel;
 	private String[] restIds;
+	private String oldModel;
 	
+	public String getOldModel() {
+		return oldModel;
+	}
+	public void setOldModel(String oldModel) {
+		this.oldModel = oldModel;
+	}
 	public String[] getByhotel() {
 		return byhotel;
 	}

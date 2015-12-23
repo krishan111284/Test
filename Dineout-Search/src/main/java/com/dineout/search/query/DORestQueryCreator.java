@@ -41,7 +41,10 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		applyFilters(queryParam, req, excludeTagMap);
 		handleNerEntity(queryParam, nerMap, req);
 		handleFacetingRequest(queryParam, req, excludeTagMap);
-		applyGlobalBoosts(queryParam,req);
+		if(req.getOldModel()!=null && req.getOldModel().equalsIgnoreCase("true"))
+			applyOldGlobalBoosts(queryParam, req);
+		else
+			applyGlobalBoosts(queryParam,req);
 		if(req.isSpatialQuery() || req.isEntitySpatialQuery()){
 			handleSpatialSortingRequest(queryParam,req);
 		}else{
@@ -55,15 +58,16 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 
 	private void applyGlobalBoosts(QueryParam queryParam,
 			DORestSearchRequest req) {
-		//queryParam.addParam("boost", "product(scale(booking_count,1,5),0.35)");
-
 		queryParam.addParam("boost", "product(scale(booking_last_7,1,5),0.45)");
 		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
 		queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recency)))),0.1)");
-		//queryParam.addParam("boost", "recip(recency,3.16e-11,1,1)" );
 
-		//queryParam.addParam("boost", "if(exists(rank),product(div(sub(11,rank),2),0.15),0.01)");
+	}
+	private void applyOldGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
+		queryParam.addParam("boost", "product(scale(booking_count,1,5),0.35)");
+		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
+		queryParam.addParam("boost", "if(exists(rank),product(div(sub(11,rank),2),0.15),0.01)");
 
 	}
 
