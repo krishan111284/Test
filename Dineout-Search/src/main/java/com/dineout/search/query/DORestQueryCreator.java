@@ -85,9 +85,24 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		handleFeaturesFilters(queryParam, req,excludeTagMap);
 		handleHotelFilters(queryParam, req,excludeTagMap);
 		handleChainFilters(queryParam, req,excludeTagMap);
-		//handleAreaLocationFilters(queryParam,req,excludeTagMap);
+		handleAreaLocationFilters(queryParam,req,excludeTagMap);
 	}
 
+	private void handleAreaLocationFilters(QueryParam queryParam,
+			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
+		if(restSearchReq.getBylocarea()!=null && restSearchReq.getBylocarea().length>0){
+			StringBuilder locationAreaFacetQr = new StringBuilder();
+			String locationAreaFacetQrStr=null;
+			for(String locationArea:restSearchReq.getBylocarea()){
+				locationAreaFacetQr.append("locality_area_ft:\""+locationArea+"\"").append(" OR ");
+			}
+			locationAreaFacetQrStr = locationAreaFacetQr.substring(0,locationAreaFacetQr.lastIndexOf(" OR "));
+
+			queryParam.addParam("fq", "{!tag=locality_area_name_ft_tag}("+locationAreaFacetQrStr.toString()+")");
+			excludeTagMap.put("locationArea", "{!ex=locality_area_name_ft_tag}");
+		}
+	}
+	
 	/*private void handleAreaLocationFilters(QueryParam queryParam,
 			DORestSearchRequest req, Map<String, String> excludeTagMap) {
 		ArrayList<String>commonList = new ArrayList<String>();
@@ -258,6 +273,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			if(facetSet.contains("features_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("features")!=null?excludeTagMap.get("features"):"")+"features_ft");}
 			if(facetSet.contains("area_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("area")!=null?excludeTagMap.get("area"):"")+"area_name_ft");}
 			if(facetSet.contains("tags_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("tags")!=null?excludeTagMap.get("tags"):"")+"tags_ft");}
+			if(facetSet.contains("locality_area_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("locationArea")!=null?excludeTagMap.get("locationArea"):"")+"locality_area_ft");}
 			if(facetSet.contains("costFor2")){
 				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "costFor2:[0 TO 500]");
 				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "costFor2:[501 TO 1000]");

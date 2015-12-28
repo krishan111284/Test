@@ -14,6 +14,7 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	private String[] byestgroupname;
 	private String[] byrate; 
 	private String [] byarea; 
+	private String [] bylocarea; 
 	private String[] bytags; 
 	private String bygroup;
 	private String group;
@@ -178,5 +179,11 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	}
 	public void setRestIds(String[] restIds) {
 		this.restIds = restIds;
+	}
+	public String[] getBylocarea() {
+		return bylocarea;
+	}
+	public void setBylocarea(String[] bylocarea) {
+		this.bylocarea = bylocarea;
 	}
 }
