@@ -61,7 +61,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		queryParam.addParam("boost", "product(scale(booking_last_7,1,5),0.45)");
 		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
-		queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recency)))),0.1)");
+		queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recent_days)))),0.1)");
 
 	}
 	private void applyOldGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
