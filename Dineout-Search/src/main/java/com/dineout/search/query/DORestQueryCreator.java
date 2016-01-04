@@ -62,8 +62,8 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
 		queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recent_days)))),0.1)");
-
 	}
+	
 	private void applyOldGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
 		queryParam.addParam("boost", "product(scale(booking_count,1,5),0.35)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
@@ -341,7 +341,8 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			if(restSearchReq.getSearchType()==null || !restSearchReq.getSearchType().equalsIgnoreCase(rb.getString("dineout.search.type.explicit")))
 				spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getLat() + "," + restSearchReq.getLng() + " d=" + restSearchReq.getRadius() + "}";
 			geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
-			queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getLat()+","+restSearchReq.getLng()+")))),0,5)");
+			//queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getLat()+","+restSearchReq.getLng()+")))),0,5)");
+			queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+"))))),0.1)");
 		}
 
 		String sortfieldApplied = "";
