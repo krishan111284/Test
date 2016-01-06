@@ -63,7 +63,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
 		queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recent_days)))),0.1)");
 	}
-	
+
 	private void applyOldGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
 		queryParam.addParam("boost", "product(scale(booking_count,1,5),0.35)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
@@ -86,6 +86,17 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		handleHotelFilters(queryParam, req,excludeTagMap);
 		handleChainFilters(queryParam, req,excludeTagMap);
 		handleAreaLocationFilters(queryParam,req,excludeTagMap);
+		handleTypeFilters(queryParam,req,excludeTagMap);
+	}
+
+	private void handleTypeFilters(QueryParam queryParam,
+			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
+		if(restSearchReq.getByType()!=null){
+			if(restSearchReq.getByType().equalsIgnoreCase("1"))
+				queryParam.addParam("fq", "fullfillment:true");
+			if(restSearchReq.getByType().equalsIgnoreCase("2"))
+				queryParam.addParam("fq", "fullfillment:false");
+		}
 	}
 
 	private void handleAreaLocationFilters(QueryParam queryParam,
@@ -102,7 +113,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			excludeTagMap.put("locationArea", "{!ex=locality_area_name_ft_tag}");
 		}
 	}
-	
+
 	/*private void handleAreaLocationFilters(QueryParam queryParam,
 			DORestSearchRequest req, Map<String, String> excludeTagMap) {
 		ArrayList<String>commonList = new ArrayList<String>();

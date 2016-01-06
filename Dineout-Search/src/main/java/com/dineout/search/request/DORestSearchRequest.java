@@ -32,6 +32,7 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	private String[] byhotel;
 	private String[] restIds;
 	private String oldModel;
+	private String byType;
 	
 	public String getOldModel() {
 		return oldModel;
@@ -185,5 +186,11 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	}
 	public void setBylocarea(String[] bylocarea) {
 		this.bylocarea = bylocarea;
+	}
+	public String getByType() {
+		return byType;
+	}
+	public void setByType(String byType) {
+		this.byType = byType;
 	}
 }
