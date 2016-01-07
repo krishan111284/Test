@@ -30,4 +30,7 @@ public class SolrConnectionUtils {
 		return solrConnectionFactory.getNERSolrServer();
 	}	
 	
+	public SolrServer getCCRecoSolrServer(){
+		return solrConnectionFactory.getCCRecoSolrServer();
+	}
 }

@@ -17,12 +17,24 @@ public class HttpSolrConnectionFactory implements SolrConnectionFactory{
 	private HttpSolrServer estSolrServer;
 	private HttpSolrServer autocompleteSolrServer;
 	private HttpSolrServer nerSolrServer;
+	private HttpSolrServer ccRecoSolrServer;
 	
 	public HttpSolrConnectionFactory(){		
 		initialiseResources();
 		initializeRestSolrServer();
 		initializeAutocompleteSolrServer();	
 		initializeNERSolrServer();
+		initializeCCRecoSolrServer();	
+	}
+	
+	private void initializeCCRecoSolrServer() {
+		try {
+			  String url=rb.getString("dineout.ccreco.solr.url");
+			  ccRecoSolrServer = new HttpSolrServer(url);
+			  setServerProperties(nerSolrServer);
+		}catch(Exception e){
+					logger.error("Unable to connect to SOLR!!!");
+				}
 	}
 	
 	private void initializeNERSolrServer() {
@@ -85,6 +97,11 @@ public class HttpSolrConnectionFactory implements SolrConnectionFactory{
 	@Override
 	public SolrServer getNERSolrServer() {
 		return nerSolrServer;
+	}
+
+	@Override
+	public SolrServer getCCRecoSolrServer() {
+		return ccRecoSolrServer;
 	}
 	
 }

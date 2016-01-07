@@ -33,6 +33,8 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	private String[] restIds;
 	private String oldModel;
 	private String byType;
+	private String bookingDate;
+	private String bookingTime;
 	
 	public String getOldModel() {
 		return oldModel;
@@ -192,5 +194,17 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	}
 	public void setByType(String byType) {
 		this.byType = byType;
+	}
+	public String getBookingDate() {
+		return bookingDate;
+	}
+	public void setBookingDate(String bookingDate) {
+		this.bookingDate = bookingDate;
+	}
+	public String getBookingTime() {
+		return bookingTime;
+	}
+	public void setBookingTime(String bookingTime) {
+		this.bookingTime = bookingTime;
 	}
 }

@@ -28,6 +28,10 @@ public class DOResponseUtils {
 		return processGroupQueryResponseForReco(qres);
 	}
 	
+	public static DORecoResult processCCRecoQueryResponse(QueryResponse qres) {
+		return processGroupQueryResponseForReco(qres);
+	}
+	
 	public static DOSearchResult processIdQueryResponse(QueryResponse qres, String domain) {
 		DOSearchResult result = new DOSearchResult();
 		result.setDomain(domain);
