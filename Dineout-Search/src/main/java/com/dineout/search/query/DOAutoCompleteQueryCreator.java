@@ -30,6 +30,7 @@ public class DOAutoCompleteQueryCreator {
 		queryParam.addParam("limit", "40");
 		queryParam.addParam("fl", "r_id,uid,area_name,location_name,loc_area_name,profile_name,profile_location_name,cuisine_name,guid,score,tag_name,fullfillment,booking_count,lat_lng");
 		queryParam.addParam("fq", "((-city_name:[* TO *] AND *:*) OR city_name:"+req.getBycity()+")");
+		queryParam.addParam("fq", "-data_type:City");
 		queryParam.addParam("q", req.getSearchname());
 		queryParam.addParam("group.sort", "fullfillment desc,booking_count desc,score desc");
 		return queryParam;

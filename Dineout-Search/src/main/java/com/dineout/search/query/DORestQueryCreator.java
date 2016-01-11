@@ -43,8 +43,10 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		handleFacetingRequest(queryParam, req, excludeTagMap);
 		if(req.getOldModel()!=null && req.getOldModel().equalsIgnoreCase("true"))
 			applyOldGlobalBoosts(queryParam, req);
+		else if(req.isSpatialQuery())
+			applySpatialGlobalBoosts(queryParam,req);
 		else
-			applyGlobalBoosts(queryParam,req);
+			applyGlobalBoosts(queryParam,req);	
 		if(req.isSpatialQuery() || req.isEntitySpatialQuery()){
 			handleSpatialSortingRequest(queryParam,req);
 		}else{
@@ -56,12 +58,19 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		return queryParam;
 	}
 
-	private void applyGlobalBoosts(QueryParam queryParam,
-			DORestSearchRequest req) {
+	private void applyGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
 		queryParam.addParam("boost", "product(scale(booking_last_7,1,5),0.45)");
 		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
 		queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recent_days)))),0.1)");
+	}
+
+	private void applySpatialGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
+		queryParam.addParam("boost", "product(scale(booking_last_7,1,5),0.45)");
+		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
+		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
+		//queryParam.addParam("boost", "product(div(1,sum(pow(2.71,product(0.005,recent_days)))),0.1)");
+		//queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recent_days)))),0.1)");
 	}
 
 	private void applyOldGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
@@ -354,6 +363,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
 			//queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getLat()+","+restSearchReq.getLng()+")))),0,5)");
 			queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+"))))),0.1)");
+			//queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.005,geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+"))))),0.1)");
 		}
 
 		String sortfieldApplied = "";
