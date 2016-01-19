@@ -34,46 +34,76 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 	@Autowired
 	FacetUtils facetUtils;
 
-	public QueryParam getSearchQuery(DORestSearchRequest req, Map<String, ArrayList<String>> nerMap) throws SearchException {
+	public QueryParam getSearchQuery(DORestSearchRequest req,
+			Map<String, ArrayList<String>> nerMap) throws SearchException {
+		String queryString = null;
 		QueryParam queryParam = new QueryParam();
 		Map<String,String> excludeTagMap = new HashMap<String,String>();
 		initializeQueryCreator(req, queryParam, req.getEstfl(),rb.getString("dineout.search.fl"));
-		queryParam.addParam("q", Constants.WILD_SEARCH_QUERY);
-		setQueryParser(queryParam, req, nerMap);
-		applyFilters(queryParam, req, excludeTagMap);
-		handleFacetingRequest(queryParam, req, excludeTagMap);
-		applyGlobalBoosts(queryParam, req);
+		queryString = !StringUtils.isBlank(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY;
+		queryParam.addParam("q", queryString);
+		setQueryParser(queryParam, req,nerMap);
 		handleBookingDayTime(queryParam, req);
-		handleSortingRequest(queryParam, req);
+		applyFilters(queryParam, req, excludeTagMap);
+		handleNerEntity(queryParam, nerMap, req);
+		handleFacetingRequest(queryParam, req, excludeTagMap);
+		if(req.getOldModel()!=null && req.getOldModel().equalsIgnoreCase("true"))
+			applyOldGlobalBoosts(queryParam, req);
+		else if(req.isSpatialQuery())
+			applySpatialGlobalBoosts(queryParam,req);
+		else
+			applyGlobalBoosts(queryParam,req);	
+		
+		if(Constants.IS_HL_TRUE.equals(req.getEsthl())){
+			setHlParams(queryParam, req.getEsthlfl(),req.getSearchname());
+		}
 		return queryParam;
 	}
 
-	private void applyGlobalBoosts(QueryParam queryParam,
-			DORestSearchRequest req) {
+	private void applyGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
 		queryParam.addParam("boost", "product(scale(booking_last_7,1,5),0.45)");
 		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
 		queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recent_days)))),0.1)");
-		//queryParam.addParam("boost", "if(exists(rank),product(div(sub(11,rank),2),0.15),0.01)");
+	}
+
+	private void applySpatialGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
+		queryParam.addParam("boost", "product(scale(booking_last_7,1,5),0.45)");
+		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
+		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
+		//queryParam.addParam("boost", "product(div(1,sum(pow(2.71,product(0.005,recent_days)))),0.1)");
+		//queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recent_days)))),0.1)");
+	}
+
+	private void applyOldGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
+		queryParam.addParam("boost", "product(scale(booking_count,1,5),0.35)");
+		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
+		queryParam.addParam("boost", "if(exists(rank),product(div(sub(11,rank),2),0.15),0.01)");
+
 	}
 
 	private void handleBookingDayTime(QueryParam queryParam, DORestSearchRequest req) {
+		String confirmedField = null,waitField = null;
 		if(req.getBookingDate()!=null && req.getBookingTime()!=null){
 			try {
 				Date date = formatter.parse(req.getBookingDate());
 				cal.setTime(date);
 				String dayOfWeek = dateFormat.format(cal.getTime());
 				//TC_Friday0030_daytime TC_Wednesday2230_daytime
-				String confirmedField = "TC_"+ dayOfWeek+ req.getBookingTime()+"_daytime";
-				String waitField = "TNC_"+ dayOfWeek+ req.getBookingTime() +"_daytime";
+				confirmedField = "TC_"+ dayOfWeek+ req.getBookingTime()+"_daytime";
+				waitField = "TNC_"+ dayOfWeek+ req.getBookingTime() +"_daytime";
 				applyProbabilityBoost(queryParam,req,confirmedField,waitField);
 
 			} catch (Exception e) {
 				logger.error(e.getMessage());		
 			}	
 		}
+		if(req.isSpatialQuery() || req.isEntitySpatialQuery()){
+			handleSpatialSortingRequest(queryParam,req,confirmedField,waitField);
+		}else{
+			handleSortingRequest(queryParam,req,confirmedField,waitField);
+		}
 	}
-
 
 	private void applyProbabilityBoost(QueryParam queryParam,
 			DORestSearchRequest req, String confirmedField, String waitField) {
@@ -92,6 +122,7 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 		handleTagsFilters(queryParam, req, excludeTagMap);
 		handleRatingsFilters(queryParam, req,excludeTagMap);
 		handleFeaturesFilters(queryParam, req,excludeTagMap);
+		handleHotelFilters(queryParam, req,excludeTagMap);
 		handleChainFilters(queryParam, req,excludeTagMap);
 		handleAreaLocationFilters(queryParam,req,excludeTagMap);
 		handleTypeFilters(queryParam,req,excludeTagMap);
@@ -122,6 +153,33 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 		}
 	}
 
+	/*private void handleAreaLocationFilters(QueryParam queryParam,
+			DORestSearchRequest req, Map<String, String> excludeTagMap) {
+		ArrayList<String>commonList = new ArrayList<String>();
+		StringBuilder areaLocFacetQr = new StringBuilder();
+
+		if(req.getByarea()!=null && req.getByarea().length>0){
+			for(String area:req.getByarea()){
+				commonList.add("area_name_ft:"+"\""+area+"\"");
+			}
+		}
+
+		if(req.getBylocation()!=null && req.getBylocation().length>0){
+			for(String location:req.getBylocation()){
+				commonList.add("locality_name_ft:"+"\""+location+"\"");
+			}
+		}
+
+		for (String alFilter: commonList){
+			areaLocFacetQr.append(alFilter).append(" OR ");
+		}
+		if(commonList.size()>0){
+			String areaLocFilter = areaLocFacetQr.substring(0,areaLocFacetQr.lastIndexOf(" OR "));
+			queryParam.addParam("fq", "{!tag=area_loc_ft_tag}("+areaLocFilter+")");
+			excludeTagMap.put("area_loc", "{!ex=area_loc_ft_tag}");
+		}
+	}*/
+
 	private void handleChainFilters(QueryParam queryParam,DORestSearchRequest req, Map<String, String> excludeTagMap) {
 		if(req.getBychain()!=null && req.getBychain().length>0){
 			StringBuilder chainFacetQr = new StringBuilder();
@@ -135,6 +193,20 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 			excludeTagMap.put("chain", "{!ex=chain_ft_tag}");
 		}			
 
+	}
+
+	private void handleHotelFilters(QueryParam queryParam, DORestSearchRequest req, Map<String, String> excludeTagMap) {
+		if(req.getByhotel()!=null && req.getByhotel().length>0){
+			StringBuilder hotelFacetQr = new StringBuilder();
+			String hotelFacetQrStr=null;
+			for(String hotel:req.getByhotel()){
+				hotelFacetQr.append("hotel_ft:\""+hotel+"\"").append(" OR ");
+			}
+			hotelFacetQrStr = hotelFacetQr.substring(0,hotelFacetQr.lastIndexOf(" OR "));
+
+			queryParam.addParam("fq", "{!tag=hotel_ft_tag}("+hotelFacetQrStr.toString()+")");
+			excludeTagMap.put("hotel", "{!ex=hotel_ft_tag}");
+		}			
 	}
 
 	private void handleFeaturesFilters(QueryParam queryParam, DORestSearchRequest req, Map<String, String> excludeTagMap) {
@@ -151,6 +223,48 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 		}		
 	}
 
+	private void handleNerEntity(QueryParam queryParam,
+			Map<String, ArrayList<String>> nerMap,DORestSearchRequest req) {
+		if(nerMap!=null && nerMap.size()>0){
+
+			if(nerMap.containsKey(Constants.NER_CUISINE_KEY)){
+				handleNerCuisine(queryParam,nerMap);
+			}
+		}
+	}
+
+	private void handleNerCuisine(QueryParam queryParam, Map<String, ArrayList<String>> nerMap) {
+		applyFamilyFilter(queryParam,nerMap);
+		applyCuisineBoosts(queryParam,nerMap);
+		changeQueryString(queryParam,nerMap);
+	}
+
+	private void changeQueryString(QueryParam queryParam,Map<String, ArrayList<String>> nerMap) {
+		if(nerMap.get(Constants.PROCESSED_QUERY).get(0).trim().isEmpty())
+			queryParam.updateParam("q", "*:*");
+		else
+			queryParam.updateParam("q", nerMap.get(Constants.PROCESSED_QUERY).get(0));
+	}
+
+	private void applyCuisineBoosts(QueryParam queryParam,Map<String, ArrayList<String>> nerMap) {
+		for(String childCuisine:nerMap.get(Constants.NER_CUISINE_KEY)){
+			queryParam.addParam("bq", "(primary_cuisine_ft:"+childCuisine+")^40000");
+			queryParam.addParam("bq", "(secondary_cuisine_ft:"+childCuisine+")^10000");	
+		}
+	}
+
+	private void applyFamilyFilter(QueryParam queryParam,Map<String, ArrayList<String>> nerMap) {
+
+		StringBuilder familyFilterBuilder = new StringBuilder();
+		String fqQrStr = null;
+		for(String cuisineFamily:nerMap.get(Constants.NER_CUISINE_FAMILY_KEY)){
+			familyFilterBuilder.append("primary_family_ft:\""+cuisineFamily+"\"").append(" OR ");
+			familyFilterBuilder.append("secondary_family_ft:\""+cuisineFamily+"\"").append(" OR ");
+		}
+		fqQrStr = familyFilterBuilder.substring(0,familyFilterBuilder.lastIndexOf(" OR "));
+		queryParam.addParam("fq", fqQrStr);
+	}
+
 	private void handleRatingsFilters(QueryParam queryParam, DORestSearchRequest req,Map<String, String> excludeTagMap){
 
 		if(req.getByrate()!=null && req.getByrate().length>0){StringBuilder rateFacetQr = new StringBuilder();
@@ -165,6 +279,20 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 		excludeTagMap.put("rate", "{!ex=avg_rating_tag}");
 		}
 	}
+
+	//NEED TO GET FIELD FOR GROUPING!!
+	/*	private void handleGroupRequest(QueryParam queryParam,
+			DORestSearchRequest req) {
+		if(!StringUtils.isEmpty(req.getBygroup())){
+			queryParam.addParam("fq", "est_group:"+req.getBygroup());
+		}
+		if(StringUtils.isEmpty(req.getBygroup()) && Constants.GROUP_TRUE.equals(req.getGroup())){
+			queryParam.addParam("group","true");
+			queryParam.addParam("group.field","est_group"); //GET NAME OF FIELD
+			queryParam.addParam("group.limit", "1");
+			queryParam.addParam("group.ngroups", "true");
+		}
+	}*/
 
 	private void handleFacetingRequest(QueryParam queryParam,
 			DORestSearchRequest restSearchReq,
@@ -216,8 +344,7 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 		}
 	}
 
-	private void handleSortingRequest(QueryParam queryParam,
-			DORestSearchRequest restSearchReq) {
+	private void handleSortingRequest(QueryParam queryParam, DORestSearchRequest restSearchReq, String confirmedField, String waitField) {
 		String bySort = restSearchReq.getBysort();
 		String sortfieldApplied = "";
 		if(!StringUtils.isEmpty(bySort)){
@@ -240,7 +367,69 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 				sortfieldApplied = "fullfillment desc,avg_rating desc";
 			}
 		}else{
-			sortfieldApplied = "fullfillment desc, score desc";
+			String maxProbability = "if(exists("+confirmedField+"),if(exists("+waitField+"),div("+confirmedField+",sum("+confirmedField+","+waitField+")),div("+confirmedField+",sum("+confirmedField+",0.5))),if(exists("+waitField+"),0,1))";
+			sortfieldApplied = "fullfillment desc,"+maxProbability+"desc, score desc";
+		}
+		queryParam.addParam("sort", sortfieldApplied);
+	}
+
+	private void handleSpatialSortingRequest(QueryParam queryParam, DORestSearchRequest restSearchReq, String confirmedField, String waitField) {
+		String spatialQuery = "";
+		String geoDistance = "";
+
+		if(restSearchReq.isSpatialQuery() && restSearchReq.isEntitySpatialQuery()){
+			spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getElat() + "," + restSearchReq.getElng() + " d=" + restSearchReq.getRadius() + "}";
+			geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
+			queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getLat()+","+restSearchReq.getLng()+")))),0,5)");
+		}
+		else if(restSearchReq.isEntitySpatialQuery()){
+			spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getElat() + "," + restSearchReq.getElng() + " d=" + restSearchReq.getRadius() + "}";
+			geoDistance = "geodist(lat_lng," + restSearchReq.getElat() +","+restSearchReq.getElng()+")";
+			queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getElat()+","+restSearchReq.getElng()+")))),0,5)");
+		}
+		else if(restSearchReq.isSpatialQuery()){
+			if(restSearchReq.getSearchType()==null || !restSearchReq.getSearchType().equalsIgnoreCase(rb.getString("dineout.search.type.explicit")))
+				spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getLat() + "," + restSearchReq.getLng() + " d=" + restSearchReq.getRadius() + "}";
+			geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
+			//queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getLat()+","+restSearchReq.getLng()+")))),0,5)");
+			queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+"))))),0.1)");
+			//queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.005,geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+"))))),0.1)");
+		}
+
+		String sortfieldApplied = "";
+		String bySort = restSearchReq.getBysort();
+
+		queryParam.addParam("fq", spatialQuery);
+		
+
+		if(!StringUtils.isEmpty(bySort)){
+			if(Constants.SORT_OPTION_ONE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,booking_count asc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_TWO.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,booking_count desc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_THREE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,costFor2 asc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_FOUR.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,costFor2 desc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_FIVE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,avg_rating asc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_SIX.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,avg_rating desc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_SEVEN.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_EIGHT.equals(bySort)){
+				sortfieldApplied = geoDistance + " asc";
+			}
+		}else{
+			sortfieldApplied = "fullfillment desc,score desc";
+			//queryParam.addParam("boost","div(1,sqrt(sum(1,product(0.4,sub(sum(abs(sub("+geoDistance+",0)),abs(sub("+geoDistance+","+Double.parseDouble(restSearchReq.getRadius())/2.2+"))),sub("+Double.parseDouble(restSearchReq.getRadius())/2.2+",0))))))");				
 		}
 		queryParam.addParam("sort", sortfieldApplied);
 	}
@@ -363,12 +552,18 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 		}
 		if(!StringUtils.isEmpty(req.getSearchname())){
 			setQfParams(queryParam);
+			setPfParams(queryParam);
 		}
 		setResponseNumLimit(queryParam,req);
 	}
 
 	private void setQfParams(QueryParam queryParam) {
 		queryParam.addParam("qf", rb.getString("dineout.search.qf.param"));
+	}
+
+	private void setPfParams(QueryParam queryParam) {
+		queryParam.addParam("pf",rb.getString("dineout.search.pf.param"));
+		queryParam.addParam("pf2",rb.getString("dineout.search.pf2.param"));
 	}
 
 }
