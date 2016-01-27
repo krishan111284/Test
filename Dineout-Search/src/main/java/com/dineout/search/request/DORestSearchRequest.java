@@ -25,6 +25,7 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	private String estfacetfl;
 	private String[] byestservicetag;
 	private String restId;
+	private String userId;
 	private String avg_rating;
 	private String profile_name;
 	private String[] byfeatures;
@@ -164,6 +165,12 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	}
 	public void setRestId(String restId) {
 		this.restId = restId;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 	public String getAvg_rating() {
 		return avg_rating;

@@ -33,4 +33,8 @@ public class SolrConnectionUtils {
 	public SolrServer getCCRecoSolrServer(){
 		return solrConnectionFactory.getCCRecoSolrServer();
 	}
+	
+	public SolrServer getCollaborativeSolrServerSolrServer(){
+		return solrConnectionFactory.getCollaborativeSolrServerSolrServer();
+	}
 }

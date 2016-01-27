@@ -22,20 +22,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.dineout.search.exception.SearchErrors;
 import com.dineout.search.request.DORestSearchRequest;
 import com.dineout.search.request.DOSearchHeader;
-import com.dineout.search.response.DORecoResponseBody;
-import com.dineout.search.response.DORecoResult;
 import com.dineout.search.response.DOSearchResponse;
-import com.dineout.search.service.RecoSearchService;
+import com.dineout.search.response.DOSearchResult;
+import com.dineout.search.service.CCRestRecoService;
 import com.dineout.search.utils.Constants;
 import com.dineout.search.validation.DORequestValidator;
 
 @Controller
-@RequestMapping(value="/suggested/")
+@RequestMapping(value="/reserve/")
 public class CCRestRecoController extends DOAbstractSearchController{
 
 	Logger logger = Logger.getLogger(CCRestRecoController.class);
 	@Autowired
-	RecoSearchService ccRestRecoService;
+	CCRestRecoService ccRestRecoService;
 	@Autowired
 	DORequestValidator doRequestValidator;
 
@@ -46,7 +45,7 @@ public class CCRestRecoController extends DOAbstractSearchController{
 		long start = new Date().getTime();
 		String jsonresp = null;
 		HttpHeaders responseHeaders = new HttpHeaders();
-		List<DORecoResult> searchResultList = null;
+		List<DOSearchResult> searchResultList = null;
 		responseHeaders.setContentType(Constants.JSON_MEDIA_TYPE);
 		SearchErrors errors = new SearchErrors();
 		doRequestValidator.validatorResourceData(request,bindingResult,new String[]{"bycity"});
@@ -56,8 +55,8 @@ public class CCRestRecoController extends DOAbstractSearchController{
 		}else{
 			searchResultList = ccRestRecoService.getSearchResults(request,errors);
 			long responseTime = new Date().getTime() - start;
-			DOSearchResponse resp = getRecoResponse(searchResultList,errors,"CCReco",responseTime);
-			if(!errors.hasErrors() && ((DORecoResponseBody)resp.getBody()).getMatches() == 0){
+			DOSearchResponse resp = getDOSearchResponse(searchResultList, "Reserve",errors,null,responseTime);
+			if(!errors.hasErrors()){
 				logger.error(request.getSearchname());
 			}
 			jsonresp = getJSON(resp);

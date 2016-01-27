@@ -1,5 +1,7 @@
 package com.dineout.search.query;
 
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +25,30 @@ public class RecoQueryCreator {
 		queryParam.addParam("defType","edismax");
 		queryParam.addParam("q", Constants.WILD_SEARCH_QUERY);
 		queryParam.addParam("fl", "profile_name,costFor2,avg_rating,cuisine,tags,city_name,r_id,lat_lng");
+		return queryParam;
+	}
+
+	public QueryParam getUserIdSearchQuery(DORestSearchRequest req) throws SearchException {
+		QueryParam queryParam = new QueryParam();
+		queryParam.addParam("fq", "diner_id:"+req.getUserId());
+		queryParam.addParam("defType","edismax");
+		queryParam.addParam("q", Constants.WILD_SEARCH_QUERY);
+		queryParam.addParam("fl", "restaurant_id");
+		return queryParam;
+	}
+
+	public QueryParam getUserRecoQuery(List<Map<Object, Object>> docList) throws SearchException {
+		QueryParam queryParam = new QueryParam();
+		StringBuilder resQr = new StringBuilder();
+		for (Map<Object, Object> doc :docList){
+			resQr.append("r_id:\""+doc.get("restaurant_id")+"\"").append(" OR ");
+		}			
+		String resQrStr = null;
+		resQrStr = resQr.substring(0,resQr.lastIndexOf(" OR "));
+		queryParam.addParam("fq", "("+resQrStr+")");
+		queryParam.addParam("defType","edismax");
+		queryParam.addParam("q", Constants.WILD_SEARCH_QUERY);
+		queryParam.addParam("fl", "city_name,cuisine,primary_cuisine,secondary_cuisine,locality_name,area_name,costFor2,avg_rating,r_id,profile_name,url,score,img,n_offers,lat_lng,fullfillment,is_accept_payment,tags,offers,features_ft,booking_last_7,booking_last_90,recency,recent_days");
 		return queryParam;
 	}
 

@@ -15,12 +15,12 @@ import com.dineout.search.exception.SearchErrors;
 import com.dineout.search.query.CCRestRecoQueryCreator;
 import com.dineout.search.query.QueryParam;
 import com.dineout.search.request.DORestSearchRequest;
-import com.dineout.search.response.DORecoResult;
+import com.dineout.search.response.DOSearchResult;
 import com.dineout.search.server.SolrConnectionUtils;
 import com.dineout.search.utils.DOResponseUtils;
 
 @Service("ccRestRecoService")
-public class CCRestRecoService implements RecoSearchService{
+public class CCRestRecoService{
 
 	Logger logger = Logger.getLogger(CCRestRecoService.class);
 	@Autowired
@@ -29,9 +29,8 @@ public class CCRestRecoService implements RecoSearchService{
 	@Autowired 
 	SolrConnectionUtils solrConnectionUtils;
 
-	@Override
-	public List<DORecoResult> getSearchResults(DORestSearchRequest request, SearchErrors errors) {
-		List<DORecoResult> result = new ArrayList<DORecoResult>();
+	public List<DOSearchResult> getSearchResults(DORestSearchRequest request, SearchErrors errors) {
+		List<DOSearchResult> result = new ArrayList<DOSearchResult>();
 		QueryParam doqp = null;
 		QueryResponse qresp = null;
 		try {
@@ -40,8 +39,8 @@ public class CCRestRecoService implements RecoSearchService{
 			qresp = server.query(doqp);
 
 			if(qresp!=null){
-				DORecoResult serachRes = null;
-				serachRes = DOResponseUtils.processCCRecoQueryResponse(qresp);
+				DOSearchResult serachRes = null;
+				serachRes = DOResponseUtils.processQueryResponse(qresp, "Reserve", false);
 				result.add(serachRes);
 			}
 		}catch (Exception e) {

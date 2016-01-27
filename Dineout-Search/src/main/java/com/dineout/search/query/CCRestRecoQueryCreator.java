@@ -53,7 +53,7 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 			applySpatialGlobalBoosts(queryParam,req);
 		else
 			applyGlobalBoosts(queryParam,req);	
-		
+
 		if(Constants.IS_HL_TRUE.equals(req.getEsthl())){
 			setHlParams(queryParam, req.getEsthlfl(),req.getSearchname());
 		}
@@ -64,7 +64,7 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 		queryParam.addParam("boost", "product(scale(booking_last_7,1,5),0.45)");
 		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
-		queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recent_days)))),0.1)");
+		//queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recent_days)))),0.1)");
 	}
 
 	private void applySpatialGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
@@ -346,6 +346,8 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 
 	private void handleSortingRequest(QueryParam queryParam, DORestSearchRequest restSearchReq, String confirmedField, String waitField) {
 		String bySort = restSearchReq.getBysort();
+		String maxProbability = "if(exists("+confirmedField+"),if(exists("+waitField+"),product(div("+confirmedField+",sum("+confirmedField+","+waitField+")),100),product(div("+confirmedField+",sum("+confirmedField+",0.5)),100)),if(exists("+waitField+"),0,100))";
+		queryParam.updateParam("fl", queryParam.get("fl")+","+"maxprob:"+maxProbability);
 		String sortfieldApplied = "";
 		if(!StringUtils.isEmpty(bySort)){
 			if(Constants.SORT_OPTION_ONE.equals(bySort)){
@@ -366,9 +368,11 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 			if(Constants.SORT_OPTION_SIX.equals(bySort)){
 				sortfieldApplied = "fullfillment desc,avg_rating desc";
 			}
+			if(Constants.SORT_OPTION_NINE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,"+maxProbability+" desc, score desc";
+			}
 		}else{
-			String maxProbability = "if(exists("+confirmedField+"),if(exists("+waitField+"),div("+confirmedField+",sum("+confirmedField+","+waitField+")),div("+confirmedField+",sum("+confirmedField+",0.5))),if(exists("+waitField+"),0,1))";
-			sortfieldApplied = "fullfillment desc,"+maxProbability+"desc, score desc";
+			sortfieldApplied = "fullfillment desc, score desc";
 		}
 		queryParam.addParam("sort", sortfieldApplied);
 	}
@@ -376,6 +380,8 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 	private void handleSpatialSortingRequest(QueryParam queryParam, DORestSearchRequest restSearchReq, String confirmedField, String waitField) {
 		String spatialQuery = "";
 		String geoDistance = "";
+		String maxProbability = "if(exists("+confirmedField+"),if(exists("+waitField+"),product(div("+confirmedField+",sum("+confirmedField+","+waitField+")),100),product(div("+confirmedField+",sum("+confirmedField+",0.5)),100)),if(exists("+waitField+"),0,100))";
+		queryParam.updateParam("fl", queryParam.get("fl")+","+"maxprob:"+maxProbability);
 
 		if(restSearchReq.isSpatialQuery() && restSearchReq.isEntitySpatialQuery()){
 			spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getElat() + "," + restSearchReq.getElng() + " d=" + restSearchReq.getRadius() + "}";
@@ -391,16 +397,14 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 			if(restSearchReq.getSearchType()==null || !restSearchReq.getSearchType().equalsIgnoreCase(rb.getString("dineout.search.type.explicit")))
 				spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getLat() + "," + restSearchReq.getLng() + " d=" + restSearchReq.getRadius() + "}";
 			geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
-			//queryParam.addParam("boost", "scale(div(1,sum(1,product(1,geodist(lat_lng,"+restSearchReq.getLat()+","+restSearchReq.getLng()+")))),0,5)");
 			queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+"))))),0.1)");
-			//queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.005,geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+"))))),0.1)");
 		}
 
 		String sortfieldApplied = "";
 		String bySort = restSearchReq.getBysort();
 
 		queryParam.addParam("fq", spatialQuery);
-		
+
 
 		if(!StringUtils.isEmpty(bySort)){
 			if(Constants.SORT_OPTION_ONE.equals(bySort)){
@@ -427,9 +431,11 @@ public class CCRestRecoQueryCreator extends DOAbstractQueryCreator {
 			if(Constants.SORT_OPTION_EIGHT.equals(bySort)){
 				sortfieldApplied = geoDistance + " asc";
 			}
+			if(Constants.SORT_OPTION_NINE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,"+maxProbability+" desc, score desc";
+			}
 		}else{
 			sortfieldApplied = "fullfillment desc,score desc";
-			//queryParam.addParam("boost","div(1,sqrt(sum(1,product(0.4,sub(sum(abs(sub("+geoDistance+",0)),abs(sub("+geoDistance+","+Double.parseDouble(restSearchReq.getRadius())/2.2+"))),sub("+Double.parseDouble(restSearchReq.getRadius())/2.2+",0))))))");				
 		}
 		queryParam.addParam("sort", sortfieldApplied);
 	}

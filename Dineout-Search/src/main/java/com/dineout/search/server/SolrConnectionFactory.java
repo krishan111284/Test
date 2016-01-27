@@ -8,5 +8,6 @@ public interface SolrConnectionFactory {
 	public SolrServer getAutoCompletionSolrServer();
 	public SolrServer getNERSolrServer();
 	public SolrServer getCCRecoSolrServer();
+	public SolrServer getCollaborativeSolrServerSolrServer();
 
 }

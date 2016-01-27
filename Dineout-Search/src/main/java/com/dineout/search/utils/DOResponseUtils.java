@@ -27,17 +27,43 @@ public class DOResponseUtils {
 	public static DORecoResult processRecoQueryResponse(QueryResponse qres) {
 		return processGroupQueryResponseForReco(qres);
 	}
-	
-	public static DORecoResult processCCRecoQueryResponse(QueryResponse qres) {
-		return processGroupQueryResponseForReco(qres);
-	}
-	
+
 	public static DOSearchResult processIdQueryResponse(QueryResponse qres, String domain) {
 		DOSearchResult result = new DOSearchResult();
 		result.setDomain(domain);
 		result.setMatches((Long)qres.getResults().getNumFound());
 		result.setDocs(getTCDocList(qres));
 		return result;
+	}
+
+	public static DOSearchResult processOptQueryResponse(QueryResponse qres, String domain, List<Map<Object, Object>> docList) {
+		DOSearchResult result = new DOSearchResult();
+		result.setMatches((Long)qres.getResults().getNumFound());
+		result.setDocs(getDocList(qres,docList));
+		return result;
+	}
+
+	public static List<Map<Object, Object>> getDocList(QueryResponse qres, List<Map<Object, Object>> docOrder) {
+		Map<Integer,Map<Object, Object>> docMap = new HashMap<Integer, Map<Object,Object>>();
+		Iterator<SolrDocument> iter = qres.getResults().iterator();
+		while(iter.hasNext()){
+			SolrDocument solrDoc = iter.next();
+			Map<Object, Object> fieldValMap = new HashMap<Object, Object>();
+			Iterator<String>fieldIterator = solrDoc.keySet().iterator();
+			while(fieldIterator.hasNext()){
+				String fieldName = fieldIterator.next();
+				fieldValMap.put(fieldName, solrDoc.get(fieldName));
+			}
+			docMap.put((Integer)fieldValMap.get("r_id"), fieldValMap);
+		}
+		List<Map<Object,Object>> list = new ArrayList<Map<Object,Object>>();
+		Iterator<Map<Object, Object>> iterMap = docOrder.iterator();
+		while(iterMap.hasNext()){
+			Map<Object, Object> doc = iterMap.next();
+			Integer id = Integer.parseInt((String)doc.get("restaurant_id"));
+			list.add(docMap.get(id));
+		}
+		return list;
 	}
 
 	public static DOSearchResult processQueryResponse(QueryResponse qres, String domain, boolean isSpellcheckApplied) {

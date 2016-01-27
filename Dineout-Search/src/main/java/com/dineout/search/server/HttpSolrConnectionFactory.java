@@ -18,6 +18,7 @@ public class HttpSolrConnectionFactory implements SolrConnectionFactory{
 	private HttpSolrServer autocompleteSolrServer;
 	private HttpSolrServer nerSolrServer;
 	private HttpSolrServer ccRecoSolrServer;
+	private HttpSolrServer collaborativeSolrServer;
 	
 	public HttpSolrConnectionFactory(){		
 		initialiseResources();
@@ -25,8 +26,20 @@ public class HttpSolrConnectionFactory implements SolrConnectionFactory{
 		initializeAutocompleteSolrServer();	
 		initializeNERSolrServer();
 		initializeCCRecoSolrServer();	
+		initializeCollaborativeSolrServer();
 	}
 	
+	private void initializeCollaborativeSolrServer() {
+		try {
+			  String url=rb.getString("dineout.collaborative.solr.url");
+			  collaborativeSolrServer = new HttpSolrServer(url);
+			  setServerProperties(collaborativeSolrServer);
+		}catch(Exception e){
+					logger.error("Unable to connect to SOLR!!!");
+				}
+			
+	}
+
 	private void initializeCCRecoSolrServer() {
 		try {
 			  String url=rb.getString("dineout.ccreco.solr.url");
@@ -102,6 +115,11 @@ public class HttpSolrConnectionFactory implements SolrConnectionFactory{
 	@Override
 	public SolrServer getCCRecoSolrServer() {
 		return ccRecoSolrServer;
+	}
+
+	@Override
+	public SolrServer getCollaborativeSolrServerSolrServer() {
+		return collaborativeSolrServer;
 	}
 	
 }
