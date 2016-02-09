@@ -31,14 +31,19 @@ public abstract class DOAbstractQueryCreator {
 	protected void addFlParams(GenericDOSearchRequest request, QueryParam queryParam, String reqFl, String fl) {
 		reqFl = StringUtils.isEmpty(reqFl) ? fl:reqFl;
 		StringBuilder sb = new StringBuilder(reqFl);
-		if(request.isSpatialQuery()){
+
+		if(request.isSpatialQuery() && request.isEntitySpatialQuery()){
 			String geoDistance = "geodist(lat_lng," + request.getLat() +","+request.getLng()+")";
 			sb.append(",").append("geo_distance:"+geoDistance);
 		}
-		if(request.isEntitySpatialQuery()){
-			String geoDistance = "geodist(lat_lng," + request.getElat() +","+request.getElng()+")";
+		else if(request.isSpatialQuery()){
+			String geoDistance = "geodist(lat_lng," + request.getLat() +","+request.getLng()+")";
 			sb.append(",").append("geo_distance:"+geoDistance);
 		}
+		/*else if(request.isEntitySpatialQuery()){
+			String geoDistance = "geodist(lat_lng," + request.getElat() +","+request.getElng()+")";
+			sb.append(",").append("geo_distance:"+geoDistance);
+		}*/
 		queryParam.addParam("fl",sb.toString());
 	}
 
