@@ -27,12 +27,23 @@ public class DOResponseUtils {
 	public static DORecoResult processRecoQueryResponse(QueryResponse qres) {
 		return processGroupQueryResponseForReco(qres);
 	}
-	
+
 	public static DOSearchResult processIdQueryResponse(QueryResponse qres, String domain) {
 		DOSearchResult result = new DOSearchResult();
 		result.setDomain(domain);
 		result.setMatches((Long)qres.getResults().getNumFound());
 		result.setDocs(getTCDocList(qres));
+		return result;
+	}
+
+	public static DORecoResult processPopularTrendingResponse(QueryResponse qres, String domain, LinkedHashMap<String, Long> facetMap) {
+		DORecoResult result = new DORecoResult();
+		Map<Integer, Map<Object, Object>> resultMap = getDocMap(qres);
+		List<Map<Object, Object>> resultDocs = new ArrayList<Map<Object,Object>>();
+		for(String restKey : facetMap.keySet()){
+			resultDocs.add(resultMap.get(Integer.parseInt(restKey)));
+		}
+		result.setDocs(resultDocs);
 		return result;
 	}
 
@@ -100,6 +111,22 @@ public class DOResponseUtils {
 				fieldValMap.put(fieldName, solrDoc.get(fieldName));
 			}
 			docList.add(fieldValMap);
+		}
+		return docList;
+	}
+
+	public static Map<Integer, Map<Object, Object>> getDocMap(QueryResponse qres) {
+		Map<Integer, Map<Object, Object>> docList = new HashMap<Integer, Map<Object,Object>>();
+		Iterator<SolrDocument> iter = qres.getResults().iterator();
+		while(iter.hasNext()){
+			SolrDocument solrDoc = iter.next();
+			Map<Object, Object> fieldValMap = new HashMap<Object, Object>();
+			Iterator<String>fieldIterator = solrDoc.keySet().iterator();
+			while(fieldIterator.hasNext()){
+				String fieldName = fieldIterator.next();
+				fieldValMap.put(fieldName, solrDoc.get(fieldName));
+			}
+			docList.put((Integer) fieldValMap.get("r_id"), fieldValMap);
 		}
 		return docList;
 	}
