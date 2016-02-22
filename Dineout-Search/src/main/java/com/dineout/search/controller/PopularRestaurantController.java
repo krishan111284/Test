@@ -48,7 +48,7 @@ public class PopularRestaurantController extends DOAbstractSearchController{
 		List<DORecoResult> searchResultList = null;
 		responseHeaders.setContentType(Constants.JSON_MEDIA_TYPE);
 		SearchErrors errors = new SearchErrors();
-		doRequestValidator.validatorResourceData(request,bindingResult,new String[]{"bycity"});
+		doRequestValidator.validatorResourceData(request,bindingResult,new String[]{"bycity","bytiming"});
 		if(bindingResult.hasErrors()){
 			processValidationErrors(bindingResult.getAllErrors(),errors);
 			jsonresp = processJSONResponse(null, null, errors);
