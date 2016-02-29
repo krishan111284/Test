@@ -110,6 +110,8 @@ public class DOLocationQueryCreator extends DOAbstractQueryCreator {
 			queryParam.addParam("group.limit", "10");
 			String geoDistance = "geodist(lat_lng," + req.getLat() +","+req.getLng()+")";
 			queryParam.addParam("sort", geoDistance + " asc");	
+			queryParam.addParam("group.sort", "score desc," +geoDistance + " asc");
+			
 		}
 
 	}
