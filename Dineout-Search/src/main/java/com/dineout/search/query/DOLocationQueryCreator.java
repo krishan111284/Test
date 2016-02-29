@@ -16,13 +16,40 @@ public class DOLocationQueryCreator extends DOAbstractQueryCreator {
 	Logger logger = Logger.getLogger(DOLocationQueryCreator.class);
 	ResourceBundle rb = ResourceBundle.getBundle("search");
 
-	public QueryParam getLocationSearchQuery(DOLocationSearchRequest req, SearchErrors errors) {
+	public QueryParam getAreaCitySearchQuery(DOLocationSearchRequest req, SearchErrors errors) {
 		QueryParam queryParam = new QueryParam();
 		queryParam.addParam("q", !StringUtils.isBlank(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY);
 		queryParam.addParam("defType", "edismax");
 		queryParam.addParam("mm", "100%");
+		queryParam.addParam("fl", rb.getString("dineout.location.cityarea.search.fl"));
+		queryParam.addParam("qf", rb.getString("dineout.location.cityarea.search.qf.param"));
+		handleGroupRequest(queryParam,req);
+		handleCityAreaGroupSort(queryParam,req);
+		handleCityAreaFilters(queryParam,req);
+		return queryParam;
+	}
+
+	public QueryParam getLocationSearchQuery(DOLocationSearchRequest req, SearchErrors errors) {
+		QueryParam queryParam = new QueryParam();
+		queryParam.addParam("q", !StringUtils.isBlank(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY);
+		queryParam.addParam("defType", "edismax");
+		queryParam.addParam("mm", "50%");
 		queryParam.addParam("fl", rb.getString("dineout.location.search.fl"));
 		queryParam.addParam("qf", rb.getString("dineout.location.search.qf.param"));
+		handleGroupRequest(queryParam,req);
+		handleFilters(queryParam,req);
+		handleExecutionType(queryParam,req);
+
+		return queryParam;
+	}
+
+	public QueryParam getGPSLocationSearchQuery(DOLocationSearchRequest req, SearchErrors errors) {
+		QueryParam queryParam = new QueryParam();
+		queryParam.addParam("q", !StringUtils.isBlank(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY);
+		queryParam.addParam("defType", "edismax");
+		queryParam.addParam("mm", "100%");
+		queryParam.addParam("fl", rb.getString("dineout.gps.location.search.fl"));
+		queryParam.addParam("qf", rb.getString("dineout.gps.location.search.qf.param"));
 		handleGroupRequest(queryParam,req);
 		handleFilters(queryParam,req);
 		handleExecutionType(queryParam,req);
@@ -33,7 +60,7 @@ public class DOLocationQueryCreator extends DOAbstractQueryCreator {
 	private void handleExecutionType(QueryParam queryParam, DOLocationSearchRequest req) {
 		if(req.isDistanceSearchQuery()){
 			handleSpatialSortingRequest(queryParam, req);
-			queryParam.addParam("group.limit", "10");	
+			queryParam.addParam("group.limit", "25");	
 		}
 
 		if(req.isGPSQuery())
@@ -46,7 +73,7 @@ public class DOLocationQueryCreator extends DOAbstractQueryCreator {
 			queryParam.addParam("group.limit", "1");	
 		}
 		if(req.isSearchQuery()){
-			queryParam.addParam("group.limit", "10");
+			queryParam.addParam("group.limit", "25");
 			queryParam.addParam("sort", "city_name asc");
 			queryParam.addParam("group.sort", "score desc");
 
@@ -55,7 +82,11 @@ public class DOLocationQueryCreator extends DOAbstractQueryCreator {
 	}
 
 	private void handleFilters(QueryParam queryParam, DOLocationSearchRequest req) {
-		queryParam.addParam("fq", "data_type:Locality OR data_type:Area OR data_type:City");
+		queryParam.addParam("fq", "data_type:Locality OR data_type:Area");
+	}
+
+	private void handleCityAreaFilters(QueryParam queryParam, DOLocationSearchRequest req) {
+		queryParam.addParam("fq", "data_type:Area OR data_type:City OR data_type:Locality");
 	}
 
 	private void handleLimit(QueryParam queryParam, DOLocationSearchRequest req) {
@@ -72,5 +103,14 @@ public class DOLocationQueryCreator extends DOAbstractQueryCreator {
 		String geoDistance = "geodist(lat_lng," + req.getLat() +","+req.getLng()+")";
 		queryParam.addParam("group.sort", geoDistance + " asc");
 		queryParam.addParam("sort", geoDistance + " asc");	
+	}
+
+	private void handleCityAreaGroupSort(QueryParam queryParam, DOLocationSearchRequest req) {
+		if(req.isDistanceSearchQuery()){
+			queryParam.addParam("group.limit", "10");
+			String geoDistance = "geodist(lat_lng," + req.getLat() +","+req.getLng()+")";
+			queryParam.addParam("sort", geoDistance + " asc");	
+		}
+
 	}
 }

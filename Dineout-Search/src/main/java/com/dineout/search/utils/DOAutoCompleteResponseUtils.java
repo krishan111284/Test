@@ -2,7 +2,10 @@ package com.dineout.search.utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.solr.client.solrj.response.Group;
 import org.apache.solr.client.solrj.response.GroupCommand;
@@ -63,6 +66,30 @@ public class DOAutoCompleteResponseUtils {
 			entity_name = (String)solrDocument.get("tag_name");
 
 		return entity_name;
+	}
+
+	public static DOLocationSearchResult processMultipleResponse(DOLocationSearchResult areaCityResult, DOLocationSearchResult locationResult){
+		DOLocationSearchResult result = locationResult;
+		if(!areaCityResult.getSuggestionsMap().isEmpty())
+		{
+			Map<String, List<DOLocationSearchResponseEntry>> areaCityMap = areaCityResult.getSuggestionsMap();
+			Map<String, List<DOLocationSearchResponseEntry>> locationMap = locationResult.getSuggestionsMap();
+			Iterator<?> areaCityResultIterator = areaCityResult.getSuggestionsMap().entrySet().iterator();
+			while (areaCityResultIterator.hasNext()) {
+				Map.Entry pair = (Map.Entry)areaCityResultIterator.next();
+				if(locationMap.get(pair.getKey()) != null){
+					List<DOLocationSearchResponseEntry> areaCityList = areaCityMap.get(pair.getKey());
+					List<DOLocationSearchResponseEntry> locationList = locationMap.get(pair.getKey());
+					Set<DOLocationSearchResponseEntry> setboth = new LinkedHashSet<DOLocationSearchResponseEntry>(areaCityList);
+					setboth.addAll(locationList);
+					areaCityList.clear();
+					areaCityList.addAll(setboth);
+					//areaCityMap.get(pair.getKey()).addAll(locationMap.get(pair.getKey()));
+				}
+			}
+			result = areaCityResult;
+		}
+		return result;
 	}
 
 	public static DOLocationSearchResult processLocationGroupQueryResponse(QueryResponse qRes) {
