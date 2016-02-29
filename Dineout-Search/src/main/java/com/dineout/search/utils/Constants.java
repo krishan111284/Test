@@ -15,6 +15,7 @@ public class Constants {
 	public static final String DEFAULT_FACET_MIN_COUNT = "1";
 	public static final String DEFAULT_START_INDEX = "0";
 	public static final String DEFAULT_NUM_ROWS = "10";
+	public static final String MAX_NUM_ROWS = "100";
 	public static final String WILD_SEARCH_QUERY="*:*";
 
 	/*****************Response Types *************************/
