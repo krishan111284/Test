@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -31,9 +32,17 @@ public class IdSearchQueryCreator {
 			queryParam.addParam("fq", "r_id:"+idFilter);
 			queryParam.addParam("defType","edismax");
 			queryParam.addParam("q", Constants.WILD_SEARCH_QUERY);
-			addFlParams(req, queryParam);			
+			addFlParams(req, queryParam);	
+			addLimit(req, queryParam);
 		}
 		return queryParam;
+	}
+
+	private void addLimit(DORestSearchRequest req, QueryParam queryParam) {
+		String start = !StringUtils.isEmpty(req.getStart())? req.getStart():Constants.DEFAULT_START_INDEX;
+		String rows = !StringUtils.isEmpty(req.getLimit())? req.getLimit():Constants.MAX_NUM_ROWS;
+		queryParam.addParam("start", start);
+		queryParam.addParam("rows", rows);
 	}
 
 	protected void addFlParams(DORestSearchRequest request, QueryParam queryParam) {

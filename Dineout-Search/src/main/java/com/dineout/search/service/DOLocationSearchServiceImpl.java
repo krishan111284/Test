@@ -30,10 +30,54 @@ public class DOLocationSearchServiceImpl implements DOLocationSearchService{
 
 	@Override
 	public DOLocationSearchResult getSuggestion(DOLocationSearchRequest req, SearchErrors errors) {
+		SolrServer server = solrConnectionUtils.getAutoSolrServer();
+		DOLocationSearchResult result =null;
+		if(req.isGPSQuery()){
+			QueryParam query = null;
+			query = locationQueryCreator.getGPSLocationSearchQuery(req,errors);
+			QueryResponse qres = null;
+			try {
+				qres = server.query(query);
+				if(qres!=null){
+					result = DOAutoCompleteResponseUtils.processLocationGroupQueryResponse(qres);
+				}
+			} catch (SolrServerException e) {
+				logger.error(e.getMessage(),e);
+				SearchError error = new SearchError(ErrorCode.SOLR_ERROR_CODE, e.getMessage());
+				errors.add(error);
+			}
+		}
+		else{
+			result = getLocationAreaCitySuggestion(req, errors,server);
+		}
+		return result;
+	}
+
+	public DOLocationSearchResult getLocationAreaCitySuggestion(DOLocationSearchRequest req, SearchErrors errors, SolrServer server) {
+		QueryParam query = null;
+		DOLocationSearchResult result = null,areaCityResult = null;
+		query = locationQueryCreator.getAreaCitySearchQuery(req,errors);
+		QueryResponse qres = null;
+		try {
+			qres = server.query(query);
+			if(qres!=null){
+				areaCityResult = DOAutoCompleteResponseUtils.processLocationGroupQueryResponse(qres);
+				DOLocationSearchResult locationResult = getLocationSuggestion(req, errors, server);
+				result = DOAutoCompleteResponseUtils.processMultipleResponse(areaCityResult, locationResult);
+
+			}
+		} catch (SolrServerException e) {
+			logger.error(e.getMessage(),e);
+			SearchError error = new SearchError(ErrorCode.SOLR_ERROR_CODE, e.getMessage());
+			errors.add(error);
+		}
+		return result;
+	}
+
+	public DOLocationSearchResult getLocationSuggestion(DOLocationSearchRequest req, SearchErrors errors, SolrServer server) {
 		QueryParam query = null;
 		DOLocationSearchResult result = null;
 		query = locationQueryCreator.getLocationSearchQuery(req,errors);
-		SolrServer server = solrConnectionUtils.getAutoSolrServer();
 		QueryResponse qres = null;
 		try {
 			qres = server.query(query);
