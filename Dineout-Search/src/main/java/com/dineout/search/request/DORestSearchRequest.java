@@ -33,6 +33,8 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	private String[] restIds;
 	private String oldModel;
 	private String byType;
+	private String recent;
+	private String [] bysptags;
 	
 	public String getOldModel() {
 		return oldModel;
@@ -192,5 +194,17 @@ public class DORestSearchRequest extends GenericDOSearchRequest{
 	}
 	public void setByType(String byType) {
 		this.byType = byType;
+	}
+	public String getRecent() {
+		return recent;
+	}
+	public void setRecent(String recent) {
+		this.recent = recent;
+	}
+	public String[] getBysptags() {
+		return bysptags;
+	}
+	public void setBysptags(String[] bysptags) {
+		this.bysptags = bysptags;
 	}
 }

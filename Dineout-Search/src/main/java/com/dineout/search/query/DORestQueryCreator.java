@@ -90,12 +90,22 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		handleAreaFilters(queryParam, req, excludeTagMap);
 		handlePriceFilters(queryParam,req,excludeTagMap);
 		handleTagsFilters(queryParam, req, excludeTagMap);
+		handleSpecialTagsFilters(queryParam, req, excludeTagMap);
 		handleRatingsFilters(queryParam, req,excludeTagMap);
 		handleFeaturesFilters(queryParam, req,excludeTagMap);
 		handleHotelFilters(queryParam, req,excludeTagMap);
 		handleChainFilters(queryParam, req,excludeTagMap);
 		handleAreaLocationFilters(queryParam,req,excludeTagMap);
 		handleTypeFilters(queryParam,req,excludeTagMap);
+		handleRecentRestaurants(queryParam,req,excludeTagMap);
+	}
+
+	private void handleRecentRestaurants(QueryParam queryParam,
+			DORestSearchRequest req, Map<String, String> excludeTagMap) {
+		if(Constants.RECENT_TRUE.equalsIgnoreCase(req.getRecent())){
+			queryParam.addParam("fq", "recency:1");
+		}
+
 	}
 
 	private void handleTypeFilters(QueryParam queryParam,
@@ -122,33 +132,6 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			excludeTagMap.put("locationArea", "{!ex=locality_area_name_ft_tag}");
 		}
 	}
-
-	/*private void handleAreaLocationFilters(QueryParam queryParam,
-			DORestSearchRequest req, Map<String, String> excludeTagMap) {
-		ArrayList<String>commonList = new ArrayList<String>();
-		StringBuilder areaLocFacetQr = new StringBuilder();
-
-		if(req.getByarea()!=null && req.getByarea().length>0){
-			for(String area:req.getByarea()){
-				commonList.add("area_name_ft:"+"\""+area+"\"");
-			}
-		}
-
-		if(req.getBylocation()!=null && req.getBylocation().length>0){
-			for(String location:req.getBylocation()){
-				commonList.add("locality_name_ft:"+"\""+location+"\"");
-			}
-		}
-
-		for (String alFilter: commonList){
-			areaLocFacetQr.append(alFilter).append(" OR ");
-		}
-		if(commonList.size()>0){
-			String areaLocFilter = areaLocFacetQr.substring(0,areaLocFacetQr.lastIndexOf(" OR "));
-			queryParam.addParam("fq", "{!tag=area_loc_ft_tag}("+areaLocFilter+")");
-			excludeTagMap.put("area_loc", "{!ex=area_loc_ft_tag}");
-		}
-	}*/
 
 	private void handleChainFilters(QueryParam queryParam,DORestSearchRequest req, Map<String, String> excludeTagMap) {
 		if(req.getBychain()!=null && req.getBychain().length>0){
@@ -435,6 +418,20 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 
 			queryParam.addParam("fq", "{!tag=tags_ft_tag}("+facilityQrStr+")");
 			excludeTagMap.put("tags", "{!ex=tags_ft_tag}");
+		}
+	}
+	
+	private void handleSpecialTagsFilters(QueryParam queryParam,
+			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
+		if(restSearchReq.getBysptags()!=null && restSearchReq.getBysptags().length>0){
+			StringBuilder spTagQr = new StringBuilder();
+			String spTagQrStr = null;
+			for(String spTag:restSearchReq.getBysptags()){
+				spTagQr.append("sp_tags_ft:\""+spTag+"\"").append(" AND ");
+			}
+			spTagQrStr = spTagQr.substring(0,spTagQr.lastIndexOf(" AND "));
+
+			queryParam.addParam("fq", "("+spTagQrStr+")");
 		}
 	}
 

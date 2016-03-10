@@ -26,6 +26,7 @@ public class Constants {
 	public static final String TC_ID_SEARCH_TRUE = "true";
 	public static final String TC_FACET_SORT_INDEX_TRUE = "true";
 	public static final String IS_HL_TRUE = "true";
+	public static final String RECENT_TRUE = "true";
 
 	/*****************************Autocompletion data types*****************************************/
 	public static final String AUTOCOMPLETION_DATA_TYPE_RESTAURANT = "Restaurant";
