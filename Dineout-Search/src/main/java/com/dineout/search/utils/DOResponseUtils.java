@@ -27,11 +27,17 @@ public class DOResponseUtils {
 	public static DORecoResult processRecoQueryResponse(QueryResponse qres) {
 		return processGroupQueryResponseForReco(qres);
 	}
-	
+
 	public static DOSearchResult processIdQueryResponse(QueryResponse qres, String domain) {
 		DOSearchResult result = new DOSearchResult();
 		result.setDomain(domain);
 		result.setMatches((Long)qres.getResults().getNumFound());
+		result.setDocs(getTCDocList(qres));
+		return result;
+	}
+
+	public static DORecoResult processRecommendationQueryResponse(QueryResponse qres) {
+		DORecoResult result = new DORecoResult();
 		result.setDocs(getTCDocList(qres));
 		return result;
 	}
@@ -86,6 +92,29 @@ public class DOResponseUtils {
 		}
 
 		return facet;
+	}
+
+	public static List<Map<Object, Object>> getSortedDocList(QueryResponse qres, ArrayList<String> restIds) {
+		List<Map<Object, Object>> docList = new ArrayList<Map<Object, Object>>();
+		Map<String, Map<Object, Object>> docMap = new HashMap<String, Map<Object, Object>>();
+		Iterator<SolrDocument> iter = qres.getResults().iterator();
+		while(iter.hasNext()){
+			SolrDocument solrDoc = iter.next();
+			Map<Object, Object> fieldValMap = new HashMap<Object, Object>();
+			Iterator<String>fieldIterator = solrDoc.keySet().iterator();
+			while(fieldIterator.hasNext()){
+				String fieldName = fieldIterator.next();
+				fieldValMap.put(fieldName, solrDoc.get(fieldName));
+			}
+			if(!fieldValMap.isEmpty())
+				docMap.put(Integer.toString((Integer) solrDoc.get("r_id")), fieldValMap);
+		}
+		for(String restId: restIds){
+			if(docMap.containsKey(restId)){
+				docList.add(docMap.get(restId));
+				}
+		}
+		return docList;
 	}
 
 	public static List<Map<Object, Object>> getTCDocList(QueryResponse qres) {

@@ -40,10 +40,7 @@ public abstract class DOAbstractQueryCreator {
 			String geoDistance = "geodist(lat_lng," + request.getLat() +","+request.getLng()+")";
 			sb.append(",").append("geo_distance:"+geoDistance);
 		}
-		/*else if(request.isEntitySpatialQuery()){
-			String geoDistance = "geodist(lat_lng," + request.getElat() +","+request.getElng()+")";
-			sb.append(",").append("geo_distance:"+geoDistance);
-		}*/
+		
 		queryParam.addParam("fl",sb.toString());
 	}
 

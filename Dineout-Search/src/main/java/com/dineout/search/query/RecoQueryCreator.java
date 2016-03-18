@@ -1,5 +1,6 @@
 package com.dineout.search.query;
 
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import org.apache.commons.lang3.StringUtils;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.dineout.search.exception.SearchException;
 import com.dineout.search.request.DORestSearchRequest;
 import com.dineout.search.request.GenericDOSearchRequest;
+import com.dineout.search.request.RecommendationRequest;
 import com.dineout.search.utils.Constants;
 
 @Component("recoQueryCreator")
@@ -25,6 +27,41 @@ public class RecoQueryCreator {
 		queryParam.addParam("fl", "profile_name,costFor2,avg_rating,cuisine,tags,city_name,r_id,lat_lng");
 		return queryParam;
 	}
+
+	public QueryParam getDinerRestaurantsQuery(DORestSearchRequest req, ArrayList<String> restIds) throws SearchException {
+		QueryParam queryParam = new QueryParam();
+		if(restIds!=null && restIds.size()>0){
+			StringBuilder sb = new StringBuilder();
+			sb.append("(");
+			for(String id:restIds){
+				sb.append(id +" OR ");
+			}
+			String idFilter = sb.substring(0, sb.lastIndexOf(" OR ")) + ")";
+			queryParam.addParam("fq", "r_id:"+idFilter);
+			applyCityRestFilter(queryParam, req);
+			queryParam.addParam("defType","edismax");
+			queryParam.addParam("fq", "fullfillment:true");
+			queryParam.addParam("q", Constants.WILD_SEARCH_QUERY);
+			queryParam.addParam("fl", rb.getString("dineout.search.fl"));			
+		}
+		return queryParam;
+	}
+
+	public QueryParam getDinerRestaurantsIdQuery(RecommendationRequest req) throws SearchException {
+		QueryParam queryParam = new QueryParam();
+		queryParam.addParam("fq", "diner_id:"+req.getDinerId());
+		queryParam.addParam("defType","edismax");
+		queryParam.addParam("q", Constants.WILD_SEARCH_QUERY);
+		queryParam.addParam("sort", "score desc");
+		queryParam.addParam("fl", "r_id,feature1,feature2,feature3,feature4,feature5,feature6,feature7,feature8,feature9");
+		String start = !StringUtils.isEmpty(req.getStart())? req.getStart():Constants.DEFAULT_START_INDEX;
+		String rows = !StringUtils.isEmpty(req.getLimit())? req.getLimit():"25";
+		queryParam.addParam("start", start);
+		queryParam.addParam("rows", rows);
+		return queryParam;
+	}
+	
+	
 
 	public QueryParam getNearByRestaurantQuery(DORestSearchRequest req) throws SearchException {
 		QueryParam queryParam = new QueryParam();

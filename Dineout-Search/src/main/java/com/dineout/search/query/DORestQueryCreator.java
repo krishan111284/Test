@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import com.dineout.search.exception.ErrorCode;
 import com.dineout.search.exception.SearchException;
 import com.dineout.search.request.DORestSearchRequest;
+import com.dineout.search.request.RecommendationRequest;
 import com.dineout.search.utils.Constants;
 import com.dineout.search.utils.FacetUtils;
 
@@ -27,6 +28,39 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 
 	@Autowired
 	FacetUtils facetUtils;
+
+	public QueryParam getSimilarRecommendedRestaurants(RecommendationRequest req, Map<String, Double> featureMap) throws SearchException{
+		QueryParam queryParam = new QueryParam();
+		//initializeQueryCreator(req, queryParam, req.getEstfl(),rb.getString("dineout.search.fl"));
+		String queryString = null;
+		queryString = !StringUtils.isBlank(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY;
+		queryParam.addParam("q", queryString);
+		setQueryParser(queryParam, req,null);
+		applyFilters(queryParam, req, null);
+		applyThisRestaurantFilter(queryParam, req);
+		applyEucledianFormula(queryParam, req, featureMap);
+		return queryParam;
+	}
+	
+	public QueryParam getDinerRecommendedRestaurants(RecommendationRequest req, Map<String, Double> featureMap) throws SearchException{
+		QueryParam queryParam = new QueryParam();
+		//initializeQueryCreator(req, queryParam, req.getEstfl(),rb.getString("dineout.search.fl"));
+		String queryString = null;
+		queryString = !StringUtils.isBlank(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY;
+		queryParam.addParam("q", queryString);
+		setQueryParser(queryParam, req,null);
+		applyFilters(queryParam, req, null);
+		applyMostBookedRestaurantFilter(queryParam, req);
+		applyProductRule(queryParam, req, featureMap);
+		return queryParam;
+	}
+
+	private void applyThisRestaurantFilter(QueryParam queryParam, RecommendationRequest req) {
+		queryParam.addParam("fq", "-r_id:"+req.getRestId());
+	}
+	
+	private void applyMostBookedRestaurantFilter(QueryParam queryParam, RecommendationRequest req) {
+	}
 
 	public QueryParam getSearchQuery(DORestSearchRequest req,
 			Map<String, ArrayList<String>> nerMap) throws SearchException {
@@ -56,6 +90,43 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			setHlParams(queryParam, req.getEsthlfl(),req.getSearchname());
 		}
 		return queryParam;
+	}
+
+	private void applyEucledianFormula(QueryParam queryParam, RecommendationRequest req, Map<String, Double> featureMap) {
+		double f1 = featureMap.get("feature1");
+		double f2 = featureMap.get("feature2");
+		double f3 = featureMap.get("feature3");
+		double f4 = featureMap.get("feature4");
+		double f5 = featureMap.get("feature5");
+		double f6 = featureMap.get("feature6");
+		double f7 = featureMap.get("feature7");
+		double f8 = featureMap.get("feature8");
+		double f9 = featureMap.get("feature9");
+		String eucledianDistance = "sqedist("+f1+","+f2+","+f3+","+f4+","+f5+","+f6+","+f7+","+f8+","+f9+",feature1,feature2,feature3,feature4,feature5,feature6,feature7,feature8,feature9)";
+		queryParam.addParam("sort", eucledianDistance +" asc");
+		applyFlFields(queryParam,req,eucledianDistance);
+	}
+	
+	private void applyProductRule(QueryParam queryParam, RecommendationRequest req, Map<String, Double> featureMap) {
+		double f1 = featureMap.get("feature1");
+		double f2 = featureMap.get("feature2");
+		double f3 = featureMap.get("feature3");
+		double f4 = featureMap.get("feature4");
+		double f5 = featureMap.get("feature5");
+		double f6 = featureMap.get("feature6");
+		double f7 = featureMap.get("feature7");
+		double f8 = featureMap.get("feature8");
+		double f9 = featureMap.get("feature9");
+		
+		String productDistance = "sum(product("+f1+",feature1),product("+f2+",feature2),product("+f3+",feature3),product("+f4+",feature4),product("+f5+",feature5),product("+f6+",feature6),product("+f7+",feature7),product("+f8+",feature8),product("+f9+",feature9))";
+		queryParam.addParam("sort", productDistance +" desc");
+		applyFlFields(queryParam,req,productDistance);
+	}
+	
+	private void applyFlFields(QueryParam queryParam,RecommendationRequest req, String distance) {
+		StringBuilder sb = new StringBuilder(rb.getString("dineout.search.fl"));
+			sb.append(",").append("distance:"+distance);
+			queryParam.addParam("fl", sb.toString());
 	}
 
 	private void applyGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
