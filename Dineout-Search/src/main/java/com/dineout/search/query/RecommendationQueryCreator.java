@@ -24,7 +24,7 @@ public class RecommendationQueryCreator {
 		queryParam.addParam("fq", "r_id:"+req.getRestId());
 		queryParam.addParam("defType","edismax");
 		queryParam.addParam("q", Constants.WILD_SEARCH_QUERY);
-		queryParam.addParam("fl", "feature1,feature2,feature3,feature4,feature5,feature6,feature7,feature8,feature9");
+		queryParam.addParam("fl", "feature1,feature2,feature3,feature4,feature5,feature6,feature7,feature8,feature9,feature10,feature11,feature12,feature13,feature14,feature15,feature16");
 		return queryParam;
 	}
 	
@@ -33,7 +33,7 @@ public class RecommendationQueryCreator {
 		queryParam.addParam("fq", "diner_id:"+req.getDinerId());
 		queryParam.addParam("defType","edismax");
 		queryParam.addParam("q", Constants.WILD_SEARCH_QUERY);
-		queryParam.addParam("fl", "feature1,feature2,feature3,feature4,feature5,feature6,feature7,feature8,feature9");
+		queryParam.addParam("fl", "feature1,feature2,feature3,feature4,feature5,feature6,feature7,feature8,feature9,feature10,feature11,feature12,feature13,feature14,feature15,feature16");
 		return queryParam;
 	}
 

@@ -102,11 +102,45 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		double f7 = featureMap.get("feature7");
 		double f8 = featureMap.get("feature8");
 		double f9 = featureMap.get("feature9");
-		String eucledianDistance = "sqedist("+f1+","+f2+","+f3+","+f4+","+f5+","+f6+","+f7+","+f8+","+f9+",feature1,feature2,feature3,feature4,feature5,feature6,feature7,feature8,feature9)";
+		double f10 = featureMap.get("feature10");
+		double f11 = featureMap.get("feature11");
+		double f12 = featureMap.get("feature12");
+		double f13 = featureMap.get("feature13");
+		double f14 = featureMap.get("feature14");
+		double f15 = featureMap.get("feature15");
+		double f16 = featureMap.get("feature16");
+		String eucledianDistance = "sqedist("+f1+","+f2+","+f3+","+f4+","+f5+","+f6+","+f7+","+f8+","+f9+","+f10+","+f11+","+f12+","+f13+","+f14+","+f15+","+f16+",feature1,feature2,feature3,feature4,feature5,feature6,feature7,feature8,feature9,feature10,feature11,feature12,feature13,feature14,feature15,feature16)";
 		queryParam.addParam("sort", eucledianDistance +" asc");
 		applyFlFields(queryParam,req,eucledianDistance);
 	}
 	
+	/*private void applyProductRule(QueryParam queryParam, RecommendationRequest req, Map<String, Double> featureMap) {
+		DecimalFormat df = new DecimalFormat("#.##");
+		df.setRoundingMode(RoundingMode.CEILING);
+		double f1 = Double.parseDouble(df.format(featureMap.get("feature1")));
+		double f2 = Double.parseDouble(df.format(featureMap.get("feature2")));
+		double f3 = Double.parseDouble(df.format(featureMap.get("feature3")));
+		double f4 = Double.parseDouble(df.format(featureMap.get("feature4")));
+		double f5 = Double.parseDouble(df.format(featureMap.get("feature5")));
+		double f6 = Double.parseDouble(df.format(featureMap.get("feature6")));
+		double f7 = Double.parseDouble(df.format(featureMap.get("feature7")));
+		double f8 = Double.parseDouble(df.format(featureMap.get("feature8")));
+		double f9 = Double.parseDouble(df.format(featureMap.get("feature9")));
+		
+		String dotProduct = "sum(product("+f1+",feature1),product("+f2+",feature2),product("+f3+",feature3),product("+f4+",feature4),product("+f5+",feature5),product("+f6+",feature6),product("+f7+",feature7),product("+f8+",feature8),product("+f9+",feature9))";
+		String sum1 = "sum("+f1+","+f2+","+f3+","+f4+","+f5+","+f6+","+f7+","+f8+","+f9+")";
+		String sum2 = "sum(feature1,feature2,feature3,feature4,feature5,feature6,feature7,feature8,feature9)";
+		String sumSquare1 = "sum(pow("+f1+",2),pow("+f2+",2),pow("+f3+",2),pow("+f4+",2),pow("+f5+",2),pow("+f6+",2),pow("+f7+",2),pow("+f8+",2),pow("+f9+",2))";
+		String sumSquare2 = "sum(pow(feature1,2),pow(feature2,2),pow(feature3,2),pow(feature4,2),pow(feature5,2),pow(feature6,2),pow(feature7,2),pow(feature8,2),pow(feature9,2))";
+		
+		String pearsonFormula = "div(sub("+dotProduct+",div(product("+sum1+","+sum2+"),9)),sqrt(product(sub("+sumSquare1+",div(pow("+sum1+",2),9)),sub("+sumSquare2+",div(pow("+sum2+",2),9)))))";
+		String scaledFormula = "scale("+pearsonFormula+",1,10)";
+		
+		queryParam.addParam("sort", scaledFormula +" desc");
+		applyFlFields(queryParam,req,scaledFormula);
+	}*/
+
+
 	private void applyProductRule(QueryParam queryParam, RecommendationRequest req, Map<String, Double> featureMap) {
 		double f1 = featureMap.get("feature1");
 		double f2 = featureMap.get("feature2");
@@ -117,8 +151,15 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		double f7 = featureMap.get("feature7");
 		double f8 = featureMap.get("feature8");
 		double f9 = featureMap.get("feature9");
+		double f10 = featureMap.get("feature10");
+		double f11 = featureMap.get("feature11");
+		double f12 = featureMap.get("feature12");
+		double f13 = featureMap.get("feature13");
+		double f14 = featureMap.get("feature14");
+		double f15 = featureMap.get("feature15");
+		double f16 = featureMap.get("feature16");
 		
-		String productDistance = "sum(product("+f1+",feature1),product("+f2+",feature2),product("+f3+",feature3),product("+f4+",feature4),product("+f5+",feature5),product("+f6+",feature6),product("+f7+",feature7),product("+f8+",feature8),product("+f9+",feature9))";
+		String productDistance = "sum(product("+f1+",feature1),product("+f2+",feature2),product("+f3+",feature3),product("+f4+",feature4),product("+f5+",feature5),product("+f6+",feature6),product("+f7+",feature7),product("+f8+",feature8),product("+f9+",feature9),product("+f10+",feature10),product("+f11+",feature11),product("+f12+",feature12),product("+f13+",feature13),product("+f14+",feature14),product("+f15+",feature15),product("+f16+",feature16))";
 		queryParam.addParam("sort", productDistance +" desc");
 		applyFlFields(queryParam,req,productDistance);
 	}
