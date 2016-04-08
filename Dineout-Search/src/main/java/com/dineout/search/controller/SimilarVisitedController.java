@@ -52,6 +52,9 @@ public class SimilarVisitedController extends DOAbstractSearchController{
 			processValidationErrors(bindingResult.getAllErrors(),errors);
 			jsonresp = processJSONResponse(null, null, errors);
 		}else{
+			String restIds[] = new String[1];
+			restIds[0]=request.getRestId();
+			request.setRestIds(restIds);
 			similarVisitedResultList = similarVisitedRecommendationService.getRecommendedResults(request,errors);
 			long responseTime = new Date().getTime() - start; 
 			DOSearchResponse resp = getRecoResponse(similarVisitedResultList,errors,Constants.SIMILAR_VISITED,responseTime);

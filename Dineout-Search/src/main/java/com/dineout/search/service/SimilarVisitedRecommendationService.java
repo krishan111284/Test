@@ -45,7 +45,7 @@ public class SimilarVisitedRecommendationService implements RecommendationServic
 			SolrServer server = solrConnectionUtils.getRestSolrServer();
 			doqp = recommendationQueryCreator.getRestIdSearchQuery(request);
 			qres = server.query(doqp);
-			Map<String, Double> featureMap = new HashMap<String, Double>();
+			Map<String, Object> featureMap = new HashMap<String, Object>();
 			if(qres!=null){
 				Iterator<SolrDocument> resultIterator = qres.getResults().iterator();
 				while(resultIterator.hasNext()){
@@ -53,7 +53,7 @@ public class SimilarVisitedRecommendationService implements RecommendationServic
 					Iterator<String>fieldIterator = solrDoc.keySet().iterator();
 					while(fieldIterator.hasNext()){
 						String fieldName = fieldIterator.next();
-						featureMap.put((String)fieldName, (Double) solrDoc.get(fieldName));
+						featureMap.put((String)fieldName, solrDoc.get(fieldName));
 					}
 				}
 			}

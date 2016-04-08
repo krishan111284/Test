@@ -40,12 +40,11 @@ public abstract class DOAbstractQueryCreator {
 			String geoDistance = "geodist(lat_lng," + request.getLat() +","+request.getLng()+")";
 			sb.append(",").append("geo_distance:"+geoDistance);
 		}
-		
+
 		queryParam.addParam("fl",sb.toString());
 	}
 
-	public void setResponseNumLimit(QueryParam queryParam,
-			GenericDOSearchRequest req) {
+	public void setResponseNumLimit(QueryParam queryParam, GenericDOSearchRequest req) {
 		String start = !StringUtils.isEmpty(req.getStart())? req.getStart():Constants.DEFAULT_START_INDEX;
 		String rows = !StringUtils.isEmpty(req.getLimit())? req.getLimit():Constants.DEFAULT_NUM_ROWS;
 		queryParam.addParam("start", start);

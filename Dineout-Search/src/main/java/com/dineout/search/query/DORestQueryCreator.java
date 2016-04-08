@@ -29,41 +29,31 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 	@Autowired
 	FacetUtils facetUtils;
 
-	public QueryParam getSimilarRecommendedRestaurants(RecommendationRequest req, Map<String, Double> featureMap) throws SearchException{
+	public QueryParam getSimilarRecommendedRestaurants(RecommendationRequest req, Map<String, Object> featureMap) throws SearchException{
 		QueryParam queryParam = new QueryParam();
-		//initializeQueryCreator(req, queryParam, req.getEstfl(),rb.getString("dineout.search.fl"));
 		String queryString = null;
 		queryString = !StringUtils.isBlank(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY;
 		queryParam.addParam("q", queryString);
 		setQueryParser(queryParam, req,null);
 		applyFilters(queryParam, req, null);
 		applyThisRestaurantFilter(queryParam, req);
-		applyEucledianFormula(queryParam, req, featureMap);
-		return queryParam;
-	}
-	
-	public QueryParam getDinerRecommendedRestaurants(RecommendationRequest req, Map<String, Double> featureMap) throws SearchException{
-		QueryParam queryParam = new QueryParam();
-		//initializeQueryCreator(req, queryParam, req.getEstfl(),rb.getString("dineout.search.fl"));
-		String queryString = null;
-		queryString = !StringUtils.isBlank(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY;
-		queryParam.addParam("q", queryString);
-		setQueryParser(queryParam, req,null);
-		applyFilters(queryParam, req, null);
-		applyMostBookedRestaurantFilter(queryParam, req);
-		applyProductRule(queryParam, req, featureMap);
+		applyEucledianDistanceSimilarity(queryParam, req, featureMap);
 		return queryParam;
 	}
 
-	private void applyThisRestaurantFilter(QueryParam queryParam, RecommendationRequest req) {
-		queryParam.addParam("fq", "-r_id:"+req.getRestId());
-	}
-	
-	private void applyMostBookedRestaurantFilter(QueryParam queryParam, RecommendationRequest req) {
+	private void applyThisRestaurantFilter(QueryParam queryParam, RecommendationRequest restSearchReq) {
+		if(restSearchReq.getRestIds()!=null && restSearchReq.getRestIds().length>0){
+			StringBuilder restQr = new StringBuilder();
+			String restQrStr = null;
+			for(String restId:restSearchReq.getRestIds()){
+				restQr.append("-r_id:\""+restId+"\"").append(" AND ");
+			}
+			restQrStr = restQr.substring(0,restQr.lastIndexOf(" AND "));
+			queryParam.addParam("fq", restQrStr);
+		}
 	}
 
-	public QueryParam getSearchQuery(DORestSearchRequest req,
-			Map<String, ArrayList<String>> nerMap) throws SearchException {
+	public QueryParam getSearchQuery(DORestSearchRequest req, Map<String, ArrayList<String>> nerMap) throws SearchException {
 		String queryString = null;
 		QueryParam queryParam = new QueryParam();
 		Map<String,String> excludeTagMap = new HashMap<String,String>();
@@ -92,82 +82,28 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		return queryParam;
 	}
 
-	private void applyEucledianFormula(QueryParam queryParam, RecommendationRequest req, Map<String, Double> featureMap) {
-		double f1 = featureMap.get("feature1");
-		double f2 = featureMap.get("feature2");
-		double f3 = featureMap.get("feature3");
-		double f4 = featureMap.get("feature4");
-		double f5 = featureMap.get("feature5");
-		double f6 = featureMap.get("feature6");
-		double f7 = featureMap.get("feature7");
-		double f8 = featureMap.get("feature8");
-		double f9 = featureMap.get("feature9");
-		double f10 = featureMap.get("feature10");
-		double f11 = featureMap.get("feature11");
-		double f12 = featureMap.get("feature12");
-		double f13 = featureMap.get("feature13");
-		double f14 = featureMap.get("feature14");
-		double f15 = featureMap.get("feature15");
-		double f16 = featureMap.get("feature16");
+	private void applyEucledianDistanceSimilarity(QueryParam queryParam, RecommendationRequest req, Map<String, Object> featureMap) {
+		double f1 = (Double) featureMap.get("feature1");
+		double f2 = (Double) featureMap.get("feature2");
+		double f3 = (Double) featureMap.get("feature3");
+		double f4 = (Double) featureMap.get("feature4");
+		double f5 = (Double) featureMap.get("feature5");
+		double f6 = (Double) featureMap.get("feature6");
+		double f7 = (Double) featureMap.get("feature7");
+		double f8 = (Double) featureMap.get("feature8");
+		double f9 = (Double) featureMap.get("feature9");
+		double f10 = (Double) featureMap.get("feature10");
+		double f11 = (Double) featureMap.get("feature11");
+		double f12 = (Double) featureMap.get("feature12");
+		double f13 = (Double) featureMap.get("feature13");
+		double f14 = (Double) featureMap.get("feature14");
+		double f15 = (Double) featureMap.get("feature15");
+		double f16 = (Double) featureMap.get("feature16");
 		String eucledianDistance = "sqedist("+f1+","+f2+","+f3+","+f4+","+f5+","+f6+","+f7+","+f8+","+f9+","+f10+","+f11+","+f12+","+f13+","+f14+","+f15+","+f16+",feature1,feature2,feature3,feature4,feature5,feature6,feature7,feature8,feature9,feature10,feature11,feature12,feature13,feature14,feature15,feature16)";
 		queryParam.addParam("sort", eucledianDistance +" asc");
-		applyFlFields(queryParam,req,eucledianDistance);
-	}
-	
-	/*private void applyProductRule(QueryParam queryParam, RecommendationRequest req, Map<String, Double> featureMap) {
-		DecimalFormat df = new DecimalFormat("#.##");
-		df.setRoundingMode(RoundingMode.CEILING);
-		double f1 = Double.parseDouble(df.format(featureMap.get("feature1")));
-		double f2 = Double.parseDouble(df.format(featureMap.get("feature2")));
-		double f3 = Double.parseDouble(df.format(featureMap.get("feature3")));
-		double f4 = Double.parseDouble(df.format(featureMap.get("feature4")));
-		double f5 = Double.parseDouble(df.format(featureMap.get("feature5")));
-		double f6 = Double.parseDouble(df.format(featureMap.get("feature6")));
-		double f7 = Double.parseDouble(df.format(featureMap.get("feature7")));
-		double f8 = Double.parseDouble(df.format(featureMap.get("feature8")));
-		double f9 = Double.parseDouble(df.format(featureMap.get("feature9")));
-		
-		String dotProduct = "sum(product("+f1+",feature1),product("+f2+",feature2),product("+f3+",feature3),product("+f4+",feature4),product("+f5+",feature5),product("+f6+",feature6),product("+f7+",feature7),product("+f8+",feature8),product("+f9+",feature9))";
-		String sum1 = "sum("+f1+","+f2+","+f3+","+f4+","+f5+","+f6+","+f7+","+f8+","+f9+")";
-		String sum2 = "sum(feature1,feature2,feature3,feature4,feature5,feature6,feature7,feature8,feature9)";
-		String sumSquare1 = "sum(pow("+f1+",2),pow("+f2+",2),pow("+f3+",2),pow("+f4+",2),pow("+f5+",2),pow("+f6+",2),pow("+f7+",2),pow("+f8+",2),pow("+f9+",2))";
-		String sumSquare2 = "sum(pow(feature1,2),pow(feature2,2),pow(feature3,2),pow(feature4,2),pow(feature5,2),pow(feature6,2),pow(feature7,2),pow(feature8,2),pow(feature9,2))";
-		
-		String pearsonFormula = "div(sub("+dotProduct+",div(product("+sum1+","+sum2+"),9)),sqrt(product(sub("+sumSquare1+",div(pow("+sum1+",2),9)),sub("+sumSquare2+",div(pow("+sum2+",2),9)))))";
-		String scaledFormula = "scale("+pearsonFormula+",1,10)";
-		
-		queryParam.addParam("sort", scaledFormula +" desc");
-		applyFlFields(queryParam,req,scaledFormula);
-	}*/
-
-
-	private void applyProductRule(QueryParam queryParam, RecommendationRequest req, Map<String, Double> featureMap) {
-		double f1 = featureMap.get("feature1");
-		double f2 = featureMap.get("feature2");
-		double f3 = featureMap.get("feature3");
-		double f4 = featureMap.get("feature4");
-		double f5 = featureMap.get("feature5");
-		double f6 = featureMap.get("feature6");
-		double f7 = featureMap.get("feature7");
-		double f8 = featureMap.get("feature8");
-		double f9 = featureMap.get("feature9");
-		double f10 = featureMap.get("feature10");
-		double f11 = featureMap.get("feature11");
-		double f12 = featureMap.get("feature12");
-		double f13 = featureMap.get("feature13");
-		double f14 = featureMap.get("feature14");
-		double f15 = featureMap.get("feature15");
-		double f16 = featureMap.get("feature16");
-		
-		String productDistance = "sum(product("+f1+",feature1),product("+f2+",feature2),product("+f3+",feature3),product("+f4+",feature4),product("+f5+",feature5),product("+f6+",feature6),product("+f7+",feature7),product("+f8+",feature8),product("+f9+",feature9),product("+f10+",feature10),product("+f11+",feature11),product("+f12+",feature12),product("+f13+",feature13),product("+f14+",feature14),product("+f15+",feature15),product("+f16+",feature16))";
-		queryParam.addParam("sort", productDistance +" desc");
-		applyFlFields(queryParam,req,productDistance);
-	}
-	
-	private void applyFlFields(QueryParam queryParam,RecommendationRequest req, String distance) {
 		StringBuilder sb = new StringBuilder(rb.getString("dineout.search.fl"));
-			sb.append(",").append("distance:"+distance);
-			queryParam.addParam("fl", sb.toString());
+		sb.append(",").append("eucledianDistance:"+eucledianDistance);
+		queryParam.addParam("fl",sb.toString());
 	}
 
 	private void applyGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
@@ -181,15 +117,12 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		queryParam.addParam("boost", "product(scale(booking_last_7,1,5),0.45)");
 		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
-		//queryParam.addParam("boost", "product(div(1,sum(pow(2.71,product(0.005,recent_days)))),0.1)");
-		//queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recent_days)))),0.1)");
 	}
 
 	private void applyOldGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
 		queryParam.addParam("boost", "product(scale(booking_count,1,5),0.35)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
 		queryParam.addParam("boost", "if(exists(rank),product(div(sub(11,rank),2),0.15),0.01)");
-
 	}
 
 	private void applyFilters(QueryParam queryParam,DORestSearchRequest req,Map<String, String> excludeTagMap) throws SearchException{
@@ -212,16 +145,13 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		handleRecentRestaurants(queryParam,req,excludeTagMap);
 	}
 
-	private void handleRecentRestaurants(QueryParam queryParam,
-			DORestSearchRequest req, Map<String, String> excludeTagMap) {
+	private void handleRecentRestaurants(QueryParam queryParam, DORestSearchRequest req, Map<String, String> excludeTagMap) {
 		if(Constants.RECENT_TRUE.equalsIgnoreCase(req.getRecent())){
 			queryParam.addParam("fq", "recency:1");
 		}
-
 	}
 
-	private void handleTypeFilters(QueryParam queryParam,
-			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
+	private void handleTypeFilters(QueryParam queryParam, DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
 		if(restSearchReq.getByType()!=null){
 			if(restSearchReq.getByType().equalsIgnoreCase("1"))
 				queryParam.addParam("fq", "fullfillment:true");
@@ -230,8 +160,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		}
 	}
 
-	private void handleAreaLocationFilters(QueryParam queryParam,
-			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
+	private void handleAreaLocationFilters(QueryParam queryParam, DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
 		if(restSearchReq.getBylocarea()!=null && restSearchReq.getBylocarea().length>0){
 			StringBuilder locationAreaFacetQr = new StringBuilder();
 			String locationAreaFacetQrStr=null;
@@ -532,7 +461,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			excludeTagMap.put("tags", "{!ex=tags_ft_tag}");
 		}
 	}
-	
+
 	private void handleSpecialTagsFilters(QueryParam queryParam,
 			DORestSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
 		if(restSearchReq.getBysptags()!=null && restSearchReq.getBysptags().length>0){
