@@ -100,9 +100,11 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		double f15 = (Double) featureMap.get("feature15");
 		double f16 = (Double) featureMap.get("feature16");
 		String eucledianDistance = "sqedist("+f1+","+f2+","+f3+","+f4+","+f5+","+f6+","+f7+","+f8+","+f9+","+f10+","+f11+","+f12+","+f13+","+f14+","+f15+","+f16+",feature1,feature2,feature3,feature4,feature5,feature6,feature7,feature8,feature9,feature10,feature11,feature12,feature13,feature14,feature15,feature16)";
+		String scaledDistance = "scale("+eucledianDistance+",1,5)";
 		queryParam.addParam("sort", eucledianDistance +" asc");
 		StringBuilder sb = new StringBuilder(rb.getString("dineout.search.fl"));
-		sb.append(",").append("eucledianDistance:"+eucledianDistance);
+		sb.append(",").append("eucledianDistance:"+scaledDistance);
+		sb.append(",").append("uneucledianDistance:"+eucledianDistance);
 		queryParam.addParam("fl",sb.toString());
 	}
 
