@@ -76,6 +76,14 @@ public abstract class DOAbstractSearchController {
 		}
 		return nerMap;
 	}
+	
+	protected String getArea(DORestSearchRequest request){
+		String area = null;
+		if(request.getBylocation()!=null){
+			area = nerServiceImpl.getArea(request);
+		}
+		return area;
+	}
 
 	/**
 	 * Process the doclist returned by the service and get the corresponding JSON

@@ -41,6 +41,14 @@ public class DOResponseUtils {
 		result.setDocs(getTCDocList(qres));
 		return result;
 	}
+	
+	public static DOSearchResult processFeaturedQueryResponse(QueryResponse qres, String domain, boolean isSpellcheckApplied) {
+		DOSearchResult result = new DOSearchResult();
+		result.setDomain(domain);
+		result.setMatches((Long)qres.getResults().getNumFound());
+		result.setDocs(getTCDocList(qres));
+		return result;
+	}
 
 	public static DOSearchResult processQueryResponse(QueryResponse qres, String domain, boolean isSpellcheckApplied) {
 		DOSearchResult result = new DOSearchResult();
@@ -112,7 +120,7 @@ public class DOResponseUtils {
 		for(String restId: restIds){
 			if(docMap.containsKey(restId)){
 				docList.add(docMap.get(restId));
-				}
+			}
 		}
 		return docList;
 	}
@@ -248,7 +256,7 @@ public class DOResponseUtils {
 				nerMap.put(Constants.NER_CUISINE_KEY, new ArrayList<String>(cuisineList));
 				nerMap.put(Constants.NER_CUISINE_FAMILY_KEY,  new ArrayList<String>(familyList));
 				nerMap.put(Constants.PROCESSED_QUERY,  new ArrayList<String>(queryList));	
-			}
+			}			
 			//For next group/entity in future
 		}
 		return nerMap;
@@ -265,7 +273,16 @@ public class DOResponseUtils {
 	public static String[] getData(Object object){
 		ArrayList tempObject =(ArrayList)object;
 		String [] fieldData = (String[]) tempObject.toArray(new String[tempObject.size()]);
-
 		return fieldData;
+	}
+
+	public static String processStringResponseForArea(QueryResponse qRes) {	
+		String area = null;
+		Iterator<SolrDocument> iter = qRes.getResults().iterator();
+		while(iter.hasNext()){
+			SolrDocument solrDoc = iter.next();
+			area = (String) solrDoc.get("area_name");
+		}
+		return area;
 	}
 }

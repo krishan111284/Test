@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.dineout.search.query.NerQueryCreator;
 import com.dineout.search.query.QueryParam;
+import com.dineout.search.request.DORestSearchRequest;
 import com.dineout.search.request.NerRequest;
 import com.dineout.search.server.SolrConnectionUtils;
 import com.dineout.search.utils.Constants;
@@ -21,18 +22,18 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-@Service("tcNerServiceImpl")
+@Service("nerServiceImpl")
 public class NerServiceImpl implements NerService{
 	Logger logger = Logger.getLogger(NerServiceImpl.class);
 	@Autowired
 	NerQueryCreator nerQueryCreator;
-	
+
 	@Autowired
 	SolrConnectionUtils solrConnectionUtils;
-	
+
 	LoadingCache<NerRequest, Map<String, ArrayList<String>>> cache = null;
-	
-	
+
+
 	public NerServiceImpl(){
 		CacheLoader<NerRequest, Map<String,ArrayList<String>>> loader = new CacheLoader<NerRequest, Map<String,ArrayList<String>>>(){
 			public Map<String, ArrayList<String>> load (NerRequest key){
@@ -42,8 +43,8 @@ public class NerServiceImpl implements NerService{
 		};
 		cache = CacheBuilder.newBuilder().maximumSize(Constants.NER_QUERY_CACHE_ROWS).build(loader);
 	}
-	
-	
+
+
 	public Map<String, ArrayList<String>> extactNamedEntities(NerRequest req){
 		Map<String, ArrayList<String>> nerMap = null;
 		try {
@@ -56,27 +57,40 @@ public class NerServiceImpl implements NerService{
 		return nerMap;
 	}
 
-
 	public Map<String, ArrayList<String>> loadNamedEntities(NerRequest req){
 		Map<String, ArrayList<String>> resp = null;
 		SolrServer server = solrConnectionUtils.getNERSolrServer();
 		QueryParam tcqp = null;
 		try {
 			tcqp = nerQueryCreator.getNERSearchQuery(req.getQuery(),req.getCity());
-		} catch (Exception e) {
-			
-		}
+		} catch (Exception e) {}
 
 		QueryResponse qres = null;
 		try {
 			qres = server.query(tcqp);
 			if(qres!=null){
-					resp = DOResponseUtils.processStrictGroupQueryResponse(qres, req.getQuery());
+				resp = DOResponseUtils.processStrictGroupQueryResponse(qres, req.getQuery());
 			}
-		} catch (SolrServerException e) {
-			
+		} catch (SolrServerException e) {}
+
+		return resp;
+	}
+
+	public String getArea(DORestSearchRequest req){
+		String resp = null;
+		SolrServer server = solrConnectionUtils.getNERSolrServer();
+		QueryParam doqp = null;
+		try {
+			doqp = nerQueryCreator.getNERAreaSearchQuery(req);
+			QueryResponse qres = null;
+			qres = server.query(doqp);
+			if(qres!=null){
+				resp = DOResponseUtils.processStringResponseForArea(qres);
+			}
+
+		}catch (Exception e) {
+			logger.error(e.getMessage(),e);
 		}
-		
 		return resp;
 	}
 }
