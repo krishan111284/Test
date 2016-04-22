@@ -80,7 +80,7 @@ public class SponsoredRestServiceImpl{
 			doqp = sponsoredQueryCreator.getLocationFeaturedQuery(request);
 			qres = server.query(doqp);
 			if(qres!=null){
-				searchRes = DOResponseUtils.processFeaturedQueryResponse(qres,Constants.RESPONSE_TYPE_FEATURED,request.isSpellcheckApplied());
+				searchRes = DOResponseUtils.processFeaturedQueryResponse(qres,Constants.RESPONSE_TYPE_SPONSORED,request.isSpellcheckApplied());
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -98,7 +98,7 @@ public class SponsoredRestServiceImpl{
 			doqp = sponsoredQueryCreator.getAreaFeaturedQuery(request);
 			qres = server.query(doqp);
 			if(qres!=null){
-				searchRes = DOResponseUtils.processFeaturedQueryResponse(qres,Constants.RESPONSE_TYPE_FEATURED,request.isSpellcheckApplied());
+				searchRes = DOResponseUtils.processFeaturedQueryResponse(qres,Constants.RESPONSE_TYPE_SPONSORED,request.isSpellcheckApplied());
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -116,7 +116,7 @@ public class SponsoredRestServiceImpl{
 			doqp = sponsoredQueryCreator.getCityFeaturedQuery(request);
 			qres = server.query(doqp);
 			if(qres!=null){
-				searchRes = DOResponseUtils.processFeaturedQueryResponse(qres,Constants.RESPONSE_TYPE_FEATURED,request.isSpellcheckApplied());
+				searchRes = DOResponseUtils.processFeaturedQueryResponse(qres,Constants.RESPONSE_TYPE_SPONSORED,request.isSpellcheckApplied());
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
