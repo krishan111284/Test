@@ -9,9 +9,9 @@ import com.dineout.search.exception.SearchException;
 import com.dineout.search.request.DORestSearchRequest;
 import com.dineout.search.utils.Constants;
 
-@Component("featuredQueryCreator")
-public class DOFeaturedQueryCreator extends DOAbstractQueryCreator {
-	Logger logger = Logger.getLogger(DOFeaturedQueryCreator.class);
+@Component("sponsoredQueryCreator")
+public class DOSponsoredQueryCreator extends DOAbstractQueryCreator {
+	Logger logger = Logger.getLogger(DOSponsoredQueryCreator.class);
 	ResourceBundle rb = ResourceBundle.getBundle("search");
 
 	public QueryParam getLocationFeaturedQuery(DORestSearchRequest req) throws SearchException {

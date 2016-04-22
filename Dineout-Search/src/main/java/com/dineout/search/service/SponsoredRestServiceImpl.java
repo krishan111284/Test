@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import com.dineout.search.exception.ErrorCode;
 import com.dineout.search.exception.SearchError;
 import com.dineout.search.exception.SearchErrors;
-import com.dineout.search.query.DOFeaturedQueryCreator;
+import com.dineout.search.query.DOSponsoredQueryCreator;
 import com.dineout.search.query.QueryParam;
 import com.dineout.search.request.DORestSearchRequest;
 import com.dineout.search.response.DOSearchResult;
@@ -21,11 +21,11 @@ import com.dineout.search.server.SolrConnectionUtils;
 import com.dineout.search.utils.Constants;
 import com.dineout.search.utils.DOResponseUtils;
 
-@Service("featuredRestServiceImpl")
-public class FeaturedRestServiceImpl{
-	Logger logger = Logger.getLogger(FeaturedRestServiceImpl.class);
+@Service("sponsoredRestServiceImpl")
+public class SponsoredRestServiceImpl{
+	Logger logger = Logger.getLogger(SponsoredRestServiceImpl.class);
 	@Autowired
-	DOFeaturedQueryCreator featuredQueryCreator;
+	DOSponsoredQueryCreator sponsoredQueryCreator;
 	@Autowired 
 	SolrConnectionUtils solrConnectionUtils;
 
@@ -33,7 +33,7 @@ public class FeaturedRestServiceImpl{
 		List<DOSearchResult> result = new ArrayList<DOSearchResult>();
 		try {
 			int limit = request.getLimit()!=null?Integer.parseInt(request.getLimit()):10;
-			SolrServer server = solrConnectionUtils.getFeaturedSolrServer();
+			SolrServer server = solrConnectionUtils.getSponsoredSolrServer();
 			DOSearchResult mainResult = new DOSearchResult();
 			if(request.getBylocation()!=null && request.getBylocation().length>0){
 				mainResult = getLocationResult(server,request,errors);
@@ -77,7 +77,7 @@ public class FeaturedRestServiceImpl{
 		QueryResponse qres = null;
 		DOSearchResult searchRes = null;
 		try {
-			doqp = featuredQueryCreator.getLocationFeaturedQuery(request);
+			doqp = sponsoredQueryCreator.getLocationFeaturedQuery(request);
 			qres = server.query(doqp);
 			if(qres!=null){
 				searchRes = DOResponseUtils.processFeaturedQueryResponse(qres,Constants.RESPONSE_TYPE_FEATURED,request.isSpellcheckApplied());
@@ -95,7 +95,7 @@ public class FeaturedRestServiceImpl{
 		QueryResponse qres = null;
 		DOSearchResult searchRes = null;
 		try {
-			doqp = featuredQueryCreator.getAreaFeaturedQuery(request);
+			doqp = sponsoredQueryCreator.getAreaFeaturedQuery(request);
 			qres = server.query(doqp);
 			if(qres!=null){
 				searchRes = DOResponseUtils.processFeaturedQueryResponse(qres,Constants.RESPONSE_TYPE_FEATURED,request.isSpellcheckApplied());
@@ -113,7 +113,7 @@ public class FeaturedRestServiceImpl{
 		QueryResponse qres = null;
 		DOSearchResult searchRes = null;
 		try {
-			doqp = featuredQueryCreator.getCityFeaturedQuery(request);
+			doqp = sponsoredQueryCreator.getCityFeaturedQuery(request);
 			qres = server.query(doqp);
 			if(qres!=null){
 				searchRes = DOResponseUtils.processFeaturedQueryResponse(qres,Constants.RESPONSE_TYPE_FEATURED,request.isSpellcheckApplied());

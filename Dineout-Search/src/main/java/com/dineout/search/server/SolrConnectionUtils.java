@@ -34,8 +34,8 @@ public class SolrConnectionUtils {
 		return solrConnectionFactory.getDinerSolrServer();
 	}
 	
-	public SolrServer getFeaturedSolrServer(){
-		return solrConnectionFactory.getFeaturedSolrServer();
+	public SolrServer getSponsoredSolrServer(){
+		return solrConnectionFactory.getSponsoredSolrServer();
 	}
 
 }

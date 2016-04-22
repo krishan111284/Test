@@ -23,17 +23,17 @@ import com.dineout.search.request.DORestSearchRequest;
 import com.dineout.search.response.DOResponseBody;
 import com.dineout.search.response.DOSearchResponse;
 import com.dineout.search.response.DOSearchResult;
-import com.dineout.search.service.FeaturedRestServiceImpl;
+import com.dineout.search.service.SponsoredRestServiceImpl;
 import com.dineout.search.utils.Constants;
 import com.dineout.search.validation.DoRestRequestValidator;
 
 @Controller
-@RequestMapping(value="/featured")
-public class DOFeaturedRestController extends DOAbstractSearchController{
+@RequestMapping(value="/sponsored")
+public class DOSponsoredRestController extends DOAbstractSearchController{
 
-	Logger logger = Logger.getLogger(DOFeaturedRestController.class);
+	Logger logger = Logger.getLogger(DOSponsoredRestController.class);
 	@Autowired
-	FeaturedRestServiceImpl featuredRestServiceImpl;
+	SponsoredRestServiceImpl sponsoredRestServiceImpl;
 	@Autowired
 	DoRestRequestValidator doRestRequestValidator;
 	@RequestMapping(value="/getresult",method = RequestMethod.GET)
@@ -55,11 +55,11 @@ public class DOFeaturedRestController extends DOAbstractSearchController{
 				areas[0] = getArea(request);
 				request.setByarea(areas);
 			}	
-			searchResultList = featuredRestServiceImpl.getSearchResults(request,errors);
+			searchResultList = sponsoredRestServiceImpl.getSearchResults(request,errors);
 			long responseTime = new Date().getTime() - start;
 			DOSearchResponse resp = getDOSearchResponse(searchResultList, null,errors,null,responseTime);
 			if(!errors.hasErrors() && ((DOResponseBody)resp.getBody()).getNumFound() == 0){
-				logger.info("FEATURED NULL QUERY: "+httpReq.getRequestURL()+"?" + httpReq.getQueryString());
+				logger.info("SPONSORED NULL QUERY: "+httpReq.getRequestURL()+"?" + httpReq.getQueryString());
 			}
 			jsonresp = getJSON(resp);
 		}
