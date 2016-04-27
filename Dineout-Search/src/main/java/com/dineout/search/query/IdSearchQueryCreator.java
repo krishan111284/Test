@@ -34,6 +34,11 @@ public class IdSearchQueryCreator {
 			queryParam.addParam("q", Constants.WILD_SEARCH_QUERY);
 			addFlParams(req, queryParam);	
 			addLimit(req, queryParam);
+			if(req.isSpatialQuery() || req.isEntitySpatialQuery()){
+				handleSpatialSortingRequest(queryParam,req);
+			}else{
+				handleSortingRequest(queryParam,req);
+			}
 		}
 		return queryParam;
 	}
@@ -52,6 +57,92 @@ public class IdSearchQueryCreator {
 			sb.append(",").append("geo_distance:"+geoDistance);
 		}
 		queryParam.addParam("fl",sb.toString());
+	}
+
+	private void handleSpatialSortingRequest(QueryParam queryParam, DORestSearchRequest restSearchReq) {
+		String spatialQuery = "";
+		String geoDistance = "";
+
+		if(restSearchReq.isSpatialQuery() && restSearchReq.isEntitySpatialQuery()){
+			spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getElat() + "," + restSearchReq.getElng() + " d=" + restSearchReq.getRadius() + "}";
+			geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
+			queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+"))))),0.1)");
+		}
+		else if(restSearchReq.isEntitySpatialQuery()){
+			spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getElat() + "," + restSearchReq.getElng() + " d=" + restSearchReq.getRadius() + "}";
+			geoDistance = "geodist(lat_lng," + restSearchReq.getElat() +","+restSearchReq.getElng()+")";
+			queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,geodist(lat_lng," + restSearchReq.getElat() +","+restSearchReq.getElng()+"))))),0.1)");
+		}
+		else if(restSearchReq.isSpatialQuery()){
+			if(restSearchReq.getSearchType()==null || !restSearchReq.getSearchType().equalsIgnoreCase(rb.getString("dineout.search.type.explicit")))
+				spatialQuery = "{!geofilt sfield=lat_lng pt=" + restSearchReq.getLat() + "," + restSearchReq.getLng() + " d=" + restSearchReq.getRadius() + "}";
+			geoDistance = "geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+")";
+			queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,geodist(lat_lng," + restSearchReq.getLat() +","+restSearchReq.getLng()+"))))),0.1)");
+		}
+
+		String sortfieldApplied = "";
+		String bySort = restSearchReq.getBysort();
+
+		queryParam.addParam("fq", spatialQuery);
+
+		if(!StringUtils.isEmpty(bySort)){
+			if(Constants.SORT_OPTION_ONE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,booking_count asc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_TWO.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,booking_count desc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_THREE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,costFor2 asc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_FOUR.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,costFor2 desc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_FIVE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,avg_rating asc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_SIX.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,avg_rating desc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_SEVEN.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,"  + geoDistance + " asc";
+			}
+			if(Constants.SORT_OPTION_EIGHT.equals(bySort)){
+				sortfieldApplied = geoDistance + " asc";
+			}
+		}else{
+			sortfieldApplied = "fullfillment desc,"  + geoDistance + " asc";
+		}
+		queryParam.addParam("sort", sortfieldApplied);
+	}
+
+	private void handleSortingRequest(QueryParam queryParam,
+			DORestSearchRequest restSearchReq) {
+		String bySort = restSearchReq.getBysort();
+		String sortfieldApplied = "";
+		if(!StringUtils.isEmpty(bySort)){
+			if(Constants.SORT_OPTION_ONE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,booking_count asc";
+			}
+			if(Constants.SORT_OPTION_TWO.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,booking_count desc";
+			}
+			if(Constants.SORT_OPTION_THREE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,costFor2 asc";
+			}
+			if(Constants.SORT_OPTION_FOUR.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,costFor2 desc";
+			}
+			if(Constants.SORT_OPTION_FIVE.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,avg_rating asc";
+			}
+			if(Constants.SORT_OPTION_SIX.equals(bySort)){
+				sortfieldApplied = "fullfillment desc,avg_rating desc";
+			}
+		}else{
+			sortfieldApplied = "fullfillment desc, score desc";
+		}
+		queryParam.addParam("sort", sortfieldApplied);
 	}
 
 }

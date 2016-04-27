@@ -51,6 +51,7 @@ public class DOIdSearchController extends DOAbstractSearchController{
 			processValidationErrors(bindingResult.getAllErrors(),errors);
 			jsonresp = processJSONResponse(null, null, errors);
 		}else{
+			processDOSearchRequest(request);
 			searchResultList = idSearchServiceImpl.getSearchResults(request,errors,null);
 			long responseTime = new Date().getTime() - start;
 			DOSearchResponse resp = getDOSearchResponse(searchResultList, null,errors,null,responseTime);
