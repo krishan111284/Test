@@ -9,5 +9,6 @@ public interface SolrConnectionFactory {
 	public SolrServer getNERSolrServer();
 	public SolrServer getDinerSolrServer();
 	public SolrServer getSponsoredSolrServer();
+	public SolrServer getEventDealsSolrServer();
 
 }

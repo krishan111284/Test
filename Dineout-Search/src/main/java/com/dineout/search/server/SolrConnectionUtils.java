@@ -37,5 +37,9 @@ public class SolrConnectionUtils {
 	public SolrServer getSponsoredSolrServer(){
 		return solrConnectionFactory.getSponsoredSolrServer();
 	}
+	
+	public SolrServer getEventDealsSolrServer(){
+		return solrConnectionFactory.getEventDealsSolrServer();
+	}
 
 }

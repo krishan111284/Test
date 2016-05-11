@@ -1,14 +1,18 @@
 package com.dineout.search.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.Group;
 import org.apache.solr.client.solrj.response.GroupCommand;
@@ -16,6 +20,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
 import org.apache.solr.common.SolrDocument;
 
+import com.dineout.search.request.DOTicketSearchRequest;
 import com.dineout.search.response.DOFacet;
 import com.dineout.search.response.DOHighlight;
 import com.dineout.search.response.DORecoResult;
@@ -23,6 +28,7 @@ import com.dineout.search.response.DOSearchResult;
 import com.dineout.search.response.DOSpellCheck;
 
 public class DOResponseUtils {
+	static ResourceBundle rb = ResourceBundle.getBundle("search");
 
 	public static DORecoResult processRecoQueryResponse(QueryResponse qres) {
 		return processGroupQueryResponseForReco(qres);
@@ -41,7 +47,7 @@ public class DOResponseUtils {
 		result.setDocs(getTCDocList(qres));
 		return result;
 	}
-	
+
 	public static DOSearchResult processFeaturedQueryResponse(QueryResponse qres, String domain, boolean isSpellcheckApplied) {
 		DOSearchResult result = new DOSearchResult();
 		result.setDomain(domain);
@@ -179,6 +185,64 @@ public class DOResponseUtils {
 		}
 		result.setDocs(docList);
 		return result;
+	}
+
+	public static DOSearchResult processTicketGroupQueryResponse(QueryResponse qRes, String domain,DOTicketSearchRequest request) {
+		DOSearchResult result = new DOSearchResult();
+		ArrayList<Map<Object, Object>> resultList = new ArrayList<Map<Object, Object>>();
+		result.setDomain(domain);
+		SolrDocument rInfo = null;
+		GroupCommand groupCommand = qRes.getGroupResponse().getValues().get(0);
+		setMatchesForGroupQuery(result, groupCommand, domain);
+		List<Group> groups =groupCommand.getValues();
+		for(Group group:groups){
+			HashMap<Object, Object> restaurantInfo = new HashMap<Object, Object>();
+			List<Map<Object, Object>> ticketList = new ArrayList<Map<Object, Object>>();
+			Iterator<SolrDocument> iter = group.getResult().iterator();
+			while(iter.hasNext()){
+				rInfo = iter.next();
+				if(rInfo.containsKey("tl_id"))
+					ticketList.add(getTicketDoc(rInfo, request, domain));	
+			}
+			processRestaurantInfo(restaurantInfo,rInfo);
+			restaurantInfo.put("dealevents",new ArrayList<Map<Object, Object>>(new LinkedHashSet<Map<Object, Object>>(ticketList)));
+			resultList.add(restaurantInfo);
+		}
+		result.setDocs(resultList);
+		result.setFacet(getFacetInfo(qRes));
+		result.setSpellCheck(getSpellCheckInfo(qRes,request.isSpellcheckApplied()));
+		return result;
+	}
+
+	private static Map<Object, Object> getTicketDoc(SolrDocument solrDoc,DOTicketSearchRequest req, String domain) {
+		Map<Object, Object> bbDoc = new HashMap<Object, Object>();
+		String fl="";
+		fl = StringUtils.isEmpty(req.getEstfl())?rb.getString("dineout.deals.fl"):req.getEstfl();
+		if(req.isSpatialQuery()){
+			fl =fl + "," + "distance";
+		}
+		Set<String>displayFields = new HashSet<String>(Arrays.asList(fl.split(",")));
+		Iterator<String>fieldIterator = displayFields.iterator();
+		while(fieldIterator.hasNext()){
+			String fieldName = fieldIterator.next();
+			
+		}
+		
+		return null;
+	}
+
+	private static void processRestaurantInfo(HashMap<Object, Object> restaurantInfo, SolrDocument rInfo) {
+		//dineout.search.fl
+		restaurantInfo.put("r_id", rInfo.get("r_id")!=null?rInfo.get("r_id"):null);
+		restaurantInfo.put("rest_name", rInfo.get("rest_name")!=null?rInfo.get("rest_name"):null);
+		restaurantInfo.put("img", rInfo.get("img")!=null?rInfo.get("img"):null);
+		restaurantInfo.put("fullfillment", rInfo.get("fullfillment")!=null?rInfo.get("fullfillment"):null);
+		restaurantInfo.put("is_pf", rInfo.get("is_pf")!=null?rInfo.get("is_pf"):null);
+		restaurantInfo.put("url", rInfo.get("url")!=null?rInfo.get("url"):null);
+		restaurantInfo.put("area_name", rInfo.get("area_name")!=null?rInfo.get("area_name"):null);
+		restaurantInfo.put("locality_name", rInfo.get("locality_name")!=null?rInfo.get("locality_name"):null);
+		restaurantInfo.put("avg_rating", rInfo.get("avg_rating")!=null?rInfo.get("avg_rating"):null);
+		restaurantInfo.put("tags", rInfo.get("tags")!=null?rInfo.get("tags"):null);
 	}
 
 	public static DOSearchResult processGroupQueryResponse(QueryResponse qRes,

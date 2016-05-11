@@ -1,10 +1,7 @@
 package com.dineout.search.controller;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -22,51 +19,46 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dineout.search.exception.SearchErrors;
-import com.dineout.search.request.DORestSearchRequest;
-import com.dineout.search.request.DOSearchHeader;
+import com.dineout.search.request.DOTicketSearchRequest;
 import com.dineout.search.response.DOResponseBody;
 import com.dineout.search.response.DOSearchResponse;
 import com.dineout.search.response.DOSearchResult;
-import com.dineout.search.service.RestSearchService;
+import com.dineout.search.service.TicketServiceImpl;
 import com.dineout.search.utils.Constants;
 import com.dineout.search.validation.DoRestRequestValidator;
 
 @Controller
-@RequestMapping(value="/search/")
-public class DODealsSearchController extends DOAbstractSearchController{
+@RequestMapping(value="/ticket")
+public class DOTicketSearchController extends DOAbstractSearchController{
 
-	Logger logger = Logger.getLogger(DODealsSearchController.class);
+	Logger logger = Logger.getLogger(DOTicketSearchController.class);
 	@Autowired
-	RestSearchService restSearchService;
+	TicketServiceImpl ticketServiceImpl;
 	@Autowired
 	DoRestRequestValidator doRestRequestValidator;
 	@RequestMapping(value="/getresult",method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<String> getKeywordresults(@ModelAttribute("searchHeader")DOSearchHeader header,
-			@ModelAttribute("restSearchRequest")DORestSearchRequest request, BindingResult bindingResult,
-			HttpServletResponse response,
-			HttpSession session,HttpServletRequest httpReq){
+	public @ResponseBody ResponseEntity<String> getKeywordresults(@ModelAttribute("ticketRequest")DOTicketSearchRequest request, 
+			BindingResult bindingResult, HttpServletResponse response, HttpSession session, HttpServletRequest httpReq){
 		long start = new Date().getTime();
 		String jsonresp = null;
 		HttpHeaders responseHeaders = new HttpHeaders();
 		List<DOSearchResult> searchResultList = null;
 		responseHeaders.setContentType(Constants.JSON_MEDIA_TYPE);
 		SearchErrors errors = new SearchErrors();
-		doRestRequestValidator.validatorResourceData(request,bindingResult,new String[]{"bycity"});
+		doRestRequestValidator.validatorResourceData(request, bindingResult, new String[]{"bycity"});
 		if(bindingResult.hasErrors()){
 			processValidationErrors(bindingResult.getAllErrors(),errors);
 			jsonresp = processJSONResponse(null, null, errors);
 		}else{
 			processDOSearchRequest(request);
-			Map<String, ArrayList<String>> nerMap = getNerMap(request);
-			searchResultList = restSearchService.getSearchResults(request,errors,nerMap);
+			searchResultList = ticketServiceImpl.getSearchResults(request,errors,null);
 			long responseTime = new Date().getTime() - start;
-			DOSearchResponse resp = getDOSearchResponse(searchResultList, null,errors,nerMap,responseTime);
+			DOSearchResponse resp = getDOSearchResponse(searchResultList, null, errors, null, responseTime);
 			if(!errors.hasErrors() && ((DOResponseBody)resp.getBody()).getNumFound() == 0){
-				logger.info("NULL QUERY: "+httpReq.getRequestURL()+"?" + httpReq.getQueryString());
+				logger.info("Null Ticket Query: "+httpReq.getRequestURL()+"?" + httpReq.getQueryString());
 			}
 			jsonresp = getJSON(resp);
 		}
 		return new ResponseEntity<String>(jsonresp, responseHeaders, HttpStatus.CREATED);
-
 	}
 }

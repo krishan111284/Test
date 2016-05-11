@@ -19,6 +19,7 @@ public class HttpSolrConnectionFactory implements SolrConnectionFactory{
 	private HttpSolrServer nerSolrServer;
 	private HttpSolrServer dinerSolrServer;
 	private HttpSolrServer sponsoredSolrServer;
+	private HttpSolrServer eventDealsSolrServer;
 
 	public HttpSolrConnectionFactory(){		
 		initialiseResources();
@@ -27,6 +28,17 @@ public class HttpSolrConnectionFactory implements SolrConnectionFactory{
 		initializeNERSolrServer();
 		initializeDinerSolrServer();
 		initializeSponsoredSolrServer();
+		initializeEventDealsSolrServer();
+	}
+
+	private void initializeEventDealsSolrServer() {
+		try {
+			String url=rb.getString("dineout.eventdeals.solr.url");
+			eventDealsSolrServer = new HttpSolrServer(url);
+			setServerProperties(eventDealsSolrServer);
+		}catch(Exception e){
+			logger.error("Unable to connect to SOLR!!!");
+		}
 	}
 
 	private void initializeSponsoredSolrServer() {
@@ -117,6 +129,11 @@ public class HttpSolrConnectionFactory implements SolrConnectionFactory{
 	@Override
 	public SolrServer getSponsoredSolrServer() {
 		return sponsoredSolrServer;
+	}
+	
+	@Override
+	public SolrServer getEventDealsSolrServer() {
+		return eventDealsSolrServer;
 	}
 
 }
