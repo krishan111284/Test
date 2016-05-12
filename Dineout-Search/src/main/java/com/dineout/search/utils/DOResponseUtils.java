@@ -1,7 +1,12 @@
 package com.dineout.search.utils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -225,9 +230,9 @@ public class DOResponseUtils {
 		Iterator<String>fieldIterator = displayFields.iterator();
 		while(fieldIterator.hasNext()){
 			String fieldName = fieldIterator.next();
-			
+
 		}
-		
+
 		return null;
 	}
 
@@ -349,4 +354,5 @@ public class DOResponseUtils {
 		}
 		return area;
 	}
+
 }
