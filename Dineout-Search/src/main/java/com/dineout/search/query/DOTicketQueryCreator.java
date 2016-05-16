@@ -46,48 +46,61 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 		}else{
 			handleSortingRequest(queryParam,request);
 		}
+		handleGroup(queryParam,request);
 		return queryParam;
 	}
 
-	private void applyGlobalBoosts(QueryParam queryParam, DOTicketSearchRequest req) {
+	private void handleGroup(QueryParam queryParam, DOTicketSearchRequest request) {
+		if(!Constants.GROUP_FALSE.equals(request.getGroup())){
+			queryParam.addParam("group","true");
+			queryParam.addParam("group.field","group_id");
+			queryParam.addParam("group.limit", "50");
+			queryParam.addParam("group.sort", "ranking_priority desc");
+		}
+	}
+
+	private void applyGlobalBoosts(QueryParam queryParam, DOTicketSearchRequest request) {
 		/*queryParam.addParam("boost", "product(scale(booking_last_7,1,5),0.45)");
 		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
 		queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,recent_days)))),0.1)");*/
 	}
 
-	private void applyFilters(QueryParam queryParam,DOTicketSearchRequest req,Map<String, String> excludeTagMap) throws SearchException{
-		handleCityFilter(queryParam,req);
-		handleCuisineFilters(queryParam,req,excludeTagMap);
-		handleLocationFilters(queryParam,req,excludeTagMap);
-		handleAreaFilters(queryParam, req, excludeTagMap);
-		handlePriceFilters(queryParam,req,excludeTagMap);
-		handleTagsFilters(queryParam, req, excludeTagMap);
-		handleAreaLocationFilters(queryParam,req,excludeTagMap);
-		handleTicketTypeFilters(queryParam,req,excludeTagMap);
-		handleRestaurantNameFilters(queryParam,req,excludeTagMap);
-		handleCategoryFilters(queryParam,req,excludeTagMap);
-		handleTicketDisplayFilters(queryParam,req);
-		handleByDateRangeFilter(queryParam,req);
+	private void applyFilters(QueryParam queryParam,DOTicketSearchRequest request,Map<String, String> excludeTagMap) throws SearchException{
+		handleCityFilter(queryParam,request);
+		handleCuisineFilters(queryParam,request,excludeTagMap);
+		handleLocationFilters(queryParam,request,excludeTagMap);
+		handleAreaFilters(queryParam, request, excludeTagMap);
+		handlePriceFilters(queryParam,request,excludeTagMap);
+		handleTagsFilters(queryParam, request, excludeTagMap);
+		handleAreaLocationFilters(queryParam,request,excludeTagMap);
+		handleTicketTypeFilters(queryParam,request,excludeTagMap);
+		handleRestaurantNameFilters(queryParam,request,excludeTagMap);
+		handleCategoryFilters(queryParam,request,excludeTagMap);
+		handleActiveBlockedFilters(queryParam,request);
+		handleByDateRangeFilter(queryParam,request);
 	}
 
-	private void handleByDateRangeFilter(QueryParam queryParam, DOTicketSearchRequest req) {
-		String start=req.getFromDate();
-		String end=req.getToDate();
+	private void handleByDateRangeFilter(QueryParam queryParam, DOTicketSearchRequest request){
+		String start=request.getFromDate(); 
+		String end=request.getToDate();
 		queryParam.addParam("fq", "(from_date_dt:[* TO " + end + "] AND to_date_dt:[" + start + " TO *])");
 		queryParam.addParam("bq", "(from_date_dt:["+start +" TO "+end+"] AND to_date_dt:["+start +" TO "+end+"])^5000");
-		queryParam.addParam("bq", "(from_date_dt:[* TO " + DODateUtil.getPreviousDate(start) +"] AND to_date_dt:["+ DODateUtil.getNextDate(end) +" TO *])^3000");
-		queryParam.addParam("bq","(from_date_dt:[* TO "+start+ "])^800");
-		queryParam.addParam("bq","(to_date_dt:["+end+" TO *])^600");
+		queryParam.addParam("bq", "(from_date_dt:[* TO " + DODateUtil.getPreviousDate(start) +"] AND to_date_dt:["+ DODateUtil.getNextDate(end) +" TO *])^1500");
+		queryParam.addParam("bq","(to_date_dt:["+end+" TO *])^2000");
+		queryParam.addParam("bq","(from_date_dt:[* TO "+start+ "])^1500");
+		if(DODateUtil.getStringToDate(start).compareTo(DODateUtil.getStringToDate(DODateUtil.getTodaysDate()))==0){
+
+		}
 	}
 
-	private void handleTicketDisplayFilters(QueryParam queryParam, DOTicketSearchRequest req) {
+	private void handleActiveBlockedFilters(QueryParam queryParam, DOTicketSearchRequest req) {
 		Map<String, Set<?>>datesDays  = DODateUtil.getBetweenDatesDays(DODateUtil.getStringToDate(req.getFromDate()), DODateUtil.getStringToDate(req.getToDate()));
 		handleActiveDaysFilter(queryParam,req, datesDays);
 		handleBlockedDatesFilters(queryParam,req, datesDays);
 	}
 
-	private void handleBlockedDatesFilters(QueryParam queryParam, DOTicketSearchRequest req, Map<String, Set<?>> datesDays) {
+	private void handleBlockedDatesFilters(QueryParam queryParam, DOTicketSearchRequest request, Map<String, Set<?>> datesDays) {
 		if(datesDays.containsKey("dates")){
 			@SuppressWarnings("unchecked")
 			Set<Date> blockedDates = (Set<Date>) datesDays.get("dates");
@@ -96,14 +109,14 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 			for(Date blockedDay:blockedDates){
 				String blocDate = DODateUtil.getDateToString(blockedDay);
 
-				blDatesFacetQr.append("blocked_date:\""+blocDate+"\"").append(" AND ");
+				blDatesFacetQr.append("-blocked_date:\""+blocDate+"\"").append(" AND ");
 			}
 			blDatesQrStr = blDatesFacetQr.substring(0,blDatesFacetQr.lastIndexOf(" AND "));
 			queryParam.addParam("fq", blDatesQrStr.toString());
 		}	
 	}
 
-	private void handleActiveDaysFilter(QueryParam queryParam, 	DOTicketSearchRequest req, Map<String, Set<?>> datesDays) {
+	private void handleActiveDaysFilter(QueryParam queryParam, 	DOTicketSearchRequest request, Map<String, Set<?>> datesDays) {
 		if(datesDays.containsKey("days")){
 			@SuppressWarnings("unchecked")
 			Set<Integer> activeDays = (Set<Integer>) datesDays.get("days");
@@ -179,20 +192,20 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 		}
 	}
 
-	private void handleFacetingRequest(QueryParam queryParam, DOTicketSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
-		if(!Constants.IS_FACET_DISABLED.equals(restSearchReq.getDisableestfacet())){
+	private void handleFacetingRequest(QueryParam queryParam, DOTicketSearchRequest request, Map<String, String> excludeTagMap) {
+		if(!Constants.IS_FACET_DISABLED.equals(request.getDisableestfacet())){
 			Set<String> facetSet = null;
-			String facetLimit = restSearchReq.getFacetlimit()!=null ? restSearchReq.getFacetlimit():Constants.DEFAULT_FACET_LIMIT;
-			String facetMinCount = restSearchReq.getFacetmincount()!=null ? restSearchReq.getFacetmincount(): Constants.DEFAULT_FACET_MIN_COUNT;
+			String facetLimit = request.getFacetlimit()!=null ? request.getFacetlimit():Constants.DEFAULT_FACET_LIMIT;
+			String facetMinCount = request.getFacetmincount()!=null ? request.getFacetmincount(): Constants.DEFAULT_FACET_MIN_COUNT;
 			String sortFlag = "count";
-			if(Constants.TC_FACET_SORT_INDEX_TRUE.equals(restSearchReq.getFacetsorttype())){
+			if(Constants.TC_FACET_SORT_INDEX_TRUE.equals(request.getFacetsorttype())){
 				sortFlag = "index";
 			}
-			if(StringUtils.isBlank(restSearchReq.getEstfacetfl())){
+			if(StringUtils.isBlank(request.getEstfacetfl())){
 				facetSet = facetUtils.getDefaultDealsFacets();
 			}else{
 				facetSet = new HashSet<String>();
-				String[] facets = restSearchReq.getEstfacetfl().split(Constants.SEPERATOR);
+				String[] facets = request.getEstfacetfl().split(Constants.SEPERATOR);
 				for(String facet:facets){
 					facetSet.add(facet);
 				}
@@ -241,7 +254,7 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 			queryParam.addParam("boost", "product(div(5,sum(pow(2.71,product(0.5,geodist(lat_lng," + request.getLat() +","+request.getLng()+"))))),0.1)");
 		}
 
-		String sortfieldApplied = "";
+		String sortfieldApplied = "score desc";
 		String bySort = request.getBysort();
 		queryParam.addParam("fq", spatialQuery);
 		if(!StringUtils.isEmpty(bySort)){
@@ -272,16 +285,19 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 			if(Constants.SORT_OPTION_NINE.equals(bySort)){
 				sortfieldApplied = "booking_count desc,"+geoDistance+ " asc";
 			}
+			if(Constants.SORT_OPTION_TEN.equals(bySort)){
+				sortfieldApplied = geoDistance+ " asc";
+			}
 		}
 		else{
-			sortfieldApplied = geoDistance+ " asc";
+			sortfieldApplied = handleDayWiseSorting(queryParam,request);
 		}
 		queryParam.addParam("sort", sortfieldApplied);
 	}
 
-	private void handleSortingRequest(QueryParam queryParam, DOTicketSearchRequest restSearchReq) {
-		String bySort = restSearchReq.getBysort();
-		String sortfieldApplied = "";
+	private void handleSortingRequest(QueryParam queryParam, DOTicketSearchRequest request) {
+		String bySort = request.getBysort();
+		String sortfieldApplied = "score desc";
 		if(!StringUtils.isEmpty(bySort)){
 			if(Constants.SORT_OPTION_ONE.equals(bySort)){
 				sortfieldApplied = "fullfillment desc,is_pf desc,price asc";
@@ -311,17 +327,35 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 				sortfieldApplied = "booking_count desc";
 			}
 		}else{
-			//NEAREST TIME FIRST
-			sortfieldApplied = "score desc";
+			sortfieldApplied = handleDayWiseSorting(queryParam,request);
 		}
 		queryParam.addParam("sort", sortfieldApplied);
 	}
 
-	private void handlePriceFilters(QueryParam queryParam, DOTicketSearchRequest restSearchReq, Map<String, String> excludeTagMap) throws SearchException {
-		if(restSearchReq.getByprice()!=null && restSearchReq.getByprice().length>0){
+	private String handleDayWiseSorting(QueryParam queryParam, DOTicketSearchRequest request){
+		String sortApplied = "score desc";
+		Date toDate = DODateUtil.getStringToDate(request.getToDate());
+		Date fromDate = DODateUtil.getStringToDate(request.getFromDate());
+		if(toDate.compareTo(fromDate)==0){
+			//same date - 1 date
+			String day = DODateUtil.getDay(request.getToDate());
+			String solrDayEndTimeField = "day_"+day+"_end";
+			if(request.getToDate().compareTo(DODateUtil.getTodaysDate())==0){
+				long timeInMinutes = DODateUtil.getCurrentTimeInMinutes();
+				sortApplied = "sum(product(max(min(sum(sub("+solrDayEndTimeField+","+timeInMinutes+"),1),1),0),sub("+solrDayEndTimeField+","+timeInMinutes+")),product(max(min(product(-1,sub("+solrDayEndTimeField+","+timeInMinutes+")),1),0),720)) asc";
+			}
+			else if(request.getToDate().compareTo(DODateUtil.getTomorrowsDate())==0){
+				sortApplied=solrDayEndTimeField+" asc"; 
+			}
+		}
+		return sortApplied;
+	}
+
+	private void handlePriceFilters(QueryParam queryParam, DOTicketSearchRequest request, Map<String, String> excludeTagMap) throws SearchException {
+		if(request.getByprice()!=null && request.getByprice().length>0){
 			StringBuilder priceFacetQr = new StringBuilder();
 			String priceFacetQrStr = null;
-			for(String price:restSearchReq.getByprice()){
+			for(String price:request.getByprice()){
 				try {
 					price = URLDecoder.decode(price, "UTF-8");
 				} catch (UnsupportedEncodingException e) {
@@ -338,11 +372,11 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 		}
 	}
 
-	private void handleTagsFilters(QueryParam queryParam, DOTicketSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
-		if(restSearchReq.getBytags()!=null && restSearchReq.getBytags().length>0){
+	private void handleTagsFilters(QueryParam queryParam, DOTicketSearchRequest request, Map<String, String> excludeTagMap) {
+		if(request.getBytags()!=null && request.getBytags().length>0){
 			StringBuilder facilityQr = new StringBuilder();
 			String facilityQrStr = null;
-			for(String facility:restSearchReq.getBytags()){
+			for(String facility:request.getBytags()){
 				facilityQr.append("tags_ft:\""+facility+"\"").append(" AND ");
 			}
 			facilityQrStr = facilityQr.substring(0,facilityQr.lastIndexOf(" AND "));
@@ -352,11 +386,11 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 		}
 	}
 
-	private void handleAreaFilters(QueryParam queryParam, DOTicketSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
-		if(restSearchReq.getByarea()!=null && restSearchReq.getByarea().length>0){
+	private void handleAreaFilters(QueryParam queryParam, DOTicketSearchRequest request, Map<String, String> excludeTagMap) {
+		if(request.getByarea()!=null && request.getByarea().length>0){
 			StringBuilder zoneFacetQr = new StringBuilder();
 			String zoneFacetQrStr = null;
-			for(String zone:restSearchReq.getByarea()){
+			for(String zone:request.getByarea()){
 				zoneFacetQr.append("area_name_ft:\""+zone+"\"").append(" OR ");
 			}
 			zoneFacetQrStr = zoneFacetQr.substring(0,zoneFacetQr.lastIndexOf(" OR "));
@@ -366,11 +400,11 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 		}
 	}
 
-	private void handleLocationFilters(QueryParam queryParam, DOTicketSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
-		if(restSearchReq.getBylocation()!=null && restSearchReq.getBylocation().length>0){
+	private void handleLocationFilters(QueryParam queryParam, DOTicketSearchRequest request, Map<String, String> excludeTagMap) {
+		if(request.getBylocation()!=null && request.getBylocation().length>0){
 			StringBuilder locationFacetQr = new StringBuilder();
 			String locationFacetQrStr=null;
-			for(String location:restSearchReq.getBylocation()){
+			for(String location:request.getBylocation()){
 				locationFacetQr.append("locality_name_ft:\""+location+"\"").append(" OR ");
 			}
 			locationFacetQrStr = locationFacetQr.substring(0,locationFacetQr.lastIndexOf(" OR "));
@@ -380,14 +414,14 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 		}
 	}
 
-	private void handleCuisineFilters(QueryParam queryParam, DOTicketSearchRequest restSearchReq, Map<String, String> excludeTagMap) {
-		if(restSearchReq.getBycuisine()!=null && restSearchReq.getBycuisine().length>0){
+	private void handleCuisineFilters(QueryParam queryParam, DOTicketSearchRequest request, Map<String, String> excludeTagMap) {
+		if(request.getBycuisine()!=null && request.getBycuisine().length>0){
 			StringBuilder cuisineFacetQr = new StringBuilder();
 			StringBuilder primaryCuisineFacetQr = new StringBuilder();
 			StringBuilder secondaryCuisineFacetQr = new StringBuilder();
 			String cuisineFacetQrStr = null;
 			String primaryCuisineFacetQrStr = null;
-			for(String cuisine:restSearchReq.getBycuisine()){
+			for(String cuisine:request.getBycuisine()){
 				cuisine.replaceAll("~","/");
 				cuisineFacetQr.append("cuisine_ft:"+"\""+cuisine+"\"").append(" OR ");
 				primaryCuisineFacetQr.append("primary_cuisine_ft:"+"\""+cuisine+"\"").append(" OR ");

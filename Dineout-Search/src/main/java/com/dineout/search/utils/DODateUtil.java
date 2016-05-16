@@ -14,40 +14,40 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 public class DODateUtil {
-	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
+	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 	private static Logger logger = Logger.getLogger(DODateUtil.class);
-	
+
 	public static String getTodaysDate(){
 		return DATE_FORMAT.format(new Date());
 	}
-	
-	public static String getTomorrowssDate(){
+
+	public static String getTomorrowsDate(){
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, 1);
 		return DATE_FORMAT.format(cal.getTime());
 	}
-	
+
 	public static String getComingFridayDate(){
 		return (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)==Calendar.FRIDAY)?DATE_FORMAT.format(new Date()):DATE_FORMAT.format(nextDayOfWeek(Calendar.FRIDAY).getTime());
 	}
-	
+
 	public static String getComingSundayDate(){
 		return DATE_FORMAT.format(nextDayOfWeek(Calendar.SUNDAY).getTime());
 	}
-	
+
 	public static String getComingMondayDate(){
 		return DATE_FORMAT.format(nextDayOfWeek(Calendar.MONDAY).getTime());
 	}
-	
+
 	public static String getNextWeeksFriday(){
-		 Calendar cal = Calendar.getInstance();
-		 if(Calendar.SATURDAY == cal.get(Calendar.DAY_OF_WEEK) || Calendar.SUNDAY == cal.get(Calendar.DAY_OF_WEEK ) || Calendar.FRIDAY == cal.get(Calendar.DAY_OF_WEEK)){
+		Calendar cal = Calendar.getInstance();
+		if(Calendar.SATURDAY == cal.get(Calendar.DAY_OF_WEEK) || Calendar.SUNDAY == cal.get(Calendar.DAY_OF_WEEK ) || Calendar.FRIDAY == cal.get(Calendar.DAY_OF_WEEK)){
 			cal = nextDayOfWeek(Calendar.FRIDAY);
-		 }else{
-			 cal = nextDayOfWeek(Calendar.FRIDAY);
-			 cal.add(Calendar.DATE, 7);
-		 }
-		 
+		}else{
+			cal = nextDayOfWeek(Calendar.FRIDAY);
+			cal.add(Calendar.DATE, 7);
+		}
+
 		return DATE_FORMAT.format(cal.getTime());
 	}
 	public static String getDay(String date){
@@ -59,7 +59,7 @@ public class DODateUtil {
 		}
 		return new Integer(cal.get(Calendar.DAY_OF_WEEK)).toString();
 	}
-	
+
 	public static String getNextDate(String date){
 		Calendar cal = Calendar.getInstance();
 		try {
@@ -70,7 +70,7 @@ public class DODateUtil {
 		cal.add(Calendar.DATE, 1);
 		return DATE_FORMAT.format(cal.getTime());
 	}
-	
+
 	public static String getPreviousDate(String date){
 		Calendar cal = Calendar.getInstance();
 		try {
@@ -80,17 +80,17 @@ public class DODateUtil {
 		}
 		cal.add(Calendar.DATE, -1);
 		return DATE_FORMAT.format(cal.getTime());
+	}
+	public static Calendar nextDayOfWeek(int dow) {
+		Calendar date = Calendar.getInstance();
+		int diff = dow - date.get(Calendar.DAY_OF_WEEK);
+		if (!(diff > 0)) {
+			diff += 7;
 		}
-	 public static Calendar nextDayOfWeek(int dow) {
-	        Calendar date = Calendar.getInstance();
-	        int diff = dow - date.get(Calendar.DAY_OF_WEEK);
-	        if (!(diff > 0)) {
-	            diff += 7;
-	        }
-	        date.add(Calendar.DAY_OF_MONTH, diff);
-	        return date;
-	    }
-	
+		date.add(Calendar.DAY_OF_MONTH, diff);
+		return date;
+	}
+
 	public static Map<String,Set<?>> getBetweenDatesDays(Date startDate, Date endDate)
 	{
 		Map<String, Set<?>> dayDatesMap = new HashMap<String, Set<?>>();
@@ -131,6 +131,19 @@ public class DODateUtil {
 			e.printStackTrace();
 		}
 		return stringDate;
+	}
+
+	public static long getCurrentTimeInMinutes(){
+		Calendar c = Calendar.getInstance();
+		long now = c.getTimeInMillis();
+		c.set(Calendar.HOUR_OF_DAY, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		long passed = now - c.getTimeInMillis();
+		long secondsPassed = passed / 1000;
+		long minutesPassed = secondsPassed / 60;
+		return minutesPassed;
 	}
 
 }

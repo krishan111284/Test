@@ -42,6 +42,7 @@ public class Constants {
 
 	/*****************************Group types*****************************************/
 	public static final String GROUP_TRUE = "true";
+	public static final String GROUP_FALSE = "false";
 
 	public static boolean IS_UNIFIED_MEMCACHE_ENABLED = false;
 	public static boolean IS_AUTO_MEMCACHE_ENABLED = false;
@@ -93,6 +94,7 @@ public class Constants {
 	public static final String SORT_OPTION_SEVEN = "7";
 	public static final String SORT_OPTION_EIGHT = "8";
 	public static final String SORT_OPTION_NINE = "9";
+	public static final String SORT_OPTION_TEN = "10";
 	public static final String RESPONSE_TYPE_REST = "RESTAURANT";
 	public static final String RESPONSE_TYPE_TICKET = "Ticket";
 	public static final String RESPONSE_TYPE_SPONSORED = "Sponsored";

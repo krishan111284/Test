@@ -1,12 +1,7 @@
 package com.dineout.search.utils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -220,9 +215,9 @@ public class DOResponseUtils {
 	}
 
 	private static Map<Object, Object> getTicketDoc(SolrDocument solrDoc,DOTicketSearchRequest req, String domain) {
-		Map<Object, Object> bbDoc = new HashMap<Object, Object>();
+		Map<Object, Object> ticketDoc = new HashMap<Object, Object>();
 		String fl="";
-		fl = StringUtils.isEmpty(req.getEstfl())?rb.getString("dineout.deals.fl"):req.getEstfl();
+		fl = StringUtils.isEmpty(req.getEstfl())?rb.getString("dineout.deals.ticket.fl"):req.getEstfl();
 		if(req.isSpatialQuery()){
 			fl =fl + "," + "distance";
 		}
@@ -230,10 +225,10 @@ public class DOResponseUtils {
 		Iterator<String>fieldIterator = displayFields.iterator();
 		while(fieldIterator.hasNext()){
 			String fieldName = fieldIterator.next();
-
+			ticketDoc.put(fieldName, solrDoc.get(fieldName));
 		}
 
-		return null;
+		return ticketDoc;
 	}
 
 	private static void processRestaurantInfo(HashMap<Object, Object> restaurantInfo, SolrDocument rInfo) {
@@ -274,10 +269,7 @@ public class DOResponseUtils {
 
 	private static void setMatchesForGroupQuery(DOSearchResult result, GroupCommand groupCommand, String domain ){
 		int matches = groupCommand.getMatches();
-		int numGroups = groupCommand.getNGroups();
-		result.setNumGroups(numGroups);
 		result.setMatches(matches);
-
 	}
 
 	private static boolean isStrictValid(String input, String query){

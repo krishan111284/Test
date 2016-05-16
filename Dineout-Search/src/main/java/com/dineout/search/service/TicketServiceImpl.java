@@ -42,11 +42,7 @@ public class TicketServiceImpl{
 			qres = server.query(doqp);
 			if(qres!=null){
 				DOSearchResult serachRes = null;
-				if(Constants.GROUP_TRUE.equals(request.getGroup())){
-					serachRes = DOResponseUtils.processTicketGroupQueryResponse(qres,Constants.RESPONSE_TYPE_TICKET,request);
-				}else{
-					serachRes = DOResponseUtils.processQueryResponse(qres,Constants.RESPONSE_TYPE_TICKET,request.isSpellcheckApplied());
-				}
+				serachRes = DOResponseUtils.processTicketGroupQueryResponse(qres,Constants.RESPONSE_TYPE_TICKET,request);
 				result.add(serachRes);
 			}
 		} catch (SolrServerException e) {
