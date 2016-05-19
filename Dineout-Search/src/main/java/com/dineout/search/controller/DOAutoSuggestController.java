@@ -38,9 +38,8 @@ public class DOAutoSuggestController extends DOAbstractSearchController{
 	
 	@RequestMapping(value="/getresult",method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<String> getKeywordresults(@ModelAttribute("searchHeader")DOSearchHeader header,
-											    @ModelAttribute("autocompleteSearchRequest")DOAutoSearchRequest doAutocompleteSearchRequest, 
-											    BindingResult bindingResult,
-												 HttpServletResponse response){
+	@ModelAttribute("autocompleteSearchRequest")DOAutoSearchRequest doAutocompleteSearchRequest, 
+	BindingResult bindingResult,HttpServletResponse response){
 		long start = new Date().getTime();
 		Logger logger = Logger.getLogger(DOAutoSuggestController.class);
 		String jsonresp = null;

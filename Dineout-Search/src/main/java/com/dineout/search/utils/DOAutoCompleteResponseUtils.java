@@ -42,7 +42,15 @@ public class DOAutoCompleteResponseUtils {
 				entry.setArea_name(solrDocument.get("area_name")!=null?(String)solrDocument.get("area_name"):null);
 				entry.setBookingCount(solrDocument.get("booking_count")!=null?((Float)solrDocument.get("booking_count")).toString():null);
 				entry.setFulfillment((String)solrDocument.get("fullfillment"));
-				entry.setSuggestion(getSuggestion(dataType,solrDocument));	
+				entry.setTg_id((String)solrDocument.get("tg_id"));
+				entry.setTicket_name((String)solrDocument.get("ticket_name"));
+				entry.setTl_id((String)solrDocument.get("tl_id"));
+				entry.setDc_name((String)solrDocument.get("dc_name"));
+				entry.setFrom_date((String)solrDocument.get("from_date"));
+				entry.setTo_date((String)solrDocument.get("to_date"));
+
+				//entry.setSuggestion(getSuggestion(dataType,solrDocument));	
+				entry.setSuggestion((String)solrDocument.get("suggestion"));
 				getLatLong(solrDocument.get("lat_lng")!=null?(String)solrDocument.get("lat_lng"):null,entry);
 				entryList.add(entry);
 			}

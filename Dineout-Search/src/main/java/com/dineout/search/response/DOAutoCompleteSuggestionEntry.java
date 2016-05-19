@@ -11,9 +11,17 @@ public class DOAutoCompleteSuggestionEntry implements ILocationResponseEntity{
 	private String cuisine_name;
 	private String tag_name;
 	private String fulfillment;
-	private String bookingCount;
+	private String popularityCount;
 	private String lat;
 	private String lng;
+	
+	private String ticket_name;
+	private String tl_id;
+	private String tg_id;
+	private String dc_name;
+	private String from_date;
+	private String to_date;
+	private String suggestion;
 
 	private Float score;
 
@@ -23,8 +31,6 @@ public class DOAutoCompleteSuggestionEntry implements ILocationResponseEntity{
 	public void setScore(Float score) {
 		this.score = score;
 	}
-
-	private String suggestion;
 
 	public String getUid() {
 		return uid;
@@ -87,16 +93,58 @@ public class DOAutoCompleteSuggestionEntry implements ILocationResponseEntity{
 		this.fulfillment = fulfillment;
 	}
 	public String getBookingCount() {
-		return bookingCount;
+		return popularityCount;
 	}
 	public void setBookingCount(String bookingCount) {
-		this.bookingCount = bookingCount;
+		this.popularityCount = bookingCount;
 	}
 	public String getLat() {
 		return lat;
 	}
 	public void setLat(String lat) {
 		this.lat = lat;
+	}
+	public String getPopularityCount() {
+		return popularityCount;
+	}
+	public void setPopularityCount(String popularityCount) {
+		this.popularityCount = popularityCount;
+	}
+	public String getTicket_name() {
+		return ticket_name;
+	}
+	public void setTicket_name(String ticket_name) {
+		this.ticket_name = ticket_name;
+	}
+	public String getTl_id() {
+		return tl_id;
+	}
+	public void setTl_id(String tl_id) {
+		this.tl_id = tl_id;
+	}
+	public String getTg_id() {
+		return tg_id;
+	}
+	public void setTg_id(String tg_id) {
+		this.tg_id = tg_id;
+	}
+	public String getDc_name() {
+		return dc_name;
+	}
+	public void setDc_name(String dc_name) {
+		this.dc_name = dc_name;
+	}
+	public String getFrom_date() {
+		return from_date;
+	}
+	public void setFrom_date(String from_date) {
+		this.from_date = from_date;
+	}
+	public String getTo_date() {
+		return to_date;
+	}
+	public void setTo_date(String to_date) {
+		this.to_date = to_date;
 	}
 	public String getLng() {
 		return lng;
