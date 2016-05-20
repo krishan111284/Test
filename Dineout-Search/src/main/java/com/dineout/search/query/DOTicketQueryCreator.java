@@ -288,6 +288,9 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 			if(Constants.SORT_OPTION_TEN.equals(bySort)){
 				sortfieldApplied = geoDistance+ " asc";
 			}
+			if(Constants.SORT_OPTION_ELEVEN.equals(bySort)){
+				sortfieldApplied = "avg_rating,"+geoDistance+ " asc";
+			}
 		}
 		else{
 			sortfieldApplied = handleDayWiseSorting(queryParam,request);
@@ -325,6 +328,9 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 			}
 			if(Constants.SORT_OPTION_NINE.equals(bySort)){
 				sortfieldApplied = "booking_count desc";
+			}
+			if(Constants.SORT_OPTION_ELEVEN.equals(bySort)){
+				sortfieldApplied = "avg_rating desc";
 			}
 		}else{
 			sortfieldApplied = handleDayWiseSorting(queryParam,request);
