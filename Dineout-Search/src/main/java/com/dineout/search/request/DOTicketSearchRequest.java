@@ -7,6 +7,7 @@ public class DOTicketSearchRequest extends DORestSearchRequest{
 	private String toDate;
 	private String[] byTicketType;
 	private String[] byRestaurant;
+	private String[] bydinerCount;
 	
 	public String getDealId() {
 		return dealId;
@@ -43,6 +44,12 @@ public class DOTicketSearchRequest extends DORestSearchRequest{
 	}
 	public void setByRestaurant(String[] byRestaurant) {
 		this.byRestaurant = byRestaurant;
+	}
+	public String[] getBydinerCount() {
+		return bydinerCount;
+	}
+	public void setBydinerCount(String[] bydinerCount) {
+		this.bydinerCount = bydinerCount;
 	}
 
 }

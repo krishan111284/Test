@@ -79,6 +79,7 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 		handleCategoryFilters(queryParam,request,excludeTagMap);
 		handleActiveBlockedFilters(queryParam,request);
 		handleByDateRangeFilter(queryParam,request);
+		handleNumberOfDinersFilters(queryParam, request, excludeTagMap);
 	}
 
 	private void handleByDateRangeFilter(QueryParam queryParam, DOTicketSearchRequest request){
@@ -228,6 +229,11 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "price:[1501 TO 2000]");
 				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "price:[2001 TO *]");
 			}
+			if(facetSet.contains("number_of_diners")){
+				queryParam.addParam("facet.query", (excludeTagMap.get("dinercount")!=null?excludeTagMap.get("dinercount"):"") + "number_of_diners:[1 TO 1]");
+				queryParam.addParam("facet.query", (excludeTagMap.get("dinercount")!=null?excludeTagMap.get("dinercount"):"") + "number_of_diners:[2 TO 2]");
+				queryParam.addParam("facet.query", (excludeTagMap.get("dinercount")!=null?excludeTagMap.get("dinercount"):"") + "number_of_diners:[3 TO *]");
+			}
 			queryParam.addParam("facet.limit",facetLimit);
 			queryParam.addParam("facet.mincount", ""+facetMinCount);
 			queryParam.addParam("facet.sort", sortFlag);
@@ -355,6 +361,26 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 			}
 		}
 		return sortApplied;
+	}
+	
+	private void handleNumberOfDinersFilters(QueryParam queryParam, DOTicketSearchRequest request, Map<String, String> excludeTagMap) throws SearchException {
+		if(request.getBydinerCount()!=null && request.getBydinerCount().length>0){
+			StringBuilder dinerCountFacetQr = new StringBuilder();
+			String dinerCountFacetQrStr = null;
+			for(String dinerCount:request.getBydinerCount()){
+				try {
+					dinerCount = URLDecoder.decode(dinerCount, "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					logger.error(e.getMessage(),e);
+					throw new SearchException(e.getMessage(),e.getCause(),ErrorCode.URL_DECODE_ERROR);
+				}
+				String[] dinerCountRange = dinerCount.split("-");
+				dinerCountFacetQr.append("number_of_diners:["+dinerCountRange[0]+" TO "+dinerCountRange[1]+"]").append(" OR ");
+			}
+			dinerCountFacetQrStr = dinerCountFacetQr.substring(0,dinerCountFacetQr.lastIndexOf(" OR "));
+			queryParam.addParam("fq", "{!tag=dinercount}("+dinerCountFacetQrStr+")");
+			excludeTagMap.put("price", "{!ex=dinercount}");
+		}
 	}
 
 	private void handlePriceFilters(QueryParam queryParam, DOTicketSearchRequest request, Map<String, String> excludeTagMap) throws SearchException {
