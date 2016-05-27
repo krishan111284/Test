@@ -99,14 +99,20 @@ public class DODateUtil {
 		Calendar calendar = new GregorianCalendar();
 		calendar.setTime(startDate);
 		int dayOfWeek;
-
-		while (calendar.getTime().before(endDate))
-		{
-			Date result = calendar.getTime();
-			dates.add(result);
+		if(endDate.compareTo(startDate)==0){
 			dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
 			days.add(dayOfWeek);
-			calendar.add(Calendar.DATE, 1);
+			dates.add(startDate);
+		}
+		else{
+			while (calendar.getTime().before(endDate))
+			{
+				Date result = calendar.getTime();
+				dates.add(result);
+				dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+				days.add(dayOfWeek);
+				calendar.add(Calendar.DATE, 1);
+			}
 		}
 		dayDatesMap.put("dates", dates);
 		dayDatesMap.put("days", days);

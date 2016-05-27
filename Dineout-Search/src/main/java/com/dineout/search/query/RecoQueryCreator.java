@@ -108,13 +108,13 @@ public class RecoQueryCreator {
 	}
 
 	private void setNearbyFlFields(QueryParam queryParam, DORestSearchRequest req) {
-		String fl="r_id,costFor2,avg_rating,profile_name,cuisine_ft,tags_ft,locality_name_ft,img,url,fullfillment,n_offers,score";
+		String fl="r_id,costFor2,avg_rating,profile_name,cuisine_ft,tags_ft,locality_name_ft,area_name_ft,img,url,fullfillment,n_offers,score";
 		String geoDistance = "geo_distance:geodist(lat_lng," + req.getLat() +","+req.getLng()+")";
 		queryParam.addParam("fl", fl+","+geoDistance);
 	}
 
 	private void setSimilarFlFields(QueryParam queryParam, DORestSearchRequest req) {
-		String fl="r_id,costFor2,avg_rating,profile_name,cuisine_ft,tags_ft,locality_name_ft,img,url,fullfillment,n_offers,score";
+		String fl="r_id,costFor2,avg_rating,profile_name,cuisine_ft,tags_ft,locality_name_ft,area_name_ft,img,url,fullfillment,n_offers,score";
 		queryParam.addParam("fl", fl);
 	}
 

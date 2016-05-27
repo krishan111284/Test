@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dineout.search.exception.SearchErrors;
 import com.dineout.search.request.DOAutoSearchRequest;
-import com.dineout.search.request.DOSearchHeader;
 import com.dineout.search.response.DOAutoCompleteSearchResult;
 import com.dineout.search.response.Header;
 import com.dineout.search.response.DOAutoSuggestResponseBody;
@@ -37,15 +36,13 @@ public class DOAutoSuggestController extends DOAbstractSearchController{
 	DOAutoCompleteService autoCompleteService;
 	
 	@RequestMapping(value="/getresult",method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<String> getKeywordresults(@ModelAttribute("searchHeader")DOSearchHeader header,
-	@ModelAttribute("autocompleteSearchRequest")DOAutoSearchRequest doAutocompleteSearchRequest, 
+	public @ResponseBody ResponseEntity<String> getKeywordresults(@ModelAttribute("autocompleteSearchRequest")DOAutoSearchRequest doAutocompleteSearchRequest, 
 	BindingResult bindingResult,HttpServletResponse response){
 		long start = new Date().getTime();
 		Logger logger = Logger.getLogger(DOAutoSuggestController.class);
 		String jsonresp = null;
 		if(jsonresp == null){
 			SearchErrors errors = new SearchErrors();
-			//processDOSearchRequest(doAutocompleteSearchRequest);
 			DOSearchResponse resp = new DOSearchResponse();
 			Header resheader = new Header(); 
 			DOAutoSuggestResponseBody body = new DOAutoSuggestResponseBody();

@@ -2,6 +2,7 @@ package com.dineout.search.utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 
 import com.dineout.search.response.DOAutoCompleteSearchResult;
-import com.dineout.search.response.DOAutoCompleteSuggestionEntry;
 import com.dineout.search.response.DOLocationSearchResponseEntry;
 import com.dineout.search.response.DOLocationSearchResult;
 import com.dineout.search.response.ILocationResponseEntity;
@@ -25,55 +25,43 @@ public class DOAutoCompleteResponseUtils {
 		GroupCommand groupCommand = qRes.getGroupResponse().getValues().get(0);
 		List<Group> groups =groupCommand.getValues();
 		for(Group group:groups){
+			List<Map<Object, Object>> docList = new ArrayList<Map<Object, Object>>();
 			String dataType = group.getGroupValue();
 			Iterator<SolrDocument> iter = group.getResult().iterator();
-			List<DOAutoCompleteSuggestionEntry> entryList = new ArrayList<DOAutoCompleteSuggestionEntry>();
 			while(iter.hasNext()){
-				SolrDocument solrDocument = iter.next();
-				DOAutoCompleteSuggestionEntry entry = new DOAutoCompleteSuggestionEntry();
-				entry.setUid((String)solrDocument.get("uid"));
-				entry.setR_id((String)solrDocument.get("r_id"));
-				entry.setGuid((String)solrDocument.get("guid"));
-				entry.setProfile_name((String)solrDocument.get("profile_name"));
-				entry.setCuisine_name((String)solrDocument.get("cuisine_name"));
-				entry.setScore((Float)solrDocument.get("score"));
-				entry.setTag_name((String)solrDocument.get("tag_name"));
-				entry.setLocation_name(solrDocument.get("location_name")!=null?(String)solrDocument.get("location_name"):null);
-				entry.setArea_name(solrDocument.get("area_name")!=null?(String)solrDocument.get("area_name"):null);
-				entry.setBookingCount(solrDocument.get("booking_count")!=null?((Float)solrDocument.get("booking_count")).toString():null);
-				entry.setFulfillment((String)solrDocument.get("fullfillment"));
-				entry.setTg_id((String)solrDocument.get("tg_id"));
-				entry.setTicket_name((String)solrDocument.get("ticket_name"));
-				entry.setTl_id((String)solrDocument.get("tl_id"));
-				entry.setDc_name((String)solrDocument.get("dc_name"));
-				entry.setFrom_date((String)solrDocument.get("from_date"));
-				entry.setTo_date((String)solrDocument.get("to_date"));
-
-				//entry.setSuggestion(getSuggestion(dataType,solrDocument));	
-				entry.setSuggestion((String)solrDocument.get("suggestion"));
-				getLatLong(solrDocument.get("lat_lng")!=null?(String)solrDocument.get("lat_lng"):null,entry);
-				entryList.add(entry);
+				Map<Object, Object> doc = DOResponseUtils.getDODoc(iter.next());
+				docList.add(doc);
 			}
-			result.getSuggestionsMap().put(dataType, entryList);
+			result.getSuggestionsMap().put(dataType, docList);
 		}
 		return result;
 	}
+	public static Map<Object, Object> processRestGroupQueryResponse(QueryResponse qRes) {
+		int docSum = 0;
+		GroupCommand groupCommand = qRes.getGroupResponse().getValues().get(0);
+		Map<Object, Object> docMap = new LinkedHashMap<Object, Object>();
+		List<Map<Object, Object>>listMap = new ArrayList<Map<Object,Object>>();
+		docMap.put("groupMatches", groupCommand.getValues().size());
+		List<Group> groups = groupCommand.getValues();
+		for(Group group:groups){
+			Map<Object, Object> groupMap = new LinkedHashMap<Object, Object>();
+			List<Map<Object, Object>> docList = new ArrayList<Map<Object, Object>>();
+			Iterator<SolrDocument> iter = group.getResult().iterator();
+			while(iter.hasNext()){
+				Map<Object, Object> doc = DOResponseUtils.getDODoc(iter.next());
+				docList.add(doc);
+			}
+			int numFound = (int) group.getResult().getNumFound();
+			docSum = docSum + numFound;
+			groupMap.put("numFound", numFound);
+			groupMap.put("groupName", group.getGroupValue());
+			groupMap.put("docs", docList);
+			listMap.add(groupMap);
 
-	private static String getSuggestion(String dataType,
-			SolrDocument solrDocument) {
-		String entity_name = null;
-		if(Constants.AUTOCOMPLETION_DATA_TYPE_RESTAURANT.equals(dataType))
-			entity_name = (String)solrDocument.get("profile_location_name");
-		if(Constants.AUTOCOMPLETION_DATA_TYPE_LOCALITY.equals(dataType))
-			entity_name = (String)solrDocument.get("loc_area_name");
-		if(Constants.AUTOCOMPLETION_DATA_TYPE_AREA.equals(dataType))
-			entity_name = (String)solrDocument.get("area_name");
-		if(Constants.AUTOCOMPLETION_DATA_TYPE_CUISINE.equals(dataType))
-			entity_name = (String)solrDocument.get("cuisine_name");
-		if(Constants.AUTOCOMPLETION_DATA_TYPE_TAGS.equals(dataType))
-			entity_name = (String)solrDocument.get("tag_name");
-
-		return entity_name;
+		}
+		docMap.put("docsFound", docSum);
+		docMap.put("groups", listMap);
+		return docMap;
 	}
 
 	public static DOLocationSearchResult processMultipleResponse(DOLocationSearchResult areaCityResult, DOLocationSearchResult locationResult){
@@ -84,6 +72,7 @@ public class DOAutoCompleteResponseUtils {
 			Map<String, List<DOLocationSearchResponseEntry>> locationMap = locationResult.getSuggestionsMap();
 			Iterator<?> areaCityResultIterator = areaCityResult.getSuggestionsMap().entrySet().iterator();
 			while (areaCityResultIterator.hasNext()) {
+				@SuppressWarnings("rawtypes")
 				Map.Entry pair = (Map.Entry)areaCityResultIterator.next();
 				if(locationMap.get(pair.getKey()) != null){
 					List<DOLocationSearchResponseEntry> areaCityList = areaCityMap.get(pair.getKey());
@@ -92,7 +81,6 @@ public class DOAutoCompleteResponseUtils {
 					setboth.addAll(locationList);
 					areaCityList.clear();
 					areaCityList.addAll(setboth);
-					//areaCityMap.get(pair.getKey()).addAll(locationMap.get(pair.getKey()));
 				}
 			}
 			result = areaCityResult;

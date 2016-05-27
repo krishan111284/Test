@@ -163,7 +163,7 @@ public class DOResponseUtils {
 	}
 
 
-	private static Map<Object, Object> getDODoc(SolrDocument solrDoc) {
+	public static Map<Object, Object> getDODoc(SolrDocument solrDoc) {
 		Map<Object, Object> tcDoc = new HashMap<Object, Object>();
 		Iterator<String>fieldIterator = solrDoc.keySet().iterator();
 		while(fieldIterator.hasNext()){
