@@ -180,8 +180,8 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		if(req.getBychain()!=null && req.getBychain().length>0){
 			StringBuilder chainFacetQr = new StringBuilder();
 			String chainFacetQrStr=null;
-			for(String hotel:req.getBychain()){
-				chainFacetQr.append("chain_name:\""+hotel+"\"").append(" OR ");
+			for(String chainName:req.getBychain()){
+				chainFacetQr.append("chain_name:\""+chainName+"\"").append(" OR ");
 			}
 			chainFacetQrStr = chainFacetQr.substring(0,chainFacetQr.lastIndexOf(" OR "));
 
