@@ -232,7 +232,6 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 			}
 			if(facetSet.contains("rest_name_ft")){
 				queryParam.addParam("facet.field",(excludeTagMap.get("rest_name")!=null?excludeTagMap.get("rest_name"):"")+"rest_name_ft");
-				queryParam.addParam("f.rest_name_ft.facet.mincount", "0");
 			}
 			if(facetSet.contains("locality_area_ft")){
 				queryParam.addParam("facet.field",(excludeTagMap.get("locationArea")!=null?excludeTagMap.get("locationArea"):"")+"locality_area_ft");
