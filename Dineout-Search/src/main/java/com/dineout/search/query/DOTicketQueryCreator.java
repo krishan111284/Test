@@ -126,7 +126,7 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 			for(Integer activeDay:activeDays){
 				activeDaysFacetQr.append("dow:\""+activeDay+"\"").append(" OR ");
 			}
-			activeDaysQrStr = activeDaysFacetQr.substring(0,activeDaysFacetQr.lastIndexOf(" OR "));
+			activeDaysQrStr = activeDaysFacetQr.substring(0,activeDaysFacetQr.lastIndexOf(" OR "));			
 			queryParam.addParam("fq", activeDaysQrStr.toString());
 		}
 	}
@@ -213,14 +213,33 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 			}
 
 			queryParam.addParam("facet", "true");
-			if(facetSet.contains("locality_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("location")!=null?excludeTagMap.get("location"):"")+"locality_name_ft");}
-			if(facetSet.contains("cuisine_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("cuisine")!=null?excludeTagMap.get("cuisine"):"")+"cuisine_ft");}
-			if(facetSet.contains("area_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("area")!=null?excludeTagMap.get("area"):"")+"area_name_ft");}
-			if(facetSet.contains("tags_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("tags")!=null?excludeTagMap.get("tags"):"")+"tags_ft");}
-			if(facetSet.contains("category_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("category")!=null?excludeTagMap.get("category"):"")+"category_ft");}
-			if(facetSet.contains("rest_name_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("rest_name")!=null?excludeTagMap.get("rest_name"):"")+"rest_name_ft");}
-			if(facetSet.contains("locality_area_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("locationArea")!=null?excludeTagMap.get("locationArea"):"")+"locality_area_ft");}
-			if(facetSet.contains("datatype_ft")){queryParam.addParam("facet.field",(excludeTagMap.get("datatype")!=null?excludeTagMap.get("datatype"):"")+"datatype_ft");}
+			if(facetSet.contains("locality_name_ft")){
+				queryParam.addParam("facet.field",(excludeTagMap.get("location")!=null?excludeTagMap.get("location"):"")+"locality_name_ft");
+			}
+			if(facetSet.contains("cuisine_ft")){
+				queryParam.addParam("facet.field",(excludeTagMap.get("cuisine")!=null?excludeTagMap.get("cuisine"):"")+"cuisine_ft");
+			}
+			if(facetSet.contains("area_name_ft")){
+				queryParam.addParam("facet.field",(excludeTagMap.get("area")!=null?excludeTagMap.get("area"):"")+"area_name_ft");
+			}
+			if(facetSet.contains("tags_ft")){
+				queryParam.addParam("facet.field",(excludeTagMap.get("tags")!=null?excludeTagMap.get("tags"):"")+"tags_ft");
+				queryParam.addParam("f.tags_ft.facet.mincount", "0");
+			}
+			if(facetSet.contains("category_ft")){
+				queryParam.addParam("facet.field",(excludeTagMap.get("category")!=null?excludeTagMap.get("category"):"")+"category_ft");
+				queryParam.addParam("f.category_ft.facet.mincount", "0");
+			}
+			if(facetSet.contains("rest_name_ft")){
+				queryParam.addParam("facet.field",(excludeTagMap.get("rest_name")!=null?excludeTagMap.get("rest_name"):"")+"rest_name_ft");
+				queryParam.addParam("f.rest_name_ft.facet.mincount", "0");
+			}
+			if(facetSet.contains("locality_area_ft")){
+				queryParam.addParam("facet.field",(excludeTagMap.get("locationArea")!=null?excludeTagMap.get("locationArea"):"")+"locality_area_ft");
+			}
+			if(facetSet.contains("datatype_ft")){
+				queryParam.addParam("facet.field",(excludeTagMap.get("datatype")!=null?excludeTagMap.get("datatype"):"")+"datatype_ft");
+			}
 
 			if(facetSet.contains("price")){
 				queryParam.addParam("facet.query", (excludeTagMap.get("price")!=null?excludeTagMap.get("price"):"") + "price:[0 TO 500]");
@@ -362,7 +381,7 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 		}
 		return sortApplied;
 	}
-	
+
 	private void handleNumberOfDinersFilters(QueryParam queryParam, DOTicketSearchRequest request, Map<String, String> excludeTagMap) throws SearchException {
 		if(request.getBydinerCount()!=null && request.getBydinerCount().length>0){
 			StringBuilder dinerCountFacetQr = new StringBuilder();
@@ -470,7 +489,7 @@ public class DOTicketQueryCreator extends DOAbstractQueryCreator {
 	private void setQueryParser(QueryParam queryParam,DOTicketSearchRequest req, Map<String, ArrayList<String>> nerMap){
 		queryParam.addParam("defType","edismax");
 		if(req.isSearchExecuted()){
-			String query = nerMap.size()>0?nerMap.get(Constants.PROCESSED_QUERY).get(0).trim():req.getSearchname();
+			String query = req.getSearchname();
 			String[] tokens = query.split(" ");
 			queryParam.addParam("mm", tokens.length+"");
 		}

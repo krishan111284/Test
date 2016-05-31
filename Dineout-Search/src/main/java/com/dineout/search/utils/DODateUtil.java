@@ -101,7 +101,7 @@ public class DODateUtil {
 		int dayOfWeek;
 		if(endDate.compareTo(startDate)==0){
 			dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-			days.add(dayOfWeek);
+			days.add(dayOfWeek-1);
 			dates.add(startDate);
 		}
 		else{
@@ -110,7 +110,7 @@ public class DODateUtil {
 				Date result = calendar.getTime();
 				dates.add(result);
 				dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-				days.add(dayOfWeek);
+				days.add(dayOfWeek-1);
 				calendar.add(Calendar.DATE, 1);
 			}
 		}
