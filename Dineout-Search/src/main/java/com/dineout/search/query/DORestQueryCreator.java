@@ -53,35 +53,6 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		}
 	}
 
-	public QueryParam getSearchQuery(DORestSearchRequest req, Map<String, ArrayList<String>> nerMap) throws SearchException {
-		String queryString = null;
-		QueryParam queryParam = new QueryParam();
-		Map<String,String> excludeTagMap = new HashMap<String,String>();
-		initializeQueryCreator(req, queryParam, req.getEstfl(),rb.getString("dineout.search.fl"));
-		queryString = !StringUtils.isBlank(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY;
-		queryParam.addParam("q", queryString);
-		setQueryParser(queryParam, req,nerMap);
-		//handleGroupRequest(queryParam,req); TODO: Field to be shared
-		applyFilters(queryParam, req, excludeTagMap);
-		handleNerEntity(queryParam, nerMap, req);
-		handleFacetingRequest(queryParam, req, excludeTagMap);
-		if(req.getOldModel()!=null && req.getOldModel().equalsIgnoreCase("true"))
-			applyOldGlobalBoosts(queryParam, req);
-		else if(req.isSpatialQuery())
-			applySpatialGlobalBoosts(queryParam,req);
-		else
-			applyGlobalBoosts(queryParam,req);	
-		if(req.isSpatialQuery() || req.isEntitySpatialQuery()){
-			handleSpatialSortingRequest(queryParam,req);
-		}else{
-			handleSortingRequest(queryParam,req);
-		}
-		if(Constants.IS_HL_TRUE.equals(req.getEsthl())){
-			setHlParams(queryParam, req.getEsthlfl(),req.getSearchname());
-		}
-		return queryParam;
-	}
-
 	private void applyEucledianDistanceSimilarity(QueryParam queryParam, RecommendationRequest req, Map<String, Object> featureMap) {
 		double f1 = (Double) featureMap.get("feature1");
 		double f2 = (Double) featureMap.get("feature2");
@@ -108,6 +79,43 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		queryParam.addParam("fl",sb.toString());
 	}
 
+	public QueryParam getSearchQuery(DORestSearchRequest req, Map<String, ArrayList<String>> nerMap) throws SearchException {
+		String queryString = null;
+		QueryParam queryParam = new QueryParam();
+		Map<String,String> excludeTagMap = new HashMap<String,String>();
+		initializeQueryCreator(req, queryParam, req.getEstfl(),rb.getString("dineout.search.fl"));
+		queryString = !StringUtils.isBlank(req.getSearchname()) ? req.getSearchname():Constants.WILD_SEARCH_QUERY;
+		queryParam.addParam("q", queryString);
+		setQueryParser(queryParam, req,nerMap);
+		//handleGroupRequest(queryParam,req); TODO: Field to be shared
+		applyFilters(queryParam, req, excludeTagMap);
+		handleNerEntity(queryParam, nerMap, req);
+		handleFacetingRequest(queryParam, req, excludeTagMap);
+
+		if((req.getBycuisine()!=null && req.getBycuisine().length>0 && req.isSpatialQuery()) || 
+				req.getBycuisine()!=null && req.getBycuisine().length>0){
+			applyCuisineBoost(queryParam,req);
+		}
+		else if(req.isSpatialQuery())
+			applySpatialGlobalBoosts(queryParam,req);
+		else
+			applyGlobalBoosts(queryParam,req);	
+		if(req.isSpatialQuery() || req.isEntitySpatialQuery()){
+			handleSpatialSortingRequest(queryParam,req);
+		}else{
+			handleSortingRequest(queryParam,req);
+		}
+		if(Constants.IS_HL_TRUE.equals(req.getEsthl())){
+			setHlParams(queryParam, req.getEsthlfl(),req.getSearchname());
+		}
+		return queryParam;
+	}
+
+	private void applyCuisineBoost(QueryParam queryParam, DORestSearchRequest req) {
+		queryParam.addParam("bf", "product(scale(booking_last_90,1,5),0.20)");
+		queryParam.addParam("bf", "product(sum(avg_rating,1),0.30)");
+	}
+
 	private void applyGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
 		queryParam.addParam("boost", "product(scale(booking_last_7,1,5),0.45)");
 		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
@@ -119,12 +127,6 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 		queryParam.addParam("boost", "product(scale(booking_last_7,1,5),0.45)");
 		queryParam.addParam("boost", "product(scale(booking_last_90,1,5),0.40)");
 		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
-	}
-
-	private void applyOldGlobalBoosts(QueryParam queryParam, DORestSearchRequest req) {
-		queryParam.addParam("boost", "product(scale(booking_count,1,5),0.35)");
-		queryParam.addParam("boost", "product(sum(avg_rating,1),0.30)");
-		queryParam.addParam("boost", "if(exists(rank),product(div(sub(11,rank),2),0.15),0.01)");
 	}
 
 	private void applyFilters(QueryParam queryParam,DORestSearchRequest req,Map<String, String> excludeTagMap) throws SearchException{
@@ -244,8 +246,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 
 	private void applyCuisineBoosts(QueryParam queryParam,Map<String, ArrayList<String>> nerMap) {
 		for(String childCuisine:nerMap.get(Constants.NER_CUISINE_KEY)){
-			queryParam.addParam("bq", "(primary_cuisine_ft:"+childCuisine+")^40000");
-			queryParam.addParam("bq", "(secondary_cuisine_ft:"+childCuisine+")^10000");	
+			queryParam.addParam("bq", "(primary_cuisine_ft:"+childCuisine+")^400000");	
 		}
 	}
 
@@ -531,7 +532,7 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			StringBuilder secondaryCuisineFacetQr = new StringBuilder();
 			String cuisineFacetQrStr = null;
 			String primaryCuisineFacetQrStr = null;
-			String secondaryCuisineFacetQrStr = null;
+			//String secondaryCuisineFacetQrStr = null;
 			for(String cuisine:restSearchReq.getBycuisine()){
 				cuisine.replaceAll("~","/");
 				cuisineFacetQr.append("cuisine_ft:"+"\""+cuisine+"\"").append(" OR ");
@@ -540,10 +541,10 @@ public class DORestQueryCreator extends DOAbstractQueryCreator {
 			}
 			cuisineFacetQrStr = cuisineFacetQr.substring(0,cuisineFacetQr.lastIndexOf(" OR "));
 			primaryCuisineFacetQrStr = primaryCuisineFacetQr.substring(0,primaryCuisineFacetQr.lastIndexOf(" OR "));
-			secondaryCuisineFacetQrStr = secondaryCuisineFacetQr.substring(0,secondaryCuisineFacetQr.lastIndexOf(" OR "));
+			//secondaryCuisineFacetQrStr = secondaryCuisineFacetQr.substring(0,secondaryCuisineFacetQr.lastIndexOf(" OR "));
 			//to give extra boost to primary cuisine when applying filter
-			queryParam.addParam("bq", "("+primaryCuisineFacetQrStr+")^40000");
-			queryParam.addParam("bq", "("+secondaryCuisineFacetQrStr+")^10000");	
+			queryParam.addParam("bq", "("+primaryCuisineFacetQrStr+")^400000");
+			//queryParam.addParam("bq", "("+secondaryCuisineFacetQrStr+")^10000");	
 
 			queryParam.addParam("fq", "{!tag=cuisine_ft_tag}("+cuisineFacetQrStr.toString()+")");
 			excludeTagMap.put("cuisine", "{!ex=cuisine_ft_tag}");
